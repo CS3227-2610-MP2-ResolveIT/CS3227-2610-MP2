@@ -1,0 +1,4 @@
+interface:
+  display_name: "AI Interaction Logging"
+  short_description: "Summarize verified AI development sessions"
+  default_prompt: "Use $logging to summarize this AI-assisted development session."

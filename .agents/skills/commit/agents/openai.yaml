@@ -1,0 +1,4 @@
+interface:
+  display_name: "Semantic Commit"
+  short_description: "Group and commit changes safely"
+  default_prompt: "Use $commit to group and commit these changes safely."
