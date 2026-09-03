@@ -118,7 +118,7 @@ class UserApiIntegrationTest {
                 .andExpect(status().isOk())
                 .andReturn();
         return new tools.jackson.databind.ObjectMapper().readTree(result.getResponse().getContentAsString())
-                .get("accessToken").asText();
+                .get("accessToken").asString();
     }
 
     private static Path createDatabasePath() {
