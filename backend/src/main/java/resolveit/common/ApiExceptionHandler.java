@@ -4,6 +4,7 @@ import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -38,6 +39,12 @@ public class ApiExceptionHandler {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     ResponseEntity<ApiError> invalidParameter() {
         return ResponseEntity.badRequest().body(new ApiError(400, "INVALID_PARAMETER", "A request parameter is invalid."));
+    }
+
+    @ExceptionHandler(ObjectOptimisticLockingFailureException.class)
+    ResponseEntity<ApiError> optimisticLock() {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ApiError(409, "TICKET_VERSION_CONFLICT", "The ticket was modified by another request."));
     }
 
     @ExceptionHandler(Exception.class)
