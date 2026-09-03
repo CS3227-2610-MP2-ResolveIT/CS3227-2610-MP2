@@ -84,7 +84,9 @@ Rules:
 
 ## 4. Core data model
 
-All application timestamps represent UTC instants. Because SQLite has no native time-zone-aware timestamp type, migrations must store them in a consistently sortable UTC representation supported by the chosen JPA mapping.
+All application timestamps represent UTC instants. Because SQLite has no native time-zone-aware timestamp type, the database schema must store them in a consistently sortable UTC representation supported by the chosen JPA mapping.
+
+For the MVP, keep the database definition in a version-controlled `schema.sql` file and let Spring SQL initialization create a new SQLite database. Configure Hibernate to validate the schema rather than generate or update it automatically. Upgrading an existing database between schema versions is outside the MVP;
 
 ### `users`
 
@@ -411,7 +413,7 @@ At minimum, automated tests must cover:
 The MVP is complete when:
 
 - All components build and run on Java 25.
-- Flyway migrations create a working SQLite database from an empty state.
+- The version-controlled `schema.sql` creates a working SQLite database from an empty state, and Hibernate validates it at startup.
 - Users can sign in, refresh their session, and sign out securely.
 - Employees can submit, edit, view, comment on, cancel, and reopen their own tickets according to the workflow.
 - Technicians can take, update, comment on, add internal notes to, and resolve tickets.
