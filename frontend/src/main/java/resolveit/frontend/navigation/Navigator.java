@@ -8,6 +8,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import resolveit.frontend.auth.AuthService;
 import resolveit.frontend.session.SessionState;
+import resolveit.frontend.ticket.EmployeeTicketService;
 import resolveit.frontend.ui.AuthenticatedController;
 import resolveit.frontend.ui.LoginController;
 
@@ -16,12 +17,14 @@ public final class Navigator {
 
     private final Stage stage;
     private final AuthService authService;
+    private final EmployeeTicketService ticketService;
     private final SessionState session;
     private ViewLifecycle activeController;
 
-    public Navigator(Stage stage, AuthService authService, SessionState session) {
+    public Navigator(Stage stage, AuthService authService, EmployeeTicketService ticketService, SessionState session) {
         this.stage = stage;
         this.authService = authService;
+        this.ticketService = ticketService;
         this.session = session;
     }
 
@@ -41,7 +44,7 @@ public final class Navigator {
         }
         show("/resolveit/frontend/views/authenticated.fxml", type -> {
             if (type == AuthenticatedController.class) {
-                return new AuthenticatedController(session, this);
+                return new AuthenticatedController(session, ticketService, this);
             }
             throw new IllegalArgumentException("Unsupported FXML controller: " + type.getName());
         });

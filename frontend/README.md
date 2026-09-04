@@ -1,6 +1,17 @@
 # ResolveIT frontend
 
-ResolveIT's desktop client is a Java 25 and JavaFX 25 application. This first frontend increment provides sign-in against the existing backend and a small authenticated welcome screen.
+ResolveIT's desktop client is a Java 25 and JavaFX 25 application. The current frontend increment provides sign-in and the employee ticket workspace described in `PROJECT.md`.
+
+Employees can:
+
+- View their own tickets and filter them by status.
+- Submit a ticket with category and priority validation.
+- Open ticket details and refresh the latest state.
+- Edit an open, unassigned ticket with optimistic-lock conflict recovery.
+- Add public comments.
+- Cancel an open or in-progress ticket and reopen a resolved ticket.
+
+Ticket requests run away from the JavaFX Application Thread. In-progress actions display a loading indicator and prevent duplicate submissions, and authentication, authorization, validation, conflict, connection, and server failures are surfaced in the relevant view.
 
 ## Prerequisites
 
@@ -44,4 +55,4 @@ Use HTTPS outside local development. The access token and signed-in user are ret
 ./gradlew build
 ```
 
-Tests cover client-side validation, configuration, session lifecycle, request/response mapping, and authentication failure handling. The backend does not yet expose the refresh and logout endpoints described by `PROJECT.md`, so sign-out in this increment clears only the local in-memory session.
+Tests cover client-side validation, configuration, session lifecycle, authentication and ticket request/response mapping, failure handling, and employee-workspace FXML wiring. The backend does not yet expose the refresh and logout endpoints described by `PROJECT.md`, so sign-out in this increment clears only the local in-memory session.

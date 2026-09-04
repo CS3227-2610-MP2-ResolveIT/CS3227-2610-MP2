@@ -36,4 +36,5 @@ application {
 tasks.named('test') {
     useJUnitPlatform()
     jvmArgs '--add-modules', 'jdk.httpserver'
+    jvmArgs '--enable-native-access=ALL-UNNAMED'
 }

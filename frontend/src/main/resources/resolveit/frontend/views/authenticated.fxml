@@ -2,46 +2,273 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane minHeight="620.0" minWidth="900.0" prefHeight="720.0" prefWidth="1120.0"
-            styleClass="shell-background" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane minHeight="620.0" minWidth="900.0" prefHeight="760.0" prefWidth="1200.0"
+            styleClass="shell-background" xmlns="http://javafx.com/javafx/25"
+            xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="resolveit.frontend.ui.AuthenticatedController">
     <top>
         <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="shell-header">
-            <padding><Insets bottom="18.0" left="34.0" right="34.0" top="18.0" /></padding>
+            <padding><Insets bottom="16.0" left="24.0" right="24.0" top="16.0" /></padding>
             <StackPane minHeight="38.0" minWidth="38.0" prefHeight="38.0" prefWidth="38.0" styleClass="shell-logo">
                 <Label text="R" styleClass="shell-logo-text" />
             </StackPane>
             <Label text="ResolveIT" styleClass="shell-brand-name" />
+            <Label text="Employee portal" styleClass="portal-label" />
             <Region HBox.hgrow="ALWAYS" />
+            <VBox alignment="CENTER_RIGHT" spacing="1.0">
+                <Label fx:id="userNameLabel" styleClass="user-name" />
+                <Label fx:id="userRoleLabel" styleClass="user-role" />
+            </VBox>
+            <StackPane minHeight="38.0" minWidth="38.0" prefHeight="38.0" prefWidth="38.0" styleClass="header-avatar">
+                <Label fx:id="avatarLabel" styleClass="header-avatar-text" />
+            </StackPane>
             <Button accessibleText="Sign out of ResolveIT" mnemonicParsing="true" onAction="#logout"
                     text="Sign _out" styleClass="secondary-button" />
         </HBox>
     </top>
+    <left>
+        <VBox minWidth="218.0" prefWidth="218.0" spacing="8.0" styleClass="sidebar">
+            <padding><Insets bottom="24.0" left="16.0" right="16.0" top="28.0" /></padding>
+            <Label text="WORKSPACE" styleClass="nav-section-label" />
+            <Button fx:id="myTicketsNavButton" accessibleText="Open My Tickets" maxWidth="Infinity"
+                    mnemonicParsing="true" onAction="#showMyTickets" text="▤  _My Tickets" styleClass="nav-button" />
+            <Button fx:id="submitNavButton" accessibleText="Open Submit Ticket" maxWidth="Infinity"
+                    mnemonicParsing="true" onAction="#showSubmitTicket" text="＋  _Submit Ticket" styleClass="nav-button" />
+            <Region VBox.vgrow="ALWAYS" />
+        </VBox>
+    </left>
     <center>
         <StackPane>
-            <padding><Insets bottom="56.0" left="56.0" right="56.0" top="56.0" /></padding>
-            <VBox alignment="CENTER" maxWidth="600.0" spacing="22.0" styleClass="welcome-card">
-                <padding><Insets bottom="52.0" left="56.0" right="56.0" top="52.0" /></padding>
-                <Label text="Signed in successfully" styleClass="eyebrow" />
-                <StackPane minHeight="86.0" minWidth="86.0" prefHeight="86.0" prefWidth="86.0"
-                           styleClass="avatar">
-                    <Label fx:id="avatarLabel" styleClass="avatar-text" />
-                </StackPane>
-                <VBox alignment="CENTER" spacing="7.0">
-                    <Label fx:id="welcomeLabel" styleClass="welcome-heading" />
-                    <Label fx:id="emailLabel" styleClass="welcome-email" />
-                    <Label fx:id="roleLabel" styleClass="role-pill" />
+            <padding><Insets bottom="30.0" left="34.0" right="34.0" top="30.0" /></padding>
+
+            <StackPane fx:id="myTicketsPage">
+                <VBox spacing="18.0">
+                    <HBox alignment="CENTER_LEFT">
+                        <VBox spacing="5.0">
+                            <Label text="My Tickets" styleClass="workspace-heading" />
+                            <Label text="Track your requests and open a ticket to see its full history."
+                                   styleClass="workspace-description" />
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button mnemonicParsing="true" onAction="#showSubmitTicket" text="＋  _New ticket"
+                                styleClass="primary-button workspace-button" />
+                    </HBox>
+                    <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="toolbar">
+                        <Label text="Status" styleClass="field-label" />
+                        <ComboBox fx:id="statusFilter" prefWidth="170.0" accessibleText="Filter tickets by status" />
+                        <Button fx:id="refreshTicketsButton" mnemonicParsing="true" onAction="#refreshTickets"
+                                text="↻  _Refresh" styleClass="secondary-button compact-button" />
+                        <ProgressIndicator fx:id="ticketsProgress" maxHeight="22.0" maxWidth="22.0"
+                                           visible="false" managed="false" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="ticketCountLabel" text="0 tickets" styleClass="count-label" />
+                    </HBox>
+                    <Label fx:id="ticketsErrorLabel" wrapText="true" styleClass="form-error" />
+                    <TableView fx:id="ticketsTable" VBox.vgrow="ALWAYS" accessibleText="Your support tickets">
+                        <placeholder><Label text="No tickets match this filter." styleClass="empty-label" /></placeholder>
+                        <columns>
+                            <TableColumn fx:id="numberColumn" prefWidth="145.0" text="Ticket" />
+                            <TableColumn fx:id="subjectColumn" minWidth="230.0" prefWidth="310.0" text="Subject" />
+                            <TableColumn fx:id="categoryColumn" prefWidth="130.0" text="Category" />
+                            <TableColumn fx:id="priorityColumn" prefWidth="100.0" text="Priority" />
+                            <TableColumn fx:id="statusColumn" prefWidth="125.0" text="Status" />
+                            <TableColumn fx:id="updatedColumn" minWidth="170.0" prefWidth="185.0" text="Last updated" />
+                        </columns>
+                    </TableView>
+                    <HBox alignment="CENTER_LEFT" spacing="9.0">
+                        <Label text="Double-click a row or press Enter to view details." styleClass="hint-label" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button fx:id="previousTicketsButton" mnemonicParsing="true" onAction="#previousTicketPage"
+                                text="←  _Previous" styleClass="secondary-button compact-button" />
+                        <Label fx:id="ticketPageLabel" text="Page 0 of 0" styleClass="count-label" />
+                        <Button fx:id="nextTicketsButton" mnemonicParsing="true" onAction="#nextTicketPage"
+                                text="_Next  →" styleClass="secondary-button compact-button" />
+                    </HBox>
                 </VBox>
-                <Label alignment="CENTER" text="Your workspace is ready. Ticket navigation will be added in the next frontend increment."
-                       textAlignment="CENTER" wrapText="true" styleClass="welcome-description" />
-            </VBox>
+            </StackPane>
+
+            <StackPane fx:id="submitTicketPage" visible="false" managed="false">
+                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="transparent-scroll">
+                    <VBox maxWidth="760.0" spacing="20.0">
+                        <VBox spacing="5.0">
+                            <Label text="Submit a Ticket" styleClass="workspace-heading" />
+                            <Label text="Tell IT what is happening and how it affects your work."
+                                   styleClass="workspace-description" />
+                        </VBox>
+                        <VBox spacing="18.0" styleClass="content-card">
+                            <VBox spacing="7.0">
+                                <Label text="Subject" styleClass="field-label" labelFor="$createSubjectField" />
+                                <TextField fx:id="createSubjectField" prefHeight="42.0" promptText="Briefly describe the issue"
+                                           accessibleHelp="Enter between 5 and 200 characters." />
+                                <Label fx:id="createSubjectError" styleClass="field-error" />
+                            </VBox>
+                            <VBox spacing="7.0">
+                                <Label text="Description" styleClass="field-label" labelFor="$createDescriptionField" />
+                                <TextArea fx:id="createDescriptionField" prefHeight="180.0" wrapText="true"
+                                          promptText="What happened? What did you expect? What have you already tried?"
+                                          accessibleHelp="Enter between 10 and 10000 characters." />
+                                <Label fx:id="createDescriptionError" styleClass="field-error" />
+                            </VBox>
+                            <HBox spacing="18.0">
+                                <VBox spacing="7.0" HBox.hgrow="ALWAYS">
+                                    <Label text="Category" styleClass="field-label" labelFor="$createCategoryField" />
+                                    <ComboBox fx:id="createCategoryField" maxWidth="Infinity" promptText="Choose a category" />
+                                    <Label fx:id="createCategoryError" styleClass="field-error" />
+                                </VBox>
+                                <VBox spacing="7.0" HBox.hgrow="ALWAYS">
+                                    <Label text="Priority" styleClass="field-label" labelFor="$createPriorityField" />
+                                    <ComboBox fx:id="createPriorityField" maxWidth="Infinity" />
+                                    <Label fx:id="createPriorityError" styleClass="field-error" />
+                                </VBox>
+                            </HBox>
+                            <Label fx:id="createFormError" wrapText="true" styleClass="form-error" />
+                            <Label fx:id="createSuccessLabel" wrapText="true" styleClass="success-message" />
+                            <HBox alignment="CENTER_RIGHT" spacing="12.0">
+                                <ProgressIndicator fx:id="createProgress" maxHeight="24.0" maxWidth="24.0"
+                                                   visible="false" managed="false" />
+                                <Button mnemonicParsing="true" onAction="#showMyTickets" text="_Cancel"
+                                        styleClass="secondary-button workspace-button" />
+                                <Button fx:id="createTicketButton" defaultButton="true" mnemonicParsing="true"
+                                        onAction="#submitTicket" text="_Submit ticket"
+                                        styleClass="primary-button workspace-button" />
+                            </HBox>
+                        </VBox>
+                    </VBox>
+                </ScrollPane>
+            </StackPane>
+
+            <StackPane fx:id="ticketDetailsPage" visible="false" managed="false">
+                <VBox spacing="16.0">
+                    <HBox alignment="CENTER_LEFT" spacing="12.0">
+                        <Button mnemonicParsing="true" onAction="#showMyTickets" text="←  _Back"
+                                styleClass="secondary-button compact-button" />
+                        <VBox spacing="3.0">
+                            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                <Label fx:id="detailNumberLabel" text="Ticket details" styleClass="workspace-heading" />
+                                <Label fx:id="detailStatusLabel" styleClass="status-pill" />
+                            </HBox>
+                            <Label text="Ticket details and public conversation" styleClass="workspace-description" />
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <ProgressIndicator fx:id="detailProgress" maxHeight="23.0" maxWidth="23.0"
+                                           visible="false" managed="false" />
+                        <Button fx:id="refreshDetailButton" mnemonicParsing="true" onAction="#refreshDetails"
+                                text="↻  _Refresh" styleClass="secondary-button compact-button" />
+                    </HBox>
+                    <Label fx:id="detailErrorLabel" wrapText="true" styleClass="form-error" />
+                    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS" styleClass="transparent-scroll">
+                        <VBox fx:id="detailContent" spacing="18.0" visible="false" managed="false">
+                            <VBox spacing="18.0" styleClass="content-card">
+                                <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                    <Label text="Request" styleClass="card-heading" />
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <Button fx:id="editButton" mnemonicParsing="true" onAction="#beginEdit"
+                                            text="✎  _Edit" styleClass="secondary-button compact-button" />
+                                    <Button fx:id="cancelActionButton" mnemonicParsing="true" onAction="#cancelTicket"
+                                            text="_Cancel ticket" styleClass="danger-button compact-button" />
+                                    <Button fx:id="reopenActionButton" mnemonicParsing="true" onAction="#reopenTicket"
+                                            text="_Reopen ticket" styleClass="primary-button compact-button" />
+                                </HBox>
+                                <VBox fx:id="detailReadOnly" spacing="18.0">
+                                    <VBox spacing="5.0">
+                                        <Label text="SUBJECT" styleClass="detail-key" />
+                                        <Label fx:id="detailSubjectLabel" wrapText="true" styleClass="detail-title" />
+                                    </VBox>
+                                    <VBox spacing="5.0">
+                                        <Label text="DESCRIPTION" styleClass="detail-key" />
+                                        <Label fx:id="detailDescriptionLabel" wrapText="true" styleClass="detail-value" />
+                                    </VBox>
+                                    <Separator />
+                                    <GridPane hgap="36.0" vgap="14.0">
+                                        <columnConstraints>
+                                            <ColumnConstraints percentWidth="50.0" />
+                                            <ColumnConstraints percentWidth="50.0" />
+                                        </columnConstraints>
+                                        <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                            <Label text="CATEGORY" styleClass="detail-key" />
+                                            <Label fx:id="detailCategoryLabel" styleClass="detail-value" />
+                                        </VBox>
+                                        <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                            <Label text="PRIORITY" styleClass="detail-key" />
+                                            <Label fx:id="detailPriorityLabel" styleClass="detail-value" />
+                                        </VBox>
+                                        <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                            <Label text="ASSIGNEE" styleClass="detail-key" />
+                                            <Label fx:id="detailAssigneeLabel" styleClass="detail-value" />
+                                        </VBox>
+                                        <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                            <Label text="CREATED" styleClass="detail-key" />
+                                            <Label fx:id="detailCreatedLabel" styleClass="detail-value" />
+                                        </VBox>
+                                    </GridPane>
+                                    <VBox fx:id="resolutionBox" spacing="5.0" visible="false" managed="false"
+                                          styleClass="resolution-box">
+                                        <Label text="RESOLUTION" styleClass="detail-key" />
+                                        <Label fx:id="resolutionLabel" wrapText="true" styleClass="detail-value" />
+                                    </VBox>
+                                </VBox>
+                                <VBox fx:id="editForm" spacing="14.0" visible="false" managed="false">
+                                    <VBox spacing="6.0">
+                                        <Label text="Subject" styleClass="field-label" labelFor="$editSubjectField" />
+                                        <TextField fx:id="editSubjectField" />
+                                    </VBox>
+                                    <VBox spacing="6.0">
+                                        <Label text="Description" styleClass="field-label" labelFor="$editDescriptionField" />
+                                        <TextArea fx:id="editDescriptionField" prefHeight="150.0" wrapText="true" />
+                                    </VBox>
+                                    <HBox spacing="14.0">
+                                        <ComboBox fx:id="editCategoryField" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
+                                        <ComboBox fx:id="editPriorityField" maxWidth="Infinity" HBox.hgrow="ALWAYS" />
+                                    </HBox>
+                                    <Label fx:id="editValidationLabel" styleClass="field-error" />
+                                    <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                                        <Button mnemonicParsing="true" onAction="#discardEdit" text="_Discard"
+                                                styleClass="secondary-button compact-button" />
+                                        <Button fx:id="saveEditButton" defaultButton="true" mnemonicParsing="true"
+                                                onAction="#saveEdit" text="_Save changes"
+                                                styleClass="primary-button compact-button" />
+                                    </HBox>
+                                </VBox>
+                            </VBox>
+
+                            <VBox spacing="14.0" styleClass="content-card">
+                                <Label text="Public comments" styleClass="card-heading" />
+                                <ListView fx:id="messagesList" prefHeight="270.0" accessibleText="Public ticket comments">
+                                    <placeholder><Label text="No comments yet." styleClass="empty-label" /></placeholder>
+                                </ListView>
+                                <VBox spacing="7.0">
+                                    <Label text="Add a comment" styleClass="field-label" labelFor="$commentField" />
+                                    <TextArea fx:id="commentField" prefHeight="100.0" wrapText="true"
+                                              promptText="Share an update or answer a question from IT…" />
+                                    <Label fx:id="commentErrorLabel" wrapText="true" styleClass="field-error" />
+                                    <HBox alignment="CENTER_RIGHT">
+                                        <Button fx:id="addCommentButton" mnemonicParsing="true" onAction="#addComment"
+                                                text="_Post comment" styleClass="primary-button workspace-button" />
+                                    </HBox>
+                                </VBox>
+                            </VBox>
+                        </VBox>
+                    </ScrollPane>
+                </VBox>
+            </StackPane>
         </StackPane>
     </center>
 </BorderPane>
