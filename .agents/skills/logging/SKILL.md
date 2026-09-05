@@ -1,6 +1,6 @@
 ---
 name: logging
-description: Summarize AI-assisted development interactions for the CS3227 MP1 project, asking targeted questions when needed for an accurate log or reflection. Use when the user asks to log a session, record prompts and decisions, verify an interaction summary, or extract reflection points for docs/Reflections.md. Do not use for Java application runtime logging such as Log4j, SLF4J, or java.util.logging.
+description: Summarize AI-assisted development interactions for the CS3227 MP2 project, asking targeted questions when needed for an accurate log or reflection. Use when the user asks to log a session, record prompts and decisions, verify an interaction summary, or extract reflection points for docs/Reflections.md. Do not use for Java application runtime logging such as Log4j, SLF4J, or java.util.logging.
 ---
 
 # Logging
@@ -9,7 +9,7 @@ Maintain accurate summaries of AI-assisted development work in the repository's 
 
 Before logging:
 
-- Read `AGENTS.md` and `specs/MP1-requirements.md` for every session in this repository. The requirements explain why these logs exist: to support reflection on AI-assisted SE and at least three explained prompt examples in `docs/Reflections.md`.
+- Read `AGENTS.md`, `PROJECT.md`, and `docs/MP2-requirements.md` for every session in this repository. These documents explain the ResolveIT requirements and why these logs exist: to support reflection on basic Agentic SE and at least three explained skills in `docs/Reflections.md`.
 - Inspect existing files in `logs/` and follow their naming conventions.
 - Do not overwrite an existing log without inspecting it first.
 

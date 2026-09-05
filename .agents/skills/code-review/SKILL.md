@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: Review an implemented MoneyMap change after testing and documentation updates; report actionable findings and whether follow-up skills must run.
+description: Review an implemented ResolveIT change after testing and documentation updates; report actionable findings and whether follow-up work must run.
 ---
 
 # Code review
@@ -19,8 +19,8 @@ branch, or repository evidence, report `BLOCKED` and ask for it.
 ## Truth and gates
 
 Use this order: verified behaviour/evidence, approved issue and acceptance
-criteria, `specs/ProductSpecification.md`, `specs/MP1-requirements.md`, current
-guides, then textbook guidance. Project sources define behaviour.
+criteria, `PROJECT.md`, `docs/MP2-requirements.md`, current guides, then textbook
+guidance. Project sources define behaviour.
 
 Use Codex's native todo/plan facility to create one item for every applicable
 review check. Mark an item complete only after obtaining evidence; do not
@@ -89,8 +89,8 @@ Report all four explicitly:
 - `Rerun write-code skill: YES` for implementation defects, unmet criteria,
   broken behaviour, data-loss/security risk, serious regression, or code-level
   defensive/design fixes; otherwise `NO`.
-- `Rerun update-documentation skill: YES` for stale/missing docs, diagrams,
-  commands, examples, or user claims; `AFTER CODE FIX` when code changes first;
+- `Edit documentation: YES` for stale/missing docs, diagrams, commands,
+  examples, or user claims; `AFTER CODE FIX` when code changes first;
   otherwise `NO`.
 - `Rerun code-review skill: AFTER FOLLOW-UP WORK` after relevant code, tests, or
   documentation changes; otherwise `NO`.

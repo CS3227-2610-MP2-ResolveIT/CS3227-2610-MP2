@@ -31,7 +31,7 @@ Keep IDs across reruns. Valid statuses are `Open`, `Accepted`, `In progress`,
 
 ## Next actions
 - Rerun write-code skill: YES | NO
-- Rerun update-documentation skill: YES | NO | AFTER CODE FIX
+- Edit documentation: YES | NO | AFTER CODE FIX
 - Rerun code-review skill: YES | NO | AFTER FOLLOW-UP WORK
 - Reason:
 

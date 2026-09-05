@@ -35,8 +35,8 @@ Use the relevant sections; do not demand every principle mechanically.
 Compare code and observed behaviour with the User Guide, Developer Guide,
 manual-testing appendix, commands, examples, diagrams, error claims, feature
 status, and release status. Classify each affected claim as verified, stale,
-inaccurate, incomplete, or not verifiable. Do not edit; route to
-`update-documentation`.
+inaccurate, incomplete, or not verifiable. Do not edit; route to the
+documentation workflow for follow-up.
 
 These criteria follow the CS2103/T guidance on [code quality], [quality
 assurance], [testing], [test design], [architecture], [principles],
