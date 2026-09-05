@@ -1,0 +1,29 @@
+spring:
+  application:
+    name: resolveit-backend
+  datasource:
+    url: jdbc:sqlite:${RESOLVEIT_DB_PATH:resolveit.db}?foreign_keys=on
+    driver-class-name: org.sqlite.JDBC
+    hikari:
+      maximum-pool-size: 1
+  sql:
+    init:
+      mode: always
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.community.dialect.SQLiteDialect
+
+server:
+  error:
+    include-message: never
+    include-stacktrace: never
+
+resolveit:
+  jwt:
+    issuer: resolveit-backend
+    access-token-ttl: 15m
+    secret: ${RESOLVEIT_JWT_SECRET:VGhpcy1pcy1hLWxvY2FsLWRldmVsb3BtZW50LWtleS1mb3ItUmVzb2x2ZUlULQ==}

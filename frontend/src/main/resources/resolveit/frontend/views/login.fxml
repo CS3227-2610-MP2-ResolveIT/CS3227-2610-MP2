@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+
+<GridPane fx:id="loginRoot" minHeight="620.0" minWidth="900.0" prefHeight="720.0" prefWidth="1120.0"
+          styleClass="app-background" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1"
+          fx:controller="resolveit.frontend.ui.LoginController">
+    <columnConstraints>
+        <ColumnConstraints percentWidth="44.0" />
+        <ColumnConstraints percentWidth="56.0" />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints percentHeight="100.0" />
+    </rowConstraints>
+
+    <VBox GridPane.columnIndex="0" alignment="CENTER_LEFT" fillWidth="true" spacing="26.0" styleClass="brand-panel">
+        <padding><Insets bottom="50.0" left="64.0" right="64.0" top="50.0" /></padding>
+        <HBox alignment="CENTER_LEFT" spacing="12.0">
+            <StackPane minHeight="44.0" minWidth="44.0" prefHeight="44.0" prefWidth="44.0" styleClass="brand-logo">
+                <Label text="R" styleClass="brand-logo-text" />
+            </StackPane>
+            <Label text="ResolveIT" styleClass="brand-name" />
+        </HBox>
+
+        <Region VBox.vgrow="ALWAYS" />
+        <VBox spacing="16.0">
+            <Label text="Support that keeps everyone moving." wrapText="true" styleClass="brand-heading" />
+            <Label text="A single place to report issues, follow progress, and get help from your IT team."
+                   wrapText="true" styleClass="brand-description" />
+        </VBox>
+
+        <VBox spacing="14.0">
+            <HBox alignment="CENTER_LEFT" spacing="12.0">
+                <Label text="✓" styleClass="feature-icon" />
+                <Label text="Track requests from report to resolution" wrapText="true" styleClass="feature-text" />
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="12.0">
+                <Label text="✓" styleClass="feature-icon" />
+                <Label text="Keep every update in one clear timeline" wrapText="true" styleClass="feature-text" />
+            </HBox>
+            <HBox alignment="CENTER_LEFT" spacing="12.0">
+                <Label text="✓" styleClass="feature-icon" />
+                <Label text="Connect directly with your support team" wrapText="true" styleClass="feature-text" />
+            </HBox>
+        </VBox>
+        <Region VBox.vgrow="ALWAYS" />
+        <Label text="Internal IT service desk" styleClass="brand-footer" />
+    </VBox>
+
+    <StackPane GridPane.columnIndex="1" styleClass="login-surface">
+        <padding><Insets bottom="48.0" left="64.0" right="64.0" top="48.0" /></padding>
+        <VBox maxWidth="430.0" spacing="28.0" styleClass="login-card">
+            <VBox spacing="8.0">
+                <Label text="Welcome back" styleClass="page-heading" />
+                <Label text="Sign in with your work account to continue." wrapText="true" styleClass="page-description" />
+            </VBox>
+
+            <VBox spacing="18.0">
+                <VBox spacing="7.0">
+                    <Label fx:id="emailLabel" text="Email address" styleClass="field-label" />
+                    <TextField fx:id="emailField" accessibleText="Email address" promptText="you@company.com"
+                               prefHeight="48.0" />
+                    <Label fx:id="emailErrorLabel" accessibleText="Email validation error" text=""
+                           wrapText="true" styleClass="field-error" />
+                </VBox>
+
+                <VBox spacing="7.0">
+                    <Label fx:id="passwordLabel" text="Password" styleClass="field-label" />
+                    <StackPane>
+                        <PasswordField fx:id="passwordField" accessibleText="Password" onAction="#submitLogin"
+                                       prefHeight="48.0" promptText="Enter your password" />
+                        <TextField fx:id="visiblePasswordField" accessibleText="Visible password" onAction="#submitLogin"
+                                   prefHeight="48.0" promptText="Enter your password" />
+                    </StackPane>
+                    <Label fx:id="passwordErrorLabel" accessibleText="Password validation error" text=""
+                           wrapText="true" styleClass="field-error" />
+                    <CheckBox fx:id="showPasswordCheckBox" mnemonicParsing="true" text="Show _password"
+                              styleClass="show-password" />
+                </VBox>
+
+                <Label fx:id="formErrorLabel" accessibleText="Sign-in error" text="" wrapText="true"
+                       styleClass="form-error" />
+
+                <HBox alignment="CENTER_LEFT" spacing="14.0">
+                    <Button fx:id="loginButton" defaultButton="true" mnemonicParsing="true" onAction="#submitLogin"
+                            prefHeight="48.0" maxWidth="1.7976931348623157E308" text="_Sign in"
+                            styleClass="primary-button" HBox.hgrow="ALWAYS" />
+                    <ProgressIndicator fx:id="progressIndicator" accessibleText="Signing in" maxHeight="26.0"
+                                       maxWidth="26.0" minHeight="26.0" minWidth="26.0" visible="false" />
+                </HBox>
+            </VBox>
+
+            <HBox alignment="CENTER_LEFT" spacing="7.0" styleClass="security-note">
+                <Label text="●" styleClass="security-dot" />
+                <Label text="Your session is kept only on this device while ResolveIT is open."
+                       wrapText="true" styleClass="security-text" />
+            </HBox>
+        </VBox>
+    </StackPane>
+</GridPane>

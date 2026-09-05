@@ -1,0 +1,4 @@
+interface:
+  display_name: "Senior Backend Java Engineer"
+  short_description: "Design and deliver production-grade Java backends"
+  default_prompt: "Use $senior-backend-java-engineer to implement this Java backend change with production-grade design and verification."
