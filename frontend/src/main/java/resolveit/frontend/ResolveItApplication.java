@@ -10,6 +10,7 @@ import resolveit.frontend.session.SessionState;
 import resolveit.frontend.ticket.EmployeeTicketService;
 import resolveit.frontend.ticket.HttpTicketClient;
 import resolveit.frontend.ticket.TechnicianTicketService;
+import resolveit.frontend.user.ManagerService;
 
 public final class ResolveItApplication extends Application {
     private HttpAuthClient authClient;
@@ -19,14 +20,16 @@ public final class ResolveItApplication extends Application {
     public void start(Stage stage) {
         var config = AppConfig.fromEnvironment(System.getenv());
         authClient = HttpAuthClient.create(config.apiBaseUrl());
+
         var session = new SessionState();
         ticketClient = HttpTicketClient.create(config.apiBaseUrl(), session);
+
         var authService = new AuthService(authClient, session);
         var ticketService = new EmployeeTicketService(ticketClient);
         var technicianTicketService = new TechnicianTicketService(ticketClient);
-        var navigator = new Navigator(stage, authService, ticketService, technicianTicketService, session);
+        var managerService = new ManagerService(ticketClient);
 
-        navigator.setManagerService(new resolveit.frontend.user.ManagerService(ticketClient));
+        var navigator = new Navigator(stage, authService, ticketService, technicianTicketService, managerService, session);
 
         stage.setTitle("ResolveIT");
         stage.setMinWidth(900);

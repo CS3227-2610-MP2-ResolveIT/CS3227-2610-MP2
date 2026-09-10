@@ -43,12 +43,14 @@ import resolveit.frontend.ticket.TicketMessage;
 import resolveit.frontend.ticket.TicketPriority;
 import resolveit.frontend.ticket.TicketStatus;
 import resolveit.frontend.ticket.TicketValidator;
+import resolveit.frontend.user.ManagerService;
 
 public final class TechnicianController implements ViewLifecycle {
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("d MMM yyyy, h:mm a");
 
     private final SessionState session;
     private final TechnicianTicketService ticketService;
+    private final ManagerService managerService;
     private final Navigator navigator;
     private final Set<CompletableFuture<?>> inFlight = new HashSet<>();
     private Ticket selectedTicket;
@@ -72,7 +74,7 @@ public final class TechnicianController implements ViewLifecycle {
         if (assigneesLoading || disposed) return;
         assigneesLoading = true;
         updateBusyState();
-        run(navigator.managerService().technicians(), users -> {
+        run(managerService.technicians(), users -> {
             assigneesLoading = false;
             assigneeField.setItems(FXCollections.observableArrayList(users));
             updateBusyState();
@@ -80,7 +82,7 @@ public final class TechnicianController implements ViewLifecycle {
     }
     @FXML private void assignTicket() {
         if (selectedTicket == null || actionLoading || assigneeField.getValue() == null) return;
-        mutate(navigator.managerService().assign(selectedTicket.id(), assigneeField.getValue().id()), "Assignment updated.");
+        mutate(managerService.assign(selectedTicket.id(), assigneeField.getValue().id()), "Assignment updated.");
     }
     @FXML private void cancelTicket() {
         if (selectedTicket == null || actionLoading || !confirm("Cancel ticket", "Cancel " + selectedTicket.ticketNumber() + "?", "Cancelled tickets cannot be reopened.")) return;
@@ -143,9 +145,11 @@ public final class TechnicianController implements ViewLifecycle {
     @FXML private Label messageErrorLabel;
     @FXML private Button addMessageButton;
 
-    public TechnicianController(SessionState session, TechnicianTicketService ticketService, Navigator navigator) {
+    public TechnicianController(SessionState session, TechnicianTicketService ticketService,
+                                ManagerService managerService, Navigator navigator) {
         this.session = session;
         this.ticketService = ticketService;
+        this.managerService = managerService;
         this.navigator = navigator;
     }
 

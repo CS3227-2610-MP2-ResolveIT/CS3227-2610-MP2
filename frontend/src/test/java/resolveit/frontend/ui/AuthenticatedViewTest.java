@@ -27,6 +27,8 @@ import resolveit.frontend.ticket.TicketRequests.CreateMessage;
 import resolveit.frontend.ticket.TicketRequests.CreateTicket;
 import resolveit.frontend.ticket.TicketRequests.UpdateTicket;
 import resolveit.frontend.ticket.TicketStatus;
+import resolveit.frontend.user.ManagerClient;
+import resolveit.frontend.user.ManagerService;
 import resolveit.frontend.ticket.TechnicianTicketService;
 import resolveit.frontend.ticket.TicketPriority;
 import resolveit.frontend.ticket.TicketRequests.ChangePriority;
@@ -42,10 +44,11 @@ class AuthenticatedViewTest {
             try {
                 var session = employeeSession();
                 var ticketService = new EmployeeTicketService(new EmptyTicketClient());
+                var managerService = new ManagerService(new EmptyTicketClient());
                 var authService = new AuthService(request -> CompletableFuture.failedFuture(
                         new UnsupportedOperationException()), session);
                 var navigator = new Navigator(new Stage(), authService, ticketService,
-                        new TechnicianTicketService(new EmptyTicketClient()), session);
+                        new TechnicianTicketService(new EmptyTicketClient()), managerService, session);
                 var loader = new FXMLLoader(getClass().getResource(
                         "/resolveit/frontend/views/authenticated.fxml"));
                 loader.setControllerFactory(type -> new AuthenticatedController(session, ticketService, navigator));
@@ -63,11 +66,11 @@ class AuthenticatedViewTest {
                 var client = new EmptyTicketClient();
                 var technicianService = new TechnicianTicketService(client);
                 var technicianNavigator = new Navigator(new Stage(), authService,
-                        new EmployeeTicketService(client), technicianService, technicianSession);
+                        new EmployeeTicketService(client), technicianService, managerService, technicianSession);
                 var technicianLoader = new FXMLLoader(getClass().getResource(
                         "/resolveit/frontend/views/technician.fxml"));
                 technicianLoader.setControllerFactory(type -> new TechnicianController(
-                        technicianSession, technicianService, technicianNavigator));
+                        technicianSession, technicianService, managerService, technicianNavigator));
                 Parent technicianRoot = technicianLoader.load();
                 var technicianScene = new Scene(technicianRoot);
                 technicianScene.getStylesheets().add(getClass().getResource(
@@ -82,7 +85,7 @@ class AuthenticatedViewTest {
                 managerSession.start(new LoginResponse("token", "Bearer", 900,
                         new User(3, "manager", "manager@example.test", Role.MANAGER, true, null, null)));
                 var managerLoader = new FXMLLoader(getClass().getResource("/resolveit/frontend/views/technician.fxml"));
-                managerLoader.setControllerFactory(type -> new TechnicianController(managerSession, technicianService, technicianNavigator));
+                managerLoader.setControllerFactory(type -> new TechnicianController(managerSession, technicianService, managerService, technicianNavigator));
                 Parent managerRoot = managerLoader.load();
                 var managerScene = new Scene(managerRoot, 1120, 720);
                 managerScene.getStylesheets().add(getClass().getResource("/resolveit/frontend/styles/app.css").toExternalForm());
@@ -91,7 +94,7 @@ class AuthenticatedViewTest {
                 org.junit.jupiter.api.Assertions.assertTrue(managerRoot.lookup("#assignmentBox").isVisible());
                 org.junit.jupiter.api.Assertions.assertEquals("All Tickets", ((javafx.scene.control.Label) managerRoot.lookup("#queueHeading")).getText());
                 var usersLoader = new FXMLLoader(getClass().getResource("/resolveit/frontend/views/users.fxml"));
-                usersLoader.setControllerFactory(type -> new UsersController(managerSession, null, technicianNavigator));
+                usersLoader.setControllerFactory(type -> new UsersController(managerSession, managerService, technicianNavigator));
                 Parent usersRoot = usersLoader.load();
                 var usersScene = new Scene(usersRoot, 900, 620);
                 usersScene.getStylesheets().add(getClass().getResource("/resolveit/frontend/styles/app.css").toExternalForm());
@@ -138,7 +141,17 @@ class AuthenticatedViewTest {
         return session;
     }
 
-    private static final class EmptyTicketClient implements TicketClient {
+    private static final class EmptyTicketClient implements TicketClient, ManagerClient {
+        @Override public java.util.concurrent.CompletionStage<PageResponse<User>> users(int page) {
+            return CompletableFuture.completedFuture(new PageResponse<>(java.util.List.of(), page, 20, 0, 0));
+        }
+        @Override public java.util.concurrent.CompletionStage<java.util.List<User>> technicians() {
+            return CompletableFuture.completedFuture(java.util.List.of());
+        }
+        @Override public java.util.concurrent.CompletionStage<User> createUser(UserRequest request) { return unsupported(); }
+        @Override public java.util.concurrent.CompletionStage<User> updateUser(int id, UserRequest request) { return unsupported(); }
+        @Override public java.util.concurrent.CompletionStage<Ticket> assign(int id, int technicianId) { return unsupported(); }
+
         @Override public java.util.concurrent.CompletionStage<PageResponse<Ticket>> list(TicketStatus status, int page, int size) {
             return CompletableFuture.completedFuture(new PageResponse<>(java.util.List.of(), page, size, 0, 0));
         }

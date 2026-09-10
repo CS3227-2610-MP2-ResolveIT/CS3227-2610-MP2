@@ -13,6 +13,7 @@ import resolveit.frontend.ticket.TechnicianTicketService;
 import resolveit.frontend.ui.AuthenticatedController;
 import resolveit.frontend.ui.LoginController;
 import resolveit.frontend.ui.TechnicianController;
+import resolveit.frontend.user.ManagerService;
 import resolveit.frontend.model.Role;
 
 public final class Navigator {
@@ -23,23 +24,27 @@ public final class Navigator {
     private final EmployeeTicketService ticketService;
     private final TechnicianTicketService technicianTicketService;
     private final SessionState session;
-    private resolveit.frontend.user.ManagerService managerService;
+    private final ManagerService managerService;
     private ViewLifecycle activeController;
-
-    public void setManagerService(resolveit.frontend.user.ManagerService service) { this.managerService = service; }
-    public resolveit.frontend.user.ManagerService managerService() { return managerService; }
 
     public void showUsers() {
         if (session.current().orElseThrow().user().role() != Role.MANAGER) return;
         show("/resolveit/frontend/views/users.fxml", type -> new resolveit.frontend.ui.UsersController(session, managerService, this));
     }
 
-    public Navigator(Stage stage, AuthService authService, EmployeeTicketService ticketService,
-                     TechnicianTicketService technicianTicketService, SessionState session) {
+    public Navigator(
+        Stage stage,
+        AuthService authService,
+        EmployeeTicketService ticketService,
+        TechnicianTicketService technicianTicketService,
+        ManagerService managerService,
+        SessionState session
+    ) {
         this.stage = stage;
         this.authService = authService;
         this.ticketService = ticketService;
         this.technicianTicketService = technicianTicketService;
+        this.managerService = managerService;
         this.session = session;
     }
 
@@ -60,7 +65,7 @@ public final class Navigator {
         if (session.current().orElseThrow().user().role() != Role.EMPLOYEE) {
             show("/resolveit/frontend/views/technician.fxml", type -> {
                 if (type == TechnicianController.class) {
-                    return new TechnicianController(session, technicianTicketService, this);
+                    return new TechnicianController(session, technicianTicketService, managerService, this);
                 }
                 throw new IllegalArgumentException("Unsupported FXML controller: " + type.getName());
             });
