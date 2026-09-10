@@ -71,4 +71,6 @@ Use HTTPS outside local development. The access token and signed-in user are ret
 ./gradlew build
 ```
 
-Tests cover client-side validation, configuration, session lifecycle, authentication and ticket request/response mapping, technician filter and action requests, failure handling, manager API request contracts, and employee/technician/manager workspace FXML wiring. The backend does not yet expose the refresh and logout endpoints described by `PROJECT.md`, so sign-out in this increment clears only the local in-memory session.
+Tests cover client-side validation, configuration, session lifecycle, authentication and ticket request/response mapping, technician filter and action requests, failure handling, manager API request contracts. 
+
+There is no need to test UI!
