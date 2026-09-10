@@ -29,7 +29,7 @@ Never use `.gitignore` to hide an uncertain or user-owned file.
 
 ## Commits
 
-Group changes by intent, not merely by file. Each commit should represent one independently valid logical outcome. Keep inseparable implementation, tests, and documentation together.
+Group changes by intent, not merely by file. Each commit should represent one independently valid logical outcome. Keep implementation with its direct tests and documentation when inseparable; split independently reviewable outcomes such as reusable tooling, test scenarios that consume it, and generated artifacts.
 
 ### Commit grouping standard
 
