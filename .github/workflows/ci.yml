@@ -54,6 +54,8 @@ jobs:
     name: Package cross-platform JARs
     needs: [backend-tests, frontend-tests]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Check out repository
         uses: actions/checkout@v7
@@ -86,3 +88,13 @@ jobs:
             backend/build/libs/resolveit-backend-0.1.0.jar
             frontend/build/libs/resolveit-frontend-0.1.0.jar
           if-no-files-found: error
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            backend/build/libs/resolveit-backend-0.1.0.jar \
+            frontend/build/libs/resolveit-frontend-0.1.0.jar \
+            --title "ResolveIT v0.1.0" \
+            --notes "ResolveIT application release."
