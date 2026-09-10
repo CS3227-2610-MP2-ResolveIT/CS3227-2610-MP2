@@ -73,12 +73,22 @@ def main() -> int:
             "The reviewer preserved implementation, tests, requirements, guidance, and documentation.",
         ),
         # Check 3: Did the report find the planted defect? It must discuss the
-        # incorrect == String comparison and recommend .equals or Objects.equals
-        # so a generic statement such as "there may be a bug" is insufficient.
+        # incorrect == String comparison and recommend value-based comparison;
+        # naming a specific Java API is optional, but a generic statement such
+        # as "there may be a bug" is insufficient.
         (
             "value-equality-defect",
             "==" in report
-            and (".equals" in lower_report or "objects.equals" in lower_report)
+            and any(
+                direction in lower_report
+                for direction in (
+                    ".equals",
+                    "objects.equals",
+                    "value comparison",
+                    "value equality",
+                    "value-based",
+                )
+            )
             and "string" in lower_report,
             35,
             "The report identifies String identity comparison and directs the fix toward value equality.",
