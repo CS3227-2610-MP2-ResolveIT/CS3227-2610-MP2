@@ -70,7 +70,3 @@ Use HTTPS outside local development. The access token and signed-in user are ret
 ./gradlew test
 ./gradlew build
 ```
-
-Tests cover client-side validation, configuration, session lifecycle, authentication and ticket request/response mapping, technician filter and action requests, failure handling, manager API request contracts. 
-
-There is no need to test UI!
