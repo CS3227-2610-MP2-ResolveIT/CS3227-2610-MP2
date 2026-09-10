@@ -1,0 +1,24 @@
+{
+  "status": "graded",
+  "skill": "code-review",
+  "test_case": "detect-string-comparison",
+  "configuration": "with-skill",
+  "trial": 1,
+  "overall_pass": false,
+  "score": 100,
+  "deterministic_score": 65,
+  "semantic_score": 100,
+  "deterministic_pass": false,
+  "semantic_pass": true,
+  "semantic_judges": 3,
+  "worker_exit_code": 0,
+  "worker_turns_planned": 1,
+  "worker_turns_completed": 1,
+  "protected_inputs_intact": true,
+  "deterministic_status": "completed",
+  "semantic_status": "completed",
+  "failure_reasons": [
+    "deterministic/value-equality-defect: Expected: the report identifies String identity comparison and directs the fix toward value equality."
+  ],
+  "run_directory": "/Users/junhaong/Documents/y3s1/CS3227/CS3227-2610-MP2/.agents/evals/code-review/runs/experiment-001/trials/detect-string-comparison/with-skill/trial-01"
+}

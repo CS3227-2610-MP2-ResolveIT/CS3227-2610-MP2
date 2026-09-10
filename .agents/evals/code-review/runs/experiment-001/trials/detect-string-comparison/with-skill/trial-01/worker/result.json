@@ -1,0 +1,39 @@
+{
+  "exit_code": 0,
+  "elapsed_seconds": 161.814,
+  "turns_planned": 1,
+  "turns_completed": 1,
+  "metrics": {
+    "event_count": 44,
+    "parse_errors": 0,
+    "command_count": 15,
+    "failed_command_count": 0,
+    "repeated_command_count": 7,
+    "prohibited_commands": [],
+    "skill_read_observed": true,
+    "input_tokens": 360906,
+    "output_tokens": 6770,
+    "skill_invocation_mode": "explicit",
+    "worker_elapsed_seconds": 161.814
+  },
+  "final_git_state": {
+    "revision": "497fddfa9b6ea8397553caacb66e35fa4481111c",
+    "status": [
+      "?? reviews/"
+    ],
+    "clean": false,
+    "worker_exit_code": 0,
+    "completed_at": "2026-09-10T13:14:00.376540+00:00",
+    "protected_inputs_intact": true,
+    "task_prompt_intact": true,
+    "injected_skill_intact": true,
+    "supporting_skills_intact": {}
+  },
+  "protected_inputs_intact": true,
+  "task_prompt_intact": true,
+  "injected_skill_intact": true,
+  "supporting_skills_intact": {},
+  "untracked_files": [
+    "reviews/issue-1.md"
+  ]
+}

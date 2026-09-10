@@ -1,0 +1,30 @@
+{
+  "skill": "code-review",
+  "skill_sha256": "36bcff522fe490871f67da8387f50d599ba1b8f1f2dbddec03a62f969926db28",
+  "test_case": "detect-string-comparison",
+  "configuration": "with-skill",
+  "trial": 1,
+  "fixture_sha256": "667fd7e3b1248a621d87d2a9956209050b162c2342756be8d60794343f575a83",
+  "fixture_revision": "efbc707f65f504b2fffffa3f8d40a8ed16cd91fc",
+  "workspace_base_revision": "497fddfa9b6ea8397553caacb66e35fa4481111c",
+  "fixture_path": "/Users/junhaong/Documents/y3s1/CS3227/CS3227-2610-MP2/.agents/evals/code-review/test-cases/detect-string-comparison/fixture",
+  "prompt_sha256": "531105956019b53bc6d26869e68770d2f9424cfac8ddc6f7369cf524df94dd1c",
+  "supporting_skills": [],
+  "supporting_skill_sha256": {},
+  "interactions": [],
+  "worker_turns_planned": 1,
+  "model": "codex-configured-default",
+  "sandbox": "workspace-write",
+  "semantic_grading": true,
+  "semantic_judges": 3,
+  "initial_git_state": {
+    "revision": "497fddfa9b6ea8397553caacb66e35fa4481111c",
+    "status": [],
+    "clean": true
+  },
+  "started_at": "2026-09-10T13:11:18.466259+00:00",
+  "skill_invocation": "explicit",
+  "worker_prompt_sha256": "531105956019b53bc6d26869e68770d2f9424cfac8ddc6f7369cf524df94dd1c",
+  "worker_turns_completed": 1,
+  "thread_id": null
+}

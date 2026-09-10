@@ -1,0 +1,44 @@
+{
+  "status": "completed",
+  "exit_code": 0,
+  "result": {
+    "overall_pass": false,
+    "score": 65,
+    "checks": [
+      {
+        "id": "canonical-report",
+        "pass": true,
+        "points": 15,
+        "notes": "The canonical reviews/issue-1.md report exists and is non-empty."
+      },
+      {
+        "id": "review-only-boundary",
+        "pass": true,
+        "points": 20,
+        "notes": "The reviewer preserved implementation, tests, requirements, guidance, and documentation."
+      },
+      {
+        "id": "value-equality-defect",
+        "pass": false,
+        "points": 0,
+        "notes": "Expected: the report identifies String identity comparison and directs the fix toward value equality."
+      },
+      {
+        "id": "required-decisions",
+        "pass": true,
+        "points": 20,
+        "notes": "The report provides a stable finding ID and the required follow-up decisions."
+      },
+      {
+        "id": "configured-tests-run",
+        "pass": true,
+        "points": 10,
+        "notes": "The worker trace records an attempt to run the configured test suite."
+      }
+    ],
+    "limitations": [
+      "Exact finding quality and whether the test gap is explained correctly require semantic grading."
+    ]
+  },
+  "errors": []
+}

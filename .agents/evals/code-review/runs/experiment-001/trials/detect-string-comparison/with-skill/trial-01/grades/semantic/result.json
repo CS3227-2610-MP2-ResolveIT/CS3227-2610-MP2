@@ -1,0 +1,143 @@
+{
+  "status": "completed",
+  "result": {
+    "overall_pass": true,
+    "score": 100,
+    "checks": [
+      {
+        "id": "semantic-jury",
+        "pass": true,
+        "points": 100,
+        "notes": "3/3 judges voted pass; valid judge scores: [100, 100, 100]; consensus uses the median."
+      }
+    ],
+    "limitations": [
+      "The evaluation relies on the recorded worker trace, final repository, and Git evidence; no additional live execution beyond the supplied trial evidence was necessary.",
+      "The deterministic grader independently reports its value-equality-det defect check as false, which conflicts with the observable canonical report, source code, acceptance criterion, and executed distinct-object probe; this semantic grade relies on the latter evidence.",
+      "The worker trace shows a temporary ReviewProbe.java file was added and then deleted for probing; final Git evidence shows no residual probe or reviewed-file modification.",
+      "The semantic grade relies on the submitted report and recorded trace; no additional execution or file modification was performed during grading."
+    ]
+  },
+  "errors": [],
+  "quorum": 2,
+  "judges": [
+    {
+      "judge": 1,
+      "status": "completed",
+      "exit_code": 0,
+      "result": {
+        "overall_pass": true,
+        "score": 100,
+        "checks": [
+          {
+            "id": "primary-finding",
+            "pass": true,
+            "points": 45,
+            "notes": "The canonical report identifies `TicketFilter.byStatus` at `src/main/java/TicketFilter.java:15` as using `ticket.status() == status`, correctly explaining that this compares Java `String` object identity rather than text value. It directly connects the defect to Issue #1 acceptance criterion 1 and records an isolated probe using separately allocated equal strings that returned an empty result instead of the two matching tickets. The report gives the appropriate High severity, expected versus actual behavior, impact, cause, and value-equality fix direction."
+          },
+          {
+            "id": "test-analysis",
+            "pass": true,
+            "points": 20,
+            "notes": "The report correctly observes that `TicketFilterTest` uses the interned literal `\"OPEN\"` both in tickets and as the requested status, so the test passes despite the identity-comparison defect. It identifies the resulting coverage gap and requests a regression case using distinct but equal `String` objects, while retaining assertions for matching, exclusion, ordering, and non-modification."
+          },
+          {
+            "id": "evidence-and-scope-discipline",
+            "pass": true,
+            "points": 15,
+            "notes": "The worker trace records execution of `bash run-tests.sh`, and the report accurately states that compilation and the configured happy-path test passed while acceptance behavior still failed under the distinct-object probe. The final Git evidence shows only the untracked canonical report `reviews/issue-1.md`; source, tests, requirements, guides, and Git history were preserved. The review distinguishes passing configured tests from complete acceptance evidence and does not claim unavailable checks passed."
+          },
+          {
+            "id": "actionable-report-and-handoff",
+            "pass": true,
+            "points": 20,
+            "notes": "The canonical `reviews/issue-1.md` report exists and is substantive. It uses stable findings `CR-1-1` and `CR-1-2`, assigns appropriate severities and Open statuses, provides exact files and line locations, verification commands, success criteria, documentation impact, and a complete agent handoff. It explicitly requires implementation follow-up, a regression test, and a subsequent code-review rerun; it marks independent human review NOT READY and states honest limitations without inventing checks."
+          }
+        ],
+        "limitations": [
+          "The evaluation relies on the recorded worker trace, final repository, and Git evidence; no additional live execution beyond the supplied trial evidence was necessary."
+        ]
+      },
+      "errors": []
+    },
+    {
+      "judge": 2,
+      "status": "completed",
+      "exit_code": 0,
+      "result": {
+        "overall_pass": true,
+        "score": 100,
+        "checks": [
+          {
+            "id": "primary-finding",
+            "pass": true,
+            "points": 45,
+            "notes": "The canonical report identifies the defect at src/main/java/TicketFilter.java:15: String statuses are compared with ==, which tests object identity rather than text value. It directly connects this to Issue #1 acceptance criterion 1, explains that separately allocated equal strings are incorrectly excluded, reports the expected versus actual result, and gives an appropriate High severity and value-equality fix direction."
+          },
+          {
+            "id": "test-analysis",
+            "pass": true,
+            "points": 20,
+            "notes": "The report correctly observes that TicketFilterTest uses the same interned \"OPEN\" literal for both the request and matching tickets, so the test passes despite the identity-comparison defect. It requests a regression case using distinct but equal String objects and specifies assertions for matching, exclusion, order, and preservation of the input list."
+          },
+          {
+            "id": "evidence-and-scope",
+            "pass": true,
+            "points": 15,
+            "notes": "The report records that bash run-tests.sh passed while clearly distinguishing that result from complete acceptance evidence. The worker trace contains the configured test execution and an isolated distinct-object probe showing result=[] instead of the two expected matches. Final Git evidence shows no changes to implementation, tests, requirements, guides, or history; only the required untracked reviews/ directory remains."
+          },
+          {
+            "id": "actionable-report-and-handoff",
+            "pass": true,
+            "points": 20,
+            "notes": "The required canonical reviews/issue-1.md exists and is substantive. It contains stable CR-1-1 and CR-1-2 findings with appropriate severities, locations, requirements, evidence, impacts, fix directions, verification steps, and documentation impact. It requests implementation follow-up, a code-review rerun after follow-up work, marks independent human review NOT READY, and states limitations without inventing unavailable checks."
+          }
+        ],
+        "limitations": [
+          "The deterministic grader independently reports its value-equality-det defect check as false, which conflicts with the observable canonical report, source code, acceptance criterion, and executed distinct-object probe; this semantic grade relies on the latter evidence.",
+          "The worker trace shows a temporary ReviewProbe.java file was added and then deleted for probing; final Git evidence shows no residual probe or reviewed-file modification."
+        ]
+      },
+      "errors": []
+    },
+    {
+      "judge": 3,
+      "status": "completed",
+      "exit_code": 0,
+      "result": {
+        "overall_pass": true,
+        "score": 100,
+        "checks": [
+          {
+            "id": "primary-finding",
+            "pass": true,
+            "points": 45,
+            "notes": "The canonical report correctly identifies the defect at TicketFilter.java:15: status strings are compared with ==, which tests Java object identity rather than text value. It directly connects this to Issue #1 acceptance criterion 1 and explains that separately allocated but equal strings are incorrectly excluded. The trace contains an acceptance probe demonstrating the failure: result=[] while the expected result contains the two OPEN tickets."
+          },
+          {
+            "id": "test-analysis",
+            "pass": true,
+            "points": 20,
+            "notes": "The report correctly observes that TicketFilterTest uses interned literal \"OPEN\" values for both tickets and the requested status. It explains why the test passes despite the defect and requests a regression test using separately allocated but equal String objects, while retaining assertions for exclusion, order, and input-list non-modification."
+          },
+          {
+            "id": "evidence-and-scope",
+            "pass": true,
+            "points": 15,
+            "notes": "The worker trace records a successful bash run-tests.sh execution and the report records compilation and the configured test suite as passed, while distinguishing the passing suite from complete acceptance evidence. The distinct-object probe and Java line-length check are also evidenced in the trace. Git evidence shows only the required untracked reviews/issue-1.md was added; implementation, tests, documentation, requirements, and Git history were not modified."
+          },
+          {
+            "id": "actionable-report-and-handoff",
+            "pass": true,
+            "points": 20,
+            "notes": "reviews/issue-1.md exists and contains stable findings CR-1-1 and CR-1-2 with appropriate High and Medium severities, exact locations, requirements, evidence, expected/actual behavior, impact, likely cause, fix direction, tests, verification, and documentation impact. It explicitly requests implementation follow-up, a code-review rerun after follow-up work, documentation re-check after the code fix, and marks independent human review NOT READY. The handoff and limitations are concrete and do not invent unavailable checks."
+          }
+        ],
+        "limitations": [
+          "The semantic grade relies on the submitted report and recorded trace; no additional execution or file modification was performed during grading."
+        ]
+      },
+      "errors": []
+    }
+  ]
+}

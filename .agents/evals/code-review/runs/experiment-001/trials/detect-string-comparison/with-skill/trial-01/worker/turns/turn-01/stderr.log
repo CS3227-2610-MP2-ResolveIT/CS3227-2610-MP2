@@ -1,0 +1,13 @@
+2026-09-10T13:12:01.025475Z ERROR codex_core::tools::router: error=exec_command failed for `/bin/zsh -lc 'bash run-tests.sh; test_status=$?; echo "run-tests exit=$test_status"; review_tmp=$(mktemp -d); javac -d "$review_tmp" src/main/java/TicketFilter.java; jshell --class-path "$review_tmp" <<'"'EOF'
+import java.util.List;
+var requested = new String(\"OPEN\");
+var first = new TicketFilter.Ticket(\"T1\", new String(\"OPEN\"));
+var second = new TicketFilter.Ticket(\"T2\", \"CLOSED\");
+var third = new TicketFilter.Ticket(\"T3\", new String(\"OPEN\"));
+var input = List.of(first, second, third);
+var result = TicketFilter.byStatus(input, requested);
+System.out.println(\"distinct-object result=\" + result);
+System.out.println(\"input=\" + input);
+System.out.println(\"expected=\" + List.of(first, third));
+EOF
+rm -rf \""'$review_tmp"'`: CreateProcess { message: "Rejected(\"`/bin/zsh -lc 'bash run-tests.sh; test_status=$?; echo \\\"run-tests exit=$test_status\\\"; review_tmp=$(mktemp -d); javac -d \\\"$review_tmp\\\" src/main/java/TicketFilter.java; jshell --class-path \\\"$review_tmp\\\" <<'\\\"'EOF'\\nimport java.util.List;\\nvar requested = new String(\\\\\\\"OPEN\\\\\\\");\\nvar first = new TicketFilter.Ticket(\\\\\\\"T1\\\\\\\", new String(\\\\\\\"OPEN\\\\\\\"));\\nvar second = new TicketFilter.Ticket(\\\\\\\"T2\\\\\\\", \\\\\\\"CLOSED\\\\\\\");\\nvar third = new TicketFilter.Ticket(\\\\\\\"T3\\\\\\\", new String(\\\\\\\"OPEN\\\\\\\"));\\nvar input = List.of(first, second, third);\\nvar result = TicketFilter.byStatus(input, requested);\\nSystem.out.println(\\\\\\\"distinct-object result=\\\\\\\" + result);\\nSystem.out.println(\\\\\\\"input=\\\\\\\" + input);\\nSystem.out.println(\\\\\\\"expected=\\\\\\\" + List.of(first, third));\\nEOF\\nrm -rf \\\\\\\"\\\"'$review_tmp\\\"'` rejected: rm -f style commands are not permitted. Use a safer approach\")" }

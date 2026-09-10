@@ -1,0 +1,87 @@
+# Code Review Report
+
+## Status
+- Target: Issue #1, submitted implementation identified by `fixture-target`; scope is `git diff fixture-base..fixture-target`.
+- Scope: `TicketFilter.byStatus`, its executable regression test, configured test runner, requirements, and User/Developer Guides. No diagrams are present in the target tree.
+- Overall: FINDINGS
+- Independent human review: NOT READY
+
+## Checks
+| Area | Status | Command/evidence |
+| --- | --- | --- |
+| Compilation | Passed | `bash run-tests.sh` compiled `src/main/java/TicketFilter.java` and `src/test/java/TicketFilterTest.java` successfully. |
+| Tests | Passed (insufficient coverage) | `bash run-tests.sh` completed successfully and printed `TicketFilterTest passed`; the test uses the same interned `"OPEN"` literal and does not protect distinct-string behavior. |
+| Smoke/acceptance testing | Failed | An isolated probe passed `new String("OPEN")` as the requested status and separate `new String("OPEN")` values on matching tickets. Actual result was `[]`; expected result was the two matching tickets in source order. The input list remained unchanged. |
+| Static analysis | Not configured | `PROJECT.md` explicitly says no static-analysis checks are configured. |
+| Packaging/resources | Not configured | `PROJECT.md` explicitly says no packaging checks are configured. |
+| Specification validation | Failed | Issue #1 criterion 1 requires equal status text to match across different Java `String` objects; implementation uses `==`, and the isolated probe reproduced the failure. Criterion 5 is also unmet because the automated test does not cover criterion 1. |
+| Documentation consistency | Incomplete / inaccurate in observed behavior | The User Guide claims equivalent `OPEN` status text is displayed, and the Developer Guide claims filtering behavior without modifying the supplied list. The no-modification claim is consistent; the equivalent-text user behavior is not verified and currently fails for distinct objects. |
+
+Additional Java review evidence: the 120-character scan reported no lines over 120 in the changed Java files. Public methods and the public `Ticket` record have concise Javadocs, and the changed code follows the stated four-space indentation and brace conventions.
+
+## Next actions
+- Rerun write-code skill: YES
+- Edit documentation: AFTER CODE FIX
+- Rerun code-review skill: AFTER FOLLOW-UP WORK
+- Reason: The implementation fails a required input-value equivalence case, and the submitted test suite gives a false sense of coverage because it only exercises shared string identity. After the code and regression test are corrected, re-verify the existing user-facing documentation against observed behavior; no documentation wording change is indicated by the current requirements.
+
+## Agent handoff
+- Follow-up required: YES
+- Current implementation/review state: The normal literal-value path passes, compilation passes, order is preserved by the stream pipeline, and the input list is not modified. Required value-based matching fails for distinct but equal `String` instances.
+- Next responsible skill or human: `write-code` skill or implementation owner, then `code-review` skill for rerun.
+- Priority and finding addressed: High, `CR-1-1`; Medium, `CR-1-2`.
+- Exact files and line locations: `src/main/java/TicketFilter.java:15` for the identity comparison; `src/test/java/TicketFilterTest.java:9-18` for the insufficient test case.
+- Required change or investigation: Change the status comparison to a null-safe value comparison consistent with Issue #1 criterion 1, while preserving stream order and leaving the input list untouched. Add an automated regression assertion using distinct `String` objects whose text is equal, and retain assertions for exclusion, source order, and non-modification.
+- Constraints and out-of-scope work: Review only; do not alter requirements, guides, or the configured test command to mask the defect. No new dependencies or tools are needed.
+- Verification commands: Run `bash run-tests.sh`; additionally exercise a distinct-object case and inspect that the result contains only matching tickets in original order while the source list is unchanged. Re-run the 120-character scan on changed Java files.
+- Manual checks: None are required beyond the automated/isolated checks for this non-GUI library behavior.
+- Success criteria: Equal status text matches even when object identities differ; non-matches are excluded; matching tickets retain source order; the input list is unchanged; automated tests fail before the fix and pass after it; compilation and the configured suite pass.
+- Documentation impact: Re-check `docs/UserGuide.md`, `docs/DeveloperGuide.md`, and `docs/MP2-requirements.md` after the code fix. Edit documentation only if its wording is still inconsistent with the verified behavior.
+- Required next rerun: Run the code-review skill after implementation and test changes, including the configured suite and acceptance probe.
+- Blocker or decision needed: No external decision is needed; implementation follow-up is required before release.
+
+## Findings
+- `CR-1-1` — [High] Compare status text by value rather than Java object identity — Status: Open
+- Category: Correctness / acceptance criterion 1
+- Location: `src/main/java/TicketFilter.java:15`
+- Requirement: Issue #1 criterion 1 and `docs/MP2-requirements.md` require equivalent status input values to behave consistently, including equal text held by different `String` objects. The User Guide likewise promises that every ticket whose status text is `OPEN` is displayed.
+- Evidence: The implementation filters with `ticket.status() == status`. An isolated compiled probe used a requested status created with `new String("OPEN")` and ticket statuses created with separate `new String("OPEN")` instances. It returned `[]` instead of `[Ticket[id=T1, status=OPEN], Ticket[id=T3, status=OPEN]]`. The configured test passed only because all matching values were the same literal object.
+- Expected / actual: Expected both tickets with status text `OPEN` to be returned, in source order. Actual result for equal-but-distinct strings is an empty list.
+- Reproduction or inspection path: From the repository root, compile `TicketFilter.java`, call `TicketFilter.byStatus` with the distinct-object inputs described above, and inspect the result; or inspect line 15 directly.
+- Impact: Valid user-visible filters can hide every matching ticket when status strings originate from separate parsing, storage, or UI values. This violates the primary acceptance criterion and makes the feature unsafe to release.
+- Likely cause / confidence: Accidental use of Java reference identity (`==`) instead of text equality; confidence high because the failure is directly reproduced.
+- Fix direction and affected responsibility: Update `TicketFilter.byStatus` to use a null-safe value comparison appropriate to the project contract, while retaining the existing filtering pipeline’s ordering and non-mutating behavior. Responsibility remains in `TicketFilter`.
+- Tests to add/update: Add a test with separate `new String("OPEN")` instances for the requested status and matching tickets; assert the expected ordered result, non-matching exclusion, and unchanged input. Include a null-status policy test only if the approved contract defines null handling.
+- Documentation impact: Current guides describe the intended value-based behavior and are not evidence of a passing implementation. Re-check them after the code fix; do not rewrite them to claim an unverified fix.
+- Verification after fixing: Run `bash run-tests.sh`, repeat the distinct-object acceptance probe, and verify the 120-character scan.
+
+- `CR-1-2` — [Medium] Add regression coverage for distinct equal status strings — Status: Open
+- Category: Tests / regression protection
+- Location: `src/test/java/TicketFilterTest.java:9-18`
+- Requirement: Issue #1 criterion 5 requires automated tests to protect all required behavior, explicitly including criterion 1; the project requirements require meaningful automated regression coverage.
+- Evidence: The only test constructs tickets with the literal `"OPEN"` and requests the same literal at line 14. It asserts the happy-path result and order, but does not create different `String` objects. `bash run-tests.sh` therefore passes while the implementation fails the required distinct-object case.
+- Expected / actual: Expected the automated suite to fail against the current `==` implementation and pass only after value-based comparison is implemented. Actual suite passes against the defective implementation.
+- Reproduction or inspection path: Run `bash run-tests.sh` and inspect `src/test/java/TicketFilterTest.java:9-18`; compare with the isolated probe in the Checks table.
+- Impact: Future regressions to reference-identity comparison can pass CI, allowing the primary acceptance defect to recur unnoticed.
+- Likely cause / confidence: Test data relies on Java literal interning and does not model the issue’s explicitly required object-identity boundary; confidence high.
+- Fix direction and affected responsibility: Extend `TicketFilterTest` with separately allocated equal status strings and assertions for the required result, while preserving the current order and exclusion assertions. Responsibility remains in the test suite.
+- Tests to add/update: Distinct-object equality regression test; input-list immutability assertion; retain non-matching and order assertions. Keep the test executable through `bash run-tests.sh`.
+- Documentation impact: None directly; the test should provide evidence for the behavior already stated in the guides.
+- Verification after fixing: `bash run-tests.sh` must pass, and an intentional temporary reversion to identity comparison should make the new regression assertion fail during development.
+
+## Positive observations
+- The submitted stream pipeline naturally preserves encounter order and creates a new result list, so the observed input list was not modified and the literal-value happy path retained order.
+- The configured test runner is small, reproducible, and compiles the implementation and test together.
+- The public API and record have concise documentation, and the changed Java files pass the project’s 120-character scan.
+
+## Gaps and limitations
+- No Gradle/Maven, static-analysis, packaging, GUI, persistence, or security checks are configured by the repository, so those areas were not applicable.
+- The project contains no diagrams to review.
+- The configured suite does not currently cover null inputs/statuses, and Issue #1 does not specify null behavior; no null behavior finding is raised.
+- The isolated acceptance probe was run against the submitted implementation and reproduced the required defect; no fix was applied during this review.
+
+## Manual checks for user
+- No manual checks required for this non-GUI behavior. After follow-up work, the next review should confirm the distinct-`String` automated case and `bash run-tests.sh`.
+
+## Conclusion
+Issue #1 is not ready for release. Compilation and the existing happy-path test pass, but `TicketFilter.byStatus` compares status strings by reference identity, violating the required value-based matching behavior. The test suite also fails to protect the explicitly required distinct-object case. Implement the code and regression-test follow-up, then rerun the code review.

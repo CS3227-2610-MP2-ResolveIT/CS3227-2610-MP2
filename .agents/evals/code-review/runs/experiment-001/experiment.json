@@ -1,0 +1,63 @@
+{
+  "id": "experiment-001",
+  "skill": "code-review",
+  "test_cases": [
+    "detect-string-comparison"
+  ],
+  "configurations": [
+    "with-skill"
+  ],
+  "trials": 1,
+  "worker_trials": 1,
+  "worker_calls": 1,
+  "model": "codex-configured-default",
+  "timeout_seconds": 600,
+  "semantic_grading": true,
+  "semantic_judges": 3,
+  "started_at": "2026-09-10T13:11:18.230826+00:00",
+  "status": "completed",
+  "completed_at": "2026-09-10T13:15:16.441405+00:00",
+  "graded_trials": 1,
+  "passed_trials": 0,
+  "completed_trials": 1,
+  "mean_score": 100.0,
+  "overall_pass": false,
+  "aggregates": {
+    "cells": {
+      "detect-string-comparison": {
+        "with-skill": {
+          "passed_trials": 0,
+          "total_trials": 1,
+          "mean_score": 100.0
+        }
+      }
+    },
+    "comparisons": {}
+  },
+  "results": [
+    {
+      "status": "graded",
+      "skill": "code-review",
+      "test_case": "detect-string-comparison",
+      "configuration": "with-skill",
+      "trial": 1,
+      "overall_pass": false,
+      "score": 100,
+      "deterministic_score": 65,
+      "semantic_score": 100,
+      "deterministic_pass": false,
+      "semantic_pass": true,
+      "semantic_judges": 3,
+      "worker_exit_code": 0,
+      "worker_turns_planned": 1,
+      "worker_turns_completed": 1,
+      "protected_inputs_intact": true,
+      "deterministic_status": "completed",
+      "semantic_status": "completed",
+      "failure_reasons": [
+        "deterministic/value-equality-defect: Expected: the report identifies String identity comparison and directs the fix toward value equality."
+      ],
+      "run_directory": "/Users/junhaong/Documents/y3s1/CS3227/CS3227-2610-MP2/.agents/evals/code-review/runs/experiment-001/trials/detect-string-comparison/with-skill/trial-01"
+    }
+  ]
+}
