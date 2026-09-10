@@ -1,5 +1,4 @@
 .gradle/
 build/
 out/
-*.log
 bin/
