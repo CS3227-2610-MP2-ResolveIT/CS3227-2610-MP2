@@ -565,6 +565,11 @@ def capture_git_evidence(
         raise HarnessError(f"could not capture Git status in {workspace}")
     (evidence_dir / "status.txt").write_text(status.stdout, encoding="utf-8")
 
+    history = git(workspace, "log", "--graph", "--decorate", "--oneline", "--all")
+    if history.returncode != 0:
+        raise HarnessError(f"could not capture Git history in {workspace}")
+    (evidence_dir / "history.txt").write_text(history.stdout, encoding="utf-8")
+
     names = untracked_paths(workspace)
     untracked_patches: list[str] = []
     for name in names:
@@ -584,6 +589,20 @@ def capture_git_evidence(
         "".join(untracked_patches), encoding="utf-8"
     )
     return names
+
+
+def remove_workspace_git_metadata(workspace: Path) -> None:
+    """Remove generated Git metadata after every grader has finished using it."""
+    git_metadata = workspace / ".git"
+    if not git_metadata.is_dir():
+        raise HarnessError(
+            f"generated workspace Git metadata is missing: {git_metadata}"
+        )
+    shutil.rmtree(git_metadata)
+    if git_metadata.exists():
+        raise HarnessError(
+            f"could not remove generated workspace Git metadata: {git_metadata}"
+        )
 
 
 def validate_grade(value: dict[str, Any] | None) -> tuple[bool, list[str]]:
@@ -971,6 +990,7 @@ def run_trial(
         "sandbox": "workspace-write",
         "semantic_grading": semantic_enabled and case.expected is not None,
         "semantic_judges": semantic_judges if semantic_enabled else 0,
+        "workspace_git_metadata_removed": False,
         "initial_git_state": git_state(workspace),
         "started_at": now(),
     }
@@ -1157,7 +1177,7 @@ def run_trial(
         }
         print("      skipped: disabled by --no-semantic-judges", flush=True)
 
-    print("  [7/7] Writing the final result", flush=True)
+    print("  [7/7] Finalizing artifacts and writing the result", flush=True)
     deterministic_result = deterministic.get("result")
     semantic_result = semantic.get("result")
     requested_grades = [
@@ -1181,6 +1201,15 @@ def run_trial(
         failure_reasons.append("The worker changed a protected harness input.")
     failure_reasons.extend(grade_failure_reasons("deterministic", deterministic))
     failure_reasons.extend(grade_failure_reasons("semantic", semantic))
+
+    # Git is required while the worker and graders inspect the trial. Once they
+    # finish, the exported git/ evidence is sufficient and workspace/ becomes a
+    # normal final-state snapshot that the parent project can traverse safely.
+    remove_workspace_git_metadata(workspace)
+    metadata["workspace_git_metadata_removed"] = True
+    metadata["completed_at"] = now()
+    write_json(run_dir / "run.json", metadata)
+
     result = {
         "status": "graded" if graders_valid else "ungraded",
         "skill": skill_root.name,
@@ -1212,6 +1241,7 @@ def run_trial(
         "protected_inputs_intact": final_state["protected_inputs_intact"],
         "deterministic_status": deterministic["status"],
         "semantic_status": semantic["status"],
+        "workspace_git_metadata_removed": True,
         "failure_reasons": list(dict.fromkeys(failure_reasons)),
         "run_directory": str(run_dir),
     }

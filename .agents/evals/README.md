@@ -104,12 +104,19 @@ never the original fixture.
 
 Different test cases may—and usually should—use different fixture directories.
 
-After copying the fixture, the harness initializes a new Git repository in the
-disposable workspace. It creates an empty `fixture-base` revision, commits the
-fixture files as `fixture-target`, then injects `TASK.md` and the controlled
-skills in one local setup commit. The setup commit is the trial's evidence base,
-so harness-provided inputs do not appear as worker changes. None of these commits
-modify the original fixture directory.
+After copying the fixture, the harness initializes a temporary Git repository
+in the disposable workspace. It creates an empty `fixture-base` revision,
+commits the fixture files as `fixture-target`, then injects `TASK.md` and the
+controlled skills in one local setup commit. The setup commit is the trial's
+evidence base, so harness-provided inputs do not appear as worker changes. None
+of these commits modify the original fixture directory.
+
+The temporary `.git/` exists while the worker and graders run. After all graders
+finish, the harness exports the Git evidence under `git/` and removes
+`workspace/.git/`. The retained `workspace/` is therefore an ordinary snapshot
+of the worker's final files, not a nested repository. If a trial is interrupted
+before grading finishes, `.git/` is retained to help diagnose the incomplete
+run.
 
 The harness constructs the repository-local skill set after copying the
 fixture:
@@ -448,7 +455,7 @@ Each trial directory contains:
 |---|---|
 | `result.json` | Final trial result and separate grader scores |
 | `run.json` | Trial inputs, configuration, initial Git state, invocation mode, and turn metadata |
-| `workspace/` | Disposable repository left by the worker |
+| `workspace/` | Final file snapshot left by the worker; its temporary `.git/` is removed after the graders finish |
 | `worker/result.json` | Worker exit status, metrics, final Git state, protected-input checks, and untracked paths |
 | `worker/trace.jsonl` | Combined worker events and tool calls from every turn |
 | `worker/turns/turn-NN/prompt.md` | Exact user message for one worker turn |
@@ -462,6 +469,7 @@ Each trial directory contains:
 | `git/unstaged.patch` | Final unstaged changes compared with the index |
 | `git/untracked.patch` | Contents of worker-created untracked files, including Git binary patches when needed |
 | `git/status.txt` | Final short Git status, including staged, unstaged, deleted, renamed, and untracked paths |
+| `git/history.txt` | Compact commit and tag history captured before temporary Git metadata is removed |
 
 The following grader directories are optional and therefore appear last:
 
