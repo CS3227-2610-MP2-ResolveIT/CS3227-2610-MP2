@@ -65,8 +65,9 @@ cd ../frontend && ./gradlew test
 
 Visible JavaFX behaviour is checked manually; no FXML/UI test remains in the current
 suite. GitHub Actions runs the backend and frontend suites as independent CI jobs on
-pushes and pull requests. Changes should be reviewed against `PROJECT.md`, tested in
-the affected module, documented, and committed as focused Conventional Commits.
+pushes and pull requests, then uploads one cross-platform executable JAR for each
+module. Changes should be reviewed against `PROJECT.md`, tested in the affected
+module, documented, and committed as focused Conventional Commits.
 
 ## Key extension points
 

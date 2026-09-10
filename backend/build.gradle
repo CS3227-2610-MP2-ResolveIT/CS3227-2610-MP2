@@ -35,3 +35,11 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+tasks.named('bootJar') {
+    archiveFileName = "resolveit-backend-${project.version}.jar"
+}
+
+tasks.named('jar') {
+    enabled = false
+}

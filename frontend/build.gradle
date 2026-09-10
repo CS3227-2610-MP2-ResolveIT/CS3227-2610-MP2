@@ -6,6 +6,8 @@ plugins {
 group = 'resolveit'
 version = '0.1.0'
 
+def javafxVersion = '25.0.1'
+
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(25)
@@ -17,12 +19,16 @@ repositories {
 }
 
 javafx {
-    version = '25.0.1'
+    version = javafxVersion
     modules = ['javafx.controls', 'javafx.fxml']
 }
 
 dependencies {
     implementation 'tools.jackson.core:jackson-databind:3.1.5'
+
+    // Include both native runtimes in the single distributable JAR.
+    runtimeOnly "org.openjfx:javafx-graphics:${javafxVersion}:linux"
+    runtimeOnly "org.openjfx:javafx-graphics:${javafxVersion}:win"
 
     testImplementation 'org.junit.jupiter:junit-jupiter:6.1.3'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:6.1.3'
@@ -31,6 +37,20 @@ dependencies {
 application {
     mainClass = 'resolveit.frontend.ResolveItApplication'
     applicationDefaultJvmArgs = ['--enable-native-access=javafx.graphics']
+}
+
+tasks.named('jar') {
+    archiveFileName = "resolveit-frontend-${project.version}.jar"
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    manifest {
+        attributes 'Main-Class': 'resolveit.frontend.Launcher'
+    }
+    from {
+        configurations.runtimeClasspath.collect { dependency ->
+            dependency.isDirectory() ? dependency : zipTree(dependency)
+        }
+    }
+    exclude 'META-INF/*.SF', 'META-INF/*.DSA', 'META-INF/*.RSA'
 }
 
 tasks.named('test') {

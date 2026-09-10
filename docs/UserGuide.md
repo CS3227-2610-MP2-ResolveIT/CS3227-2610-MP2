@@ -57,3 +57,14 @@ cd ../frontend
 ```
 
 Both suites should finish with `BUILD SUCCESSFUL`.
+
+## Packaged application
+
+Successful GitHub Actions runs provide `resolveit-backend-0.1.0.jar` and
+`resolveit-frontend-0.1.0.jar` in the `resolveit-cross-platform-jars` artifact.
+Both JARs require Java 25 and run on Linux or Windows:
+
+```bash
+java -jar resolveit-backend-0.1.0.jar
+java --enable-native-access=ALL-UNNAMED -jar resolveit-frontend-0.1.0.jar
+```
