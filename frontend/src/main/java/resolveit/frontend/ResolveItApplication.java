@@ -9,6 +9,7 @@ import resolveit.frontend.navigation.Navigator;
 import resolveit.frontend.session.SessionState;
 import resolveit.frontend.ticket.EmployeeTicketService;
 import resolveit.frontend.ticket.HttpTicketClient;
+import resolveit.frontend.ticket.TechnicianTicketService;
 
 public final class ResolveItApplication extends Application {
     private HttpAuthClient authClient;
@@ -22,7 +23,8 @@ public final class ResolveItApplication extends Application {
         ticketClient = HttpTicketClient.create(config.apiBaseUrl(), session);
         var authService = new AuthService(authClient, session);
         var ticketService = new EmployeeTicketService(ticketClient);
-        var navigator = new Navigator(stage, authService, ticketService, session);
+        var technicianTicketService = new TechnicianTicketService(ticketClient);
+        var navigator = new Navigator(stage, authService, ticketService, technicianTicketService, session);
 
         stage.setTitle("ResolveIT");
         stage.setMinWidth(900);

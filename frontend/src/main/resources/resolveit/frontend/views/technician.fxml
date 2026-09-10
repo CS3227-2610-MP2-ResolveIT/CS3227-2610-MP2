@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane minHeight="620.0" minWidth="900.0" prefHeight="760.0" prefWidth="1200.0"
+            styleClass="shell-background" xmlns="http://javafx.com/javafx/25"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="resolveit.frontend.ui.TechnicianController">
+    <top>
+        <HBox alignment="CENTER_LEFT" spacing="12.0" styleClass="shell-header">
+            <padding><Insets bottom="16.0" left="24.0" right="24.0" top="16.0" /></padding>
+            <StackPane minHeight="38.0" minWidth="38.0" prefHeight="38.0" prefWidth="38.0" styleClass="shell-logo">
+                <Label text="R" styleClass="shell-logo-text" />
+            </StackPane>
+            <Label text="ResolveIT" styleClass="shell-brand-name" />
+            <Label text="Technician workspace" styleClass="portal-label technician-portal-label" />
+            <Region HBox.hgrow="ALWAYS" />
+            <VBox alignment="CENTER_RIGHT" spacing="1.0">
+                <Label fx:id="userNameLabel" styleClass="user-name" />
+                <Label fx:id="userRoleLabel" styleClass="user-role" />
+            </VBox>
+            <StackPane minHeight="38.0" minWidth="38.0" prefHeight="38.0" prefWidth="38.0" styleClass="header-avatar">
+                <Label fx:id="avatarLabel" styleClass="header-avatar-text" />
+            </StackPane>
+            <Button accessibleText="Sign out of ResolveIT" mnemonicParsing="true" onAction="#logout"
+                    text="Sign _out" styleClass="secondary-button" />
+        </HBox>
+    </top>
+    <left>
+        <VBox minWidth="218.0" prefWidth="218.0" spacing="8.0" styleClass="sidebar">
+            <padding><Insets bottom="24.0" left="16.0" right="16.0" top="28.0" /></padding>
+            <Label text="SUPPORT" styleClass="nav-section-label" />
+            <Button fx:id="queueNavButton" accessibleText="Open Ticket Queue" maxWidth="Infinity"
+                    mnemonicParsing="true" onAction="#showQueue" text="▤  Ticket _Queue" styleClass="nav-button" />
+            <Region VBox.vgrow="ALWAYS" />
+        </VBox>
+    </left>
+    <center>
+        <StackPane>
+            <padding><Insets bottom="30.0" left="34.0" right="34.0" top="30.0" /></padding>
+
+            <StackPane fx:id="queuePage">
+                <VBox spacing="18.0">
+                    <VBox spacing="5.0">
+                        <Label text="Ticket Queue" styleClass="workspace-heading" />
+                        <Label text="Review unresolved requests, take ownership, and keep work moving."
+                               styleClass="workspace-description" />
+                    </VBox>
+                    <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="toolbar">
+                        <ComboBox fx:id="statusFilter" prefWidth="145.0" promptText="All statuses"
+                                  accessibleText="Filter tickets by status" />
+                        <ComboBox fx:id="priorityFilter" prefWidth="145.0" promptText="All priorities"
+                                  accessibleText="Filter tickets by priority" />
+                        <ComboBox fx:id="assignmentFilter" prefWidth="165.0"
+                                  accessibleText="Filter tickets by assignment" />
+                        <Button fx:id="refreshQueueButton" mnemonicParsing="true" onAction="#refreshQueue"
+                                text="↻  _Refresh" styleClass="secondary-button compact-button" />
+                        <ProgressIndicator fx:id="queueProgress" maxHeight="22.0" maxWidth="22.0"
+                                           visible="false" managed="false" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="ticketCountLabel" text="0 tickets" styleClass="count-label" />
+                    </HBox>
+                    <Label fx:id="queueErrorLabel" wrapText="true" styleClass="form-error" />
+                    <TableView fx:id="ticketsTable" VBox.vgrow="ALWAYS" accessibleText="Technician ticket queue">
+                        <placeholder><Label text="No tickets match these filters." styleClass="empty-label" /></placeholder>
+                        <columns>
+                            <TableColumn fx:id="numberColumn" prefWidth="125.0" text="Ticket" />
+                            <TableColumn fx:id="subjectColumn" minWidth="190.0" prefWidth="260.0" text="Subject" />
+                            <TableColumn fx:id="requesterColumn" prefWidth="125.0" text="Requester" />
+                            <TableColumn fx:id="priorityColumn" prefWidth="90.0" text="Priority" />
+                            <TableColumn fx:id="statusColumn" prefWidth="115.0" text="Status" />
+                            <TableColumn fx:id="assigneeColumn" prefWidth="125.0" text="Assignee" />
+                            <TableColumn fx:id="updatedColumn" minWidth="160.0" prefWidth="170.0" text="Last updated" />
+                        </columns>
+                    </TableView>
+                    <HBox alignment="CENTER_LEFT" spacing="9.0">
+                        <Label text="Double-click a row or press Enter to view and work on a ticket."
+                               styleClass="hint-label" />
+                        <Region HBox.hgrow="ALWAYS" />
+                        <Button fx:id="previousButton" mnemonicParsing="true" onAction="#previousPage"
+                                text="←  _Previous" styleClass="secondary-button compact-button" />
+                        <Label fx:id="pageLabel" text="Page 0 of 0" styleClass="count-label" />
+                        <Button fx:id="nextButton" mnemonicParsing="true" onAction="#nextPage"
+                                text="_Next  →" styleClass="secondary-button compact-button" />
+                    </HBox>
+                </VBox>
+            </StackPane>
+
+            <StackPane fx:id="detailPage" visible="false" managed="false">
+                <VBox spacing="16.0">
+                    <HBox alignment="CENTER_LEFT" spacing="12.0">
+                        <Button mnemonicParsing="true" onAction="#showQueue" text="←  _Back"
+                                styleClass="secondary-button compact-button" />
+                        <VBox spacing="3.0">
+                            <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                <Label fx:id="detailNumberLabel" text="Ticket details" styleClass="workspace-heading" />
+                                <Label fx:id="detailStatusLabel" styleClass="status-pill" />
+                            </HBox>
+                            <Label text="Request details, support actions, and complete conversation"
+                                   styleClass="workspace-description" />
+                        </VBox>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <ProgressIndicator fx:id="detailProgress" maxHeight="23.0" maxWidth="23.0"
+                                           visible="false" managed="false" />
+                        <Button fx:id="refreshDetailButton" mnemonicParsing="true" onAction="#refreshDetails"
+                                text="↻  _Refresh" styleClass="secondary-button compact-button" />
+                    </HBox>
+                    <Label fx:id="detailErrorLabel" wrapText="true" styleClass="form-error" />
+                    <Label fx:id="detailNoticeLabel" wrapText="true" styleClass="success-message" />
+                    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS" styleClass="transparent-scroll">
+                        <VBox fx:id="detailContent" spacing="18.0" visible="false" managed="false">
+                            <VBox spacing="18.0" styleClass="content-card">
+                                <HBox alignment="CENTER_LEFT" spacing="8.0">
+                                    <Label text="Request" styleClass="card-heading" />
+                                    <Region HBox.hgrow="ALWAYS" />
+                                    <Button fx:id="takeButton" mnemonicParsing="true" onAction="#takeTicket"
+                                            text="_Take ticket" styleClass="primary-button compact-button" />
+                                    <Button fx:id="beginWorkButton" mnemonicParsing="true" onAction="#beginWork"
+                                            text="_Begin work" styleClass="primary-button compact-button" />
+                                    <Button fx:id="reopenButton" mnemonicParsing="true" onAction="#reopenTicket"
+                                            text="_Reopen" styleClass="secondary-button compact-button" />
+                                </HBox>
+                                <VBox spacing="5.0">
+                                    <Label text="SUBJECT" styleClass="detail-key" />
+                                    <Label fx:id="detailSubjectLabel" wrapText="true" styleClass="detail-title" />
+                                </VBox>
+                                <VBox spacing="5.0">
+                                    <Label text="DESCRIPTION" styleClass="detail-key" />
+                                    <Label fx:id="detailDescriptionLabel" wrapText="true" styleClass="detail-value" />
+                                </VBox>
+                                <Separator />
+                                <GridPane hgap="30.0" vgap="14.0">
+                                    <columnConstraints>
+                                        <ColumnConstraints percentWidth="33.33" />
+                                        <ColumnConstraints percentWidth="33.33" />
+                                        <ColumnConstraints percentWidth="33.34" />
+                                    </columnConstraints>
+                                    <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                        <Label text="CATEGORY" styleClass="detail-key" />
+                                        <Label fx:id="detailCategoryLabel" styleClass="detail-value" />
+                                    </VBox>
+                                    <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                        <Label text="PRIORITY" styleClass="detail-key" />
+                                        <Label fx:id="detailPriorityLabel" styleClass="detail-value" />
+                                    </VBox>
+                                    <VBox spacing="4.0" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                                        <Label text="CREATED" styleClass="detail-key" />
+                                        <Label fx:id="detailCreatedLabel" styleClass="detail-value" />
+                                    </VBox>
+                                    <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                        <Label text="REQUESTER" styleClass="detail-key" />
+                                        <Label fx:id="detailRequesterLabel" styleClass="detail-value" />
+                                    </VBox>
+                                    <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                        <Label text="ASSIGNEE" styleClass="detail-key" />
+                                        <Label fx:id="detailAssigneeLabel" styleClass="detail-value" />
+                                    </VBox>
+                                </GridPane>
+                                <VBox fx:id="resolutionBox" spacing="5.0" visible="false" managed="false"
+                                      styleClass="resolution-box">
+                                    <Label text="RESOLUTION" styleClass="detail-key" />
+                                    <Label fx:id="resolutionLabel" wrapText="true" styleClass="detail-value" />
+                                </VBox>
+                            </VBox>
+
+                            <VBox spacing="12.0" styleClass="content-card">
+                                <Label text="Support actions" styleClass="card-heading" />
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                    <Label text="Priority" styleClass="field-label" labelFor="$priorityField" />
+                                    <ComboBox fx:id="priorityField" prefWidth="150.0" />
+                                    <Button fx:id="changePriorityButton" mnemonicParsing="true" onAction="#changePriority"
+                                            text="_Update priority" styleClass="secondary-button compact-button" />
+                                </HBox>
+                                <VBox fx:id="resolveBox" spacing="8.0" visible="false" managed="false"
+                                      styleClass="resolution-action-box">
+                                    <Label text="Resolution note" styleClass="field-label" labelFor="$resolutionField" />
+                                    <TextArea fx:id="resolutionField" prefHeight="100.0" wrapText="true"
+                                              promptText="Describe what fixed the issue…"
+                                              accessibleHelp="A non-blank resolution note is required." />
+                                    <Label fx:id="resolutionErrorLabel" wrapText="true" styleClass="field-error" />
+                                    <HBox alignment="CENTER_RIGHT">
+                                        <Button fx:id="resolveButton" mnemonicParsing="true" onAction="#resolveTicket"
+                                                text="_Resolve ticket" styleClass="primary-button workspace-button" />
+                                    </HBox>
+                                </VBox>
+                            </VBox>
+
+                            <VBox spacing="14.0" styleClass="content-card">
+                                <Label text="Conversation and internal notes" styleClass="card-heading" />
+                                <Label text="Internal notes are visible only to technicians and managers."
+                                       styleClass="hint-label" />
+                                <ListView fx:id="messagesList" prefHeight="270.0" accessibleText="Ticket messages and internal notes">
+                                    <placeholder><Label text="No messages yet." styleClass="empty-label" /></placeholder>
+                                </ListView>
+                                <VBox spacing="7.0">
+                                    <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                        <Label text="Message type" styleClass="field-label" labelFor="$messageTypeField" />
+                                        <ComboBox fx:id="messageTypeField" prefWidth="175.0" />
+                                    </HBox>
+                                    <Label text="Message" styleClass="field-label" labelFor="$messageField" />
+                                    <TextArea fx:id="messageField" prefHeight="100.0" wrapText="true"
+                                              promptText="Add a public update or an IT-only note…" />
+                                    <Label fx:id="messageErrorLabel" wrapText="true" styleClass="field-error" />
+                                    <HBox alignment="CENTER_RIGHT">
+                                        <Button fx:id="addMessageButton" mnemonicParsing="true" onAction="#addMessage"
+                                                text="_Post message" styleClass="primary-button workspace-button" />
+                                    </HBox>
+                                </VBox>
+                            </VBox>
+                        </VBox>
+                    </ScrollPane>
+                </VBox>
+            </StackPane>
+        </StackPane>
+    </center>
+</BorderPane>

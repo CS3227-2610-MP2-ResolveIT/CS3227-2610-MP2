@@ -305,6 +305,11 @@
     -fx-text-fill: -brand-blue-dark;
 }
 
+.technician-portal-label {
+    -fx-background-color: #e8f7f3;
+    -fx-text-fill: #0f766e;
+}
+
 .user-name {
     -fx-font-size: 13px;
     -fx-font-weight: 700;
@@ -560,6 +565,14 @@
     -fx-padding: 14px;
 }
 
+.resolution-action-box {
+    -fx-background-color: #f8fafc;
+    -fx-background-radius: 9px;
+    -fx-border-color: -border;
+    -fx-border-radius: 9px;
+    -fx-padding: 14px;
+}
+
 .status-pill {
     -fx-background-radius: 13px;
     -fx-font-size: 11px;
@@ -601,6 +614,14 @@
 .comment-card {
     -fx-background-color: #f8fafc;
     -fx-background-radius: 8px;
+    -fx-padding: 11px 13px;
+}
+
+.internal-note-card {
+    -fx-background-color: #fff8e7;
+    -fx-background-radius: 8px;
+    -fx-border-color: #f3d28b;
+    -fx-border-radius: 8px;
     -fx-padding: 11px 13px;
 }
 

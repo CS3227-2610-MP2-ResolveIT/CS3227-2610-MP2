@@ -4,9 +4,14 @@ import java.util.concurrent.CompletionStage;
 import resolveit.frontend.ticket.TicketRequests.CreateMessage;
 import resolveit.frontend.ticket.TicketRequests.CreateTicket;
 import resolveit.frontend.ticket.TicketRequests.UpdateTicket;
+import resolveit.frontend.ticket.TicketRequests.ChangePriority;
+import resolveit.frontend.ticket.TicketRequests.ChangeStatus;
+import resolveit.frontend.ticket.TicketRequests.ResolveTicket;
 
 public interface TicketClient {
     CompletionStage<PageResponse<Ticket>> list(TicketStatus status, int page, int size);
+    CompletionStage<PageResponse<Ticket>> list(TicketStatus status, TicketPriority priority,
+                                                Boolean assignedToMe, Boolean unassigned, int page, int size);
     CompletionStage<Ticket> get(int ticketId);
     CompletionStage<Ticket> create(CreateTicket request);
     CompletionStage<Ticket> update(int ticketId, UpdateTicket request);
@@ -14,4 +19,8 @@ public interface TicketClient {
     CompletionStage<TicketMessage> addComment(int ticketId, CreateMessage request);
     CompletionStage<Ticket> cancel(int ticketId);
     CompletionStage<Ticket> reopen(int ticketId);
+    CompletionStage<Ticket> take(int ticketId);
+    CompletionStage<Ticket> changeStatus(int ticketId, ChangeStatus request);
+    CompletionStage<Ticket> changePriority(int ticketId, ChangePriority request);
+    CompletionStage<Ticket> resolve(int ticketId, ResolveTicket request);
 }

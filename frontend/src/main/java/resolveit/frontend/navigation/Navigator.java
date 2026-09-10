@@ -9,8 +9,11 @@ import javafx.stage.Stage;
 import resolveit.frontend.auth.AuthService;
 import resolveit.frontend.session.SessionState;
 import resolveit.frontend.ticket.EmployeeTicketService;
+import resolveit.frontend.ticket.TechnicianTicketService;
 import resolveit.frontend.ui.AuthenticatedController;
 import resolveit.frontend.ui.LoginController;
+import resolveit.frontend.ui.TechnicianController;
+import resolveit.frontend.model.Role;
 
 public final class Navigator {
     private static final String STYLESHEET = "/resolveit/frontend/styles/app.css";
@@ -18,13 +21,16 @@ public final class Navigator {
     private final Stage stage;
     private final AuthService authService;
     private final EmployeeTicketService ticketService;
+    private final TechnicianTicketService technicianTicketService;
     private final SessionState session;
     private ViewLifecycle activeController;
 
-    public Navigator(Stage stage, AuthService authService, EmployeeTicketService ticketService, SessionState session) {
+    public Navigator(Stage stage, AuthService authService, EmployeeTicketService ticketService,
+                     TechnicianTicketService technicianTicketService, SessionState session) {
         this.stage = stage;
         this.authService = authService;
         this.ticketService = ticketService;
+        this.technicianTicketService = technicianTicketService;
         this.session = session;
     }
 
@@ -40,6 +46,15 @@ public final class Navigator {
     public void showAuthenticated() {
         if (session.current().isEmpty()) {
             showLogin();
+            return;
+        }
+        if (session.current().orElseThrow().user().role() == Role.TECHNICIAN) {
+            show("/resolveit/frontend/views/technician.fxml", type -> {
+                if (type == TechnicianController.class) {
+                    return new TechnicianController(session, technicianTicketService, this);
+                }
+                throw new IllegalArgumentException("Unsupported FXML controller: " + type.getName());
+            });
             return;
         }
         show("/resolveit/frontend/views/authenticated.fxml", type -> {

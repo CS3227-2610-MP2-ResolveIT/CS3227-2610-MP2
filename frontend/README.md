@@ -1,6 +1,6 @@
 # ResolveIT frontend
 
-ResolveIT's desktop client is a Java 25 and JavaFX 25 application. The current frontend increment provides sign-in and the employee ticket workspace described in `PROJECT.md`.
+ResolveIT's desktop client is a Java 25 and JavaFX 25 application. The current frontend provides sign-in plus the employee and technician ticket workspaces described in `PROJECT.md`.
 
 Employees can:
 
@@ -10,6 +10,13 @@ Employees can:
 - Edit an open, unassigned ticket with optimistic-lock conflict recovery.
 - Add public comments.
 - Cancel an open or in-progress ticket and reopen a resolved ticket.
+
+Technicians can:
+
+- View the support queue and filter it by status, priority, and assignment.
+- Take an eligible unassigned ticket or begin work on a ticket assigned to them.
+- Change ticket priority, reopen a resolved ticket, and resolve assigned work with a required resolution note.
+- Read the complete ticket conversation and add either public comments or IT-only internal notes.
 
 Ticket requests run away from the JavaFX Application Thread. In-progress actions display a loading indicator and prevent duplicate submissions, and authentication, authorization, validation, conflict, connection, and server failures are surfaced in the relevant view.
 
@@ -55,4 +62,4 @@ Use HTTPS outside local development. The access token and signed-in user are ret
 ./gradlew build
 ```
 
-Tests cover client-side validation, configuration, session lifecycle, authentication and ticket request/response mapping, failure handling, and employee-workspace FXML wiring. The backend does not yet expose the refresh and logout endpoints described by `PROJECT.md`, so sign-out in this increment clears only the local in-memory session.
+Tests cover client-side validation, configuration, session lifecycle, authentication and ticket request/response mapping, technician filter and action requests, failure handling, and employee/technician workspace FXML wiring. Manager-specific ticket assignment and user-management screens are not implemented yet. The backend does not yet expose the refresh and logout endpoints described by `PROJECT.md`, so sign-out in this increment clears only the local in-memory session.

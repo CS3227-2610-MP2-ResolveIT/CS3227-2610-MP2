@@ -13,4 +13,10 @@ public final class TicketRequests {
             int version) {}
 
     public record CreateMessage(String messageType, String message) {}
+
+    public record ChangeStatus(TicketStatus status) {}
+
+    public record ChangePriority(TicketPriority priority) {}
+
+    public record ResolveTicket(String resolutionNote) {}
 }

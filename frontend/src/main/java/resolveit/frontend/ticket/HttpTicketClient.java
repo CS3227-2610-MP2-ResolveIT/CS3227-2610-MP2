@@ -17,6 +17,9 @@ import resolveit.frontend.session.SessionState;
 import resolveit.frontend.ticket.TicketRequests.CreateMessage;
 import resolveit.frontend.ticket.TicketRequests.CreateTicket;
 import resolveit.frontend.ticket.TicketRequests.UpdateTicket;
+import resolveit.frontend.ticket.TicketRequests.ChangePriority;
+import resolveit.frontend.ticket.TicketRequests.ChangeStatus;
+import resolveit.frontend.ticket.TicketRequests.ResolveTicket;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
@@ -44,8 +47,18 @@ public final class HttpTicketClient implements TicketClient, AutoCloseable {
 
     @Override
     public CompletionStage<PageResponse<Ticket>> list(TicketStatus status, int page, int size) {
+        return list(status, null, null, null, page, size);
+    }
+
+    @Override
+    public CompletionStage<PageResponse<Ticket>> list(TicketStatus status, TicketPriority priority,
+                                                       Boolean assignedToMe, Boolean unassigned,
+                                                       int page, int size) {
         var suffix = "?page=" + page + "&size=" + size
-                + (status == null ? "" : "&status=" + encode(status.name()));
+                + queryParameter("status", status == null ? null : status.name())
+                + queryParameter("priority", priority == null ? null : priority.name())
+                + queryParameter("assignedToMe", assignedToMe)
+                + queryParameter("unassigned", unassigned);
         return send("GET", URI.create(ticketsUrl + suffix), null, new TypeReference<PageResponse<Ticket>>() {});
     }
 
@@ -84,6 +97,29 @@ public final class HttpTicketClient implements TicketClient, AutoCloseable {
     @Override
     public CompletionStage<Ticket> reopen(int ticketId) {
         return send("POST", URI.create(ticketUrl(ticketId) + "/reopen"), null, new TypeReference<Ticket>() {});
+    }
+
+    @Override
+    public CompletionStage<Ticket> take(int ticketId) {
+        return send("POST", URI.create(ticketUrl(ticketId) + "/take"), null, new TypeReference<Ticket>() {});
+    }
+
+    @Override
+    public CompletionStage<Ticket> changeStatus(int ticketId, ChangeStatus request) {
+        return send("PATCH", URI.create(ticketUrl(ticketId) + "/status"), request,
+                new TypeReference<Ticket>() {});
+    }
+
+    @Override
+    public CompletionStage<Ticket> changePriority(int ticketId, ChangePriority request) {
+        return send("PATCH", URI.create(ticketUrl(ticketId) + "/priority"), request,
+                new TypeReference<Ticket>() {});
+    }
+
+    @Override
+    public CompletionStage<Ticket> resolve(int ticketId, ResolveTicket request) {
+        return send("POST", URI.create(ticketUrl(ticketId) + "/resolve"), request,
+                new TypeReference<Ticket>() {});
     }
 
     private <T> CompletionStage<T> send(String method, URI uri, Object body, TypeReference<T> type) {
@@ -160,6 +196,10 @@ public final class HttpTicketClient implements TicketClient, AutoCloseable {
 
     private static String encode(String value) {
         return URLEncoder.encode(value, StandardCharsets.UTF_8);
+    }
+
+    private static String queryParameter(String name, Object value) {
+        return value == null ? "" : "&" + name + "=" + encode(value.toString());
     }
 
     @Override
