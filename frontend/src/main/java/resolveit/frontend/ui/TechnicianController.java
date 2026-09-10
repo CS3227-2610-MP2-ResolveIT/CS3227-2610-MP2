@@ -52,12 +52,40 @@ public final class TechnicianController implements ViewLifecycle {
     private final Navigator navigator;
     private final Set<CompletableFuture<?>> inFlight = new HashSet<>();
     private Ticket selectedTicket;
+    private Integer detailTicketId;
     private boolean disposed;
     private boolean listLoading;
     private boolean detailLoading;
     private boolean actionLoading;
     private int currentPage;
     private int pageCount;
+
+    @FXML private Label workspaceLabel, queueHeading, queueDescription;
+    @FXML private Button usersNavButton, requestsNavButton, cancelButton, assignButton, refreshAssigneesButton;
+    @FXML private VBox assignmentBox;
+    @FXML private ComboBox<resolveit.frontend.model.User> assigneeField;
+    private boolean assigneesLoading;
+    private boolean isManager() { return session.current().orElseThrow().user().role() == resolveit.frontend.model.Role.MANAGER; }
+    @FXML private void showRequests() { navigator.showRequesterWorkspace(); }
+    @FXML private void showUsers() { navigator.showUsers(); }
+    @FXML private void refreshAssignees() {
+        if (assigneesLoading || disposed) return;
+        assigneesLoading = true;
+        updateBusyState();
+        run(navigator.managerService().technicians(), users -> {
+            assigneesLoading = false;
+            assigneeField.setItems(FXCollections.observableArrayList(users));
+            updateBusyState();
+        }, failure -> { assigneesLoading = false; updateBusyState(); showFailure(detailErrorLabel, failure); });
+    }
+    @FXML private void assignTicket() {
+        if (selectedTicket == null || actionLoading || assigneeField.getValue() == null) return;
+        mutate(navigator.managerService().assign(selectedTicket.id(), assigneeField.getValue().id()), "Assignment updated.");
+    }
+    @FXML private void cancelTicket() {
+        if (selectedTicket == null || actionLoading || !confirm("Cancel ticket", "Cancel " + selectedTicket.ticketNumber() + "?", "Cancelled tickets cannot be reopened.")) return;
+        mutate(ticketService.cancel(selectedTicket.id()), "Ticket cancelled.");
+    }
 
     @FXML private Label avatarLabel;
     @FXML private Label userNameLabel;
@@ -130,7 +158,23 @@ public final class TechnicianController implements ViewLifecycle {
 
         statusFilter.setItems(FXCollections.observableArrayList(
                 TicketStatus.OPEN, TicketStatus.IN_PROGRESS, TicketStatus.RESOLVED));
+        statusFilter.getItems().addFirst(null);
+        if (isManager()) statusFilter.getItems().add(TicketStatus.CANCELLED);
+        usersNavButton.setVisible(isManager());
+        usersNavButton.setManaged(isManager());
+        assignmentBox.setVisible(isManager());
+        assignmentBox.setManaged(isManager());
+        if (isManager()) {
+            workspaceLabel.setText("Manager workspace");
+            queueHeading.setText("All Tickets");
+            queueDescription.setText("Review all requests, including resolved and cancelled tickets, and manage assignments.");
+            queueNavButton.setText("All _Tickets");
+            ticketsTable.setAccessibleText("All tickets");
+        }
+        assigneeField.setConverter(nullableConverter("Choose an active technician or manager", candidate -> candidate.username() + " (" + candidate.role() + ")"));
+        assigneeField.valueProperty().addListener((o, a, b) -> updateBusyState());
         priorityFilter.setItems(FXCollections.observableArrayList(TicketPriority.values()));
+        priorityFilter.getItems().addFirst(null);
         assignmentFilter.setItems(FXCollections.observableArrayList(AssignmentFilter.values()));
         statusFilter.setConverter(nullableConverter("All statuses", TicketStatus::displayName));
         priorityFilter.setConverter(nullableConverter("All priorities", TicketPriority::displayName));
@@ -225,6 +269,9 @@ public final class TechnicianController implements ViewLifecycle {
     }
 
     private void openTicket(int ticketId) {
+        if (detailLoading || actionLoading) return;
+        detailTicketId = ticketId;
+        assigneeField.setValue(null);
         showPage(detailPage);
         queueNavButton.getStyleClass().remove("nav-button-active");
         selectedTicket = null;
@@ -232,10 +279,11 @@ public final class TechnicianController implements ViewLifecycle {
         detailContent.setVisible(false);
         detailContent.setManaged(false);
         loadDetails(ticketId, null);
+        if (isManager()) refreshAssignees();
     }
 
     @FXML private void refreshDetails() {
-        if (selectedTicket != null) loadDetails(selectedTicket.id(), null);
+        if (detailTicketId != null) loadDetails(detailTicketId, null);
     }
 
     private void loadDetails(int ticketId, String notice) {
@@ -383,18 +431,31 @@ public final class TechnicianController implements ViewLifecycle {
         resolutionLabel.setText(hasResolution ? ticket.resolutionNote() : "");
         takeButton.setVisible(ticket.status() == TicketStatus.OPEN && ticket.assignedToId() == null);
         takeButton.setManaged(takeButton.isVisible());
-        beginWorkButton.setVisible(ticket.status() == TicketStatus.OPEN && assignedToCurrentUser);
+        beginWorkButton.setVisible(ticket.status() == TicketStatus.OPEN && (assignedToCurrentUser || isManager()) && ticket.assignedToId() != null);
         beginWorkButton.setManaged(beginWorkButton.isVisible());
         reopenButton.setVisible(ticket.status() == TicketStatus.RESOLVED);
         reopenButton.setManaged(reopenButton.isVisible());
-        resolveBox.setVisible(ticket.status() == TicketStatus.IN_PROGRESS && assignedToCurrentUser);
+        resolveBox.setVisible(ticket.status() == TicketStatus.IN_PROGRESS && (assignedToCurrentUser || isManager()));
         resolveBox.setManaged(resolveBox.isVisible());
+        cancelButton.setVisible(isManager() && (ticket.status() == TicketStatus.OPEN || ticket.status() == TicketStatus.IN_PROGRESS));
+        cancelButton.setManaged(cancelButton.isVisible());
         resolutionField.clear();
         resolutionErrorLabel.setText("");
         updateBusyState();
     }
 
     private void updateBusyState() {
+        boolean detailBusy = actionLoading || detailLoading;
+        detailContent.setDisable(detailBusy);
+        queueNavButton.setDisable(detailBusy);
+        usersNavButton.setDisable(detailBusy);
+        requestsNavButton.setDisable(detailBusy);
+        ticketsTable.setDisable(detailBusy);
+        cancelButton.setDisable(detailBusy);
+        assigneeField.setDisable(detailBusy || assigneesLoading);
+        refreshAssigneesButton.setDisable(detailBusy || assigneesLoading);
+        assignButton.setDisable(detailBusy || assigneesLoading || selectedTicket == null || assigneeField.getValue() == null
+                || selectedTicket.status() == TicketStatus.RESOLVED || selectedTicket.status() == TicketStatus.CANCELLED);
         queueProgress.setVisible(listLoading);
         queueProgress.setManaged(listLoading);
         refreshQueueButton.setDisable(listLoading);
@@ -403,7 +464,7 @@ public final class TechnicianController implements ViewLifecycle {
         assignmentFilter.setDisable(listLoading);
         previousButton.setDisable(listLoading || currentPage <= 0);
         nextButton.setDisable(listLoading || currentPage + 1 >= pageCount);
-        detailProgress.setVisible(detailLoading || actionLoading);
+        detailProgress.setVisible(detailLoading || actionLoading || assigneesLoading);
         detailProgress.setManaged(detailProgress.isVisible());
         refreshDetailButton.setDisable(detailLoading || actionLoading);
         takeButton.setDisable(actionLoading);

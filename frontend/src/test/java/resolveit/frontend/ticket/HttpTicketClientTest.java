@@ -49,6 +49,41 @@ class HttpTicketClientTest {
     }
 
     @Test
+    void managerEndpointsMatchBackendContracts() {
+        var body = new AtomicReference<String>();
+        var method = new AtomicReference<String>();
+        String user = "{\"id\":9,\"username\":\"support\",\"email\":\"support@example.test\",\"role\":\"TECHNICIAN\",\"active\":true}";
+        server.createContext("/api/v1/users", exchange -> {
+            exchangeSeen.set(exchange);
+            body.set(new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8));
+            method.set(exchange.getRequestMethod());
+            respond(exchange, 200, exchange.getRequestMethod().equals("GET")
+                    ? "{\"content\":[" + user + "],\"page\":1,\"size\":20,\"totalElements\":21,\"totalPages\":2}" : user);
+        });
+        server.createContext("/api/v1/technicians", exchange -> respond(exchange, 200, "[" + user + "]"));
+        server.createContext("/api/v1/tickets/3/assign", exchange -> {
+            body.set(new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8));
+            method.set(exchange.getRequestMethod());
+            respond(exchange, 200, ticketJson("OPEN", 1));
+        });
+        assertEquals(1, client.users(1).toCompletableFuture().join().page());
+        assertEquals("page=1&size=20", exchangeSeen.get().getRequestURI().getQuery());
+        assertEquals("Bearer test-token", exchangeSeen.get().getRequestHeaders().getFirst("Authorization"));
+        assertEquals(Role.TECHNICIAN, client.technicians().toCompletableFuture().join().getFirst().role());
+        var request = new resolveit.frontend.user.ManagerClient.UserRequest("support", "support@example.test", "secret123", Role.TECHNICIAN, true);
+        client.createUser(request).toCompletableFuture().join();
+        assertEquals("POST", method.get());
+        assertTrue(body.get().contains("\"password\":\"secret123\""));
+        client.updateUser(9, new resolveit.frontend.user.ManagerClient.UserRequest("support", "support@example.test", null, Role.MANAGER, false)).toCompletableFuture().join();
+        assertEquals("PATCH", method.get());
+        assertEquals("/api/v1/users/9", exchangeSeen.get().getRequestURI().getPath());
+        assertTrue(body.get().contains("\"active\":false"));
+        client.assign(3, 9).toCompletableFuture().join();
+        assertEquals("POST", method.get());
+        assertEquals("{\"technicianId\":9}", body.get());
+    }
+
+    @Test
     void listsTicketsWithStatusAndBearerToken() {
         server.createContext("/api/v1/tickets", exchange -> {
             exchangeSeen.set(exchange);

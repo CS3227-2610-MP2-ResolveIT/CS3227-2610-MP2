@@ -23,7 +23,7 @@ import resolveit.frontend.ticket.TicketRequests.ResolveTicket;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
-public final class HttpTicketClient implements TicketClient, AutoCloseable {
+public final class HttpTicketClient implements TicketClient, resolveit.frontend.user.ManagerClient, AutoCloseable {
     private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(5);
     private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(15);
 
@@ -120,6 +120,31 @@ public final class HttpTicketClient implements TicketClient, AutoCloseable {
     public CompletionStage<Ticket> resolve(int ticketId, ResolveTicket request) {
         return send("POST", URI.create(ticketUrl(ticketId) + "/resolve"), request,
                 new TypeReference<Ticket>() {});
+    }
+
+    @Override
+    public CompletionStage<PageResponse<resolveit.frontend.model.User>> users(int page) {
+        return send("GET", ticketsUrl.resolve("users?page=" + page + "&size=20"), null, new TypeReference<>() {});
+    }
+
+    @Override
+    public CompletionStage<java.util.List<resolveit.frontend.model.User>> technicians() {
+        return send("GET", ticketsUrl.resolve("technicians"), null, new TypeReference<>() {});
+    }
+
+    @Override
+    public CompletionStage<resolveit.frontend.model.User> createUser(UserRequest request) {
+        return send("POST", ticketsUrl.resolve("users"), request, new TypeReference<>() {});
+    }
+
+    @Override
+    public CompletionStage<resolveit.frontend.model.User> updateUser(int id, UserRequest request) {
+        return send("PATCH", ticketsUrl.resolve("users/" + id), request, new TypeReference<>() {});
+    }
+
+    @Override
+    public CompletionStage<Ticket> assign(int id, int technicianId) {
+        return send("POST", URI.create(ticketUrl(id) + "/assign"), java.util.Map.of("technicianId", technicianId), new TypeReference<>() {});
     }
 
     private <T> CompletionStage<T> send(String method, URI uri, Object body, TypeReference<T> type) {

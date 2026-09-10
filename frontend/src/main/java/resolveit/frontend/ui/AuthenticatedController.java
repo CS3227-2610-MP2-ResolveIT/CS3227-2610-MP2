@@ -60,6 +60,9 @@ public final class AuthenticatedController implements ViewLifecycle {
     private int currentTicketPage;
     private int ticketPageCount;
 
+    @FXML private Label requesterPortalLabel, requestsHeading;
+    @FXML private Button supportNavButton;
+    @FXML private void showSupport() { navigator.showAuthenticated(); }
     @FXML private Label avatarLabel;
     @FXML private Label userNameLabel;
     @FXML private Label userRoleLabel;
@@ -140,6 +143,15 @@ public final class AuthenticatedController implements ViewLifecycle {
         userNameLabel.setText(user.username());
         userRoleLabel.setText(user.role().displayName());
         avatarLabel.setText(initials(user.username()));
+        boolean support = user.role() != resolveit.frontend.model.Role.EMPLOYEE;
+        supportNavButton.setVisible(support);
+        supportNavButton.setManaged(support);
+        if (support) {
+            requesterPortalLabel.setText("Request workspace");
+            requestsHeading.setText("Visible tickets");
+            myTicketsNavButton.setText("Visible tickets");
+            myTicketsNavButton.setAccessibleText("Open visible tickets");
+        }
 
         statusFilter.setItems(FXCollections.observableArrayList(
                 "All statuses", "Open", "In progress", "Resolved", "Cancelled"));
@@ -444,11 +456,11 @@ public final class AuthenticatedController implements ViewLifecycle {
         resolutionBox.setVisible(ticket.resolutionNote() != null && !ticket.resolutionNote().isBlank());
         resolutionBox.setManaged(resolutionBox.isVisible());
         resolutionLabel.setText(ticket.resolutionNote() == null ? "" : ticket.resolutionNote());
-        editButton.setVisible(ticket.isEditableByRequester());
+        editButton.setVisible(ticket.requesterId() == session.current().orElseThrow().user().id() && ticket.isEditableByRequester());
         editButton.setManaged(editButton.isVisible());
-        cancelActionButton.setVisible(ticket.isCancellableByRequester());
+        cancelActionButton.setVisible(ticket.requesterId() == session.current().orElseThrow().user().id() && ticket.isCancellableByRequester());
         cancelActionButton.setManaged(cancelActionButton.isVisible());
-        reopenActionButton.setVisible(ticket.isReopenableByRequester());
+        reopenActionButton.setVisible(ticket.requesterId() == session.current().orElseThrow().user().id() && ticket.isReopenableByRequester());
         reopenActionButton.setManaged(reopenActionButton.isVisible());
         setEditing(false);
     }

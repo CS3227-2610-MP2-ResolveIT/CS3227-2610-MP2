@@ -34,6 +34,7 @@ public final class TechnicianTicketService {
     public CompletionStage<Ticket> resolve(int id, String resolutionNote) {
         return client.resolve(id, new ResolveTicket(resolutionNote.trim()));
     }
+    public CompletionStage<Ticket> cancel(int id) { return client.cancel(id); }
     public CompletionStage<Ticket> reopen(int id) { return client.reopen(id); }
 
     public enum AssignmentFilter {

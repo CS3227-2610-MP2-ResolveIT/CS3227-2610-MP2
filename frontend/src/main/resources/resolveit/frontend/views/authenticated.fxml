@@ -31,7 +31,7 @@
                 <Label text="R" styleClass="shell-logo-text" />
             </StackPane>
             <Label text="ResolveIT" styleClass="shell-brand-name" />
-            <Label text="Employee portal" styleClass="portal-label" />
+            <Label fx:id="requesterPortalLabel" text="Employee portal" styleClass="portal-label" />
             <Region HBox.hgrow="ALWAYS" />
             <VBox alignment="CENTER_RIGHT" spacing="1.0">
                 <Label fx:id="userNameLabel" styleClass="user-name" />
@@ -48,6 +48,7 @@
         <VBox minWidth="218.0" prefWidth="218.0" spacing="8.0" styleClass="sidebar">
             <padding><Insets bottom="24.0" left="16.0" right="16.0" top="28.0" /></padding>
             <Label text="WORKSPACE" styleClass="nav-section-label" />
+            <Button fx:id="supportNavButton" text="Support workspace" onAction="#showSupport" styleClass="nav-button" maxWidth="Infinity" />
             <Button fx:id="myTicketsNavButton" accessibleText="Open My Tickets" maxWidth="Infinity"
                     mnemonicParsing="true" onAction="#showMyTickets" text="▤  _My Tickets" styleClass="nav-button" />
             <Button fx:id="submitNavButton" accessibleText="Open Submit Ticket" maxWidth="Infinity"
@@ -63,7 +64,7 @@
                 <VBox spacing="18.0">
                     <HBox alignment="CENTER_LEFT">
                         <VBox spacing="5.0">
-                            <Label text="My Tickets" styleClass="workspace-heading" />
+                            <Label fx:id="requestsHeading" text="My Tickets" styleClass="workspace-heading" />
                             <Label text="Track your requests and open a ticket to see its full history."
                                    styleClass="workspace-description" />
                         </VBox>

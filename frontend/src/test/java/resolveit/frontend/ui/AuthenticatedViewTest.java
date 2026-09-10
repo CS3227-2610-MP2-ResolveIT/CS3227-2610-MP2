@@ -78,6 +78,29 @@ class AuthenticatedViewTest {
                 assertNotNull(technicianRoot.lookup("#takeButton"));
                 assertNotNull(technicianRoot.lookup("#resolutionField"));
                 assertNotNull(technicianRoot.lookup("#messageTypeField"));
+                var managerSession = new SessionState();
+                managerSession.start(new LoginResponse("token", "Bearer", 900,
+                        new User(3, "manager", "manager@example.test", Role.MANAGER, true, null, null)));
+                var managerLoader = new FXMLLoader(getClass().getResource("/resolveit/frontend/views/technician.fxml"));
+                managerLoader.setControllerFactory(type -> new TechnicianController(managerSession, technicianService, technicianNavigator));
+                Parent managerRoot = managerLoader.load();
+                var managerScene = new Scene(managerRoot, 1120, 720);
+                managerScene.getStylesheets().add(getClass().getResource("/resolveit/frontend/styles/app.css").toExternalForm());
+                managerRoot.applyCss(); managerRoot.layout();
+                org.junit.jupiter.api.Assertions.assertTrue(managerRoot.lookup("#usersNavButton").isVisible());
+                org.junit.jupiter.api.Assertions.assertTrue(managerRoot.lookup("#assignmentBox").isVisible());
+                org.junit.jupiter.api.Assertions.assertEquals("All Tickets", ((javafx.scene.control.Label) managerRoot.lookup("#queueHeading")).getText());
+                var usersLoader = new FXMLLoader(getClass().getResource("/resolveit/frontend/views/users.fxml"));
+                usersLoader.setControllerFactory(type -> new UsersController(managerSession, null, technicianNavigator));
+                Parent usersRoot = usersLoader.load();
+                var usersScene = new Scene(usersRoot, 900, 620);
+                usersScene.getStylesheets().add(getClass().getResource("/resolveit/frontend/styles/app.css").toExternalForm());
+                usersRoot.applyCss(); usersRoot.layout();
+                assertNotNull(usersRoot.lookup("#usersTable"));
+                assertNotNull(usersRoot.lookup("#passwordField"));
+                assertNotNull(usersRoot.lookup("#saveButton"));
+                savePreview(managerRoot, "manager-tickets");
+                savePreview(usersRoot, "manager-users");
             } catch (Throwable problem) {
                 failure.set(problem);
             } finally {
@@ -88,6 +111,17 @@ class AuthenticatedViewTest {
 
         if (!finished.await(10, TimeUnit.SECONDS)) throw new AssertionError("JavaFX view load timed out");
         if (failure.get() != null) throw new AssertionError("Authenticated workspace did not load", failure.get());
+    }
+
+    private void savePreview(Parent root, String name) throws java.io.IOException {
+        var directory = System.getenv("RESOLVEIT_UI_PREVIEW_DIR");
+        if (directory == null) return;
+        var image = root.snapshot(null, null);
+        var buffered = new java.awt.image.BufferedImage((int) image.getWidth(), (int) image.getHeight(), java.awt.image.BufferedImage.TYPE_INT_ARGB);
+        for (int y = 0; y < image.getHeight(); y++) {
+            for (int x = 0; x < image.getWidth(); x++) buffered.setRGB(x, y, image.getPixelReader().getArgb(x, y));
+        }
+        javax.imageio.ImageIO.write(buffered, "png", new java.io.File(directory, name + ".png"));
     }
 
     private SessionState employeeSession() {

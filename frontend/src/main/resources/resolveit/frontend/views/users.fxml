@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="resolveit.frontend.ui.UsersController" styleClass="shell-background" minWidth="900" minHeight="620">
+    <top><HBox spacing="16" alignment="CENTER_LEFT" styleClass="shell-header">
+        <padding><Insets top="16" bottom="16" left="24" right="24" /></padding>
+        <Label text="ResolveIT" styleClass="shell-brand-name" />
+        <Button fx:id="backButton" text="All _Tickets" mnemonicParsing="true" onAction="#back" styleClass="secondary-button" />
+        <Region HBox.hgrow="ALWAYS" /><Label fx:id="profileLabel" />
+        <Button text="Sign _out" mnemonicParsing="true" onAction="#logout" styleClass="secondary-button" />
+    </HBox></top>
+    <center><VBox spacing="14">
+        <padding><Insets top="24" bottom="24" left="24" right="24" /></padding>
+        <Label text="User Management" styleClass="workspace-heading" />
+        <Label text="Create accounts, update details, and manage roles and access." styleClass="workspace-description" />
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Button fx:id="refreshButton" text="_Refresh" mnemonicParsing="true" onAction="#refresh" styleClass="secondary-button" />
+            <Button fx:id="newButton" text="_New user" mnemonicParsing="true" onAction="#newUser" styleClass="primary-button" />
+            <ProgressIndicator fx:id="progress" maxWidth="24" maxHeight="24" visible="false" managed="false" />
+        </HBox>
+        <Label fx:id="errorLabel" wrapText="true" styleClass="form-error" />
+        <Label fx:id="noticeLabel" wrapText="true" styleClass="success-message" />
+        <SplitPane dividerPositions="0.60" VBox.vgrow="ALWAYS">
+            <VBox spacing="12" minWidth="380">
+                <TableView fx:id="usersTable" VBox.vgrow="ALWAYS" accessibleText="User accounts; select a user to edit">
+                    <placeholder><Label text="No users found." /></placeholder>
+                    <columns>
+                        <TableColumn fx:id="usernameColumn" text="Username" prefWidth="140" />
+                        <TableColumn fx:id="emailColumn" text="Email" prefWidth="190" />
+                        <TableColumn fx:id="roleColumn" text="Role" prefWidth="110" />
+                        <TableColumn fx:id="activeColumn" text="Access" prefWidth="90" />
+                    </columns>
+                </TableView>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Button fx:id="previousButton" text="Previous" onAction="#previous" />
+                    <Label fx:id="pageLabel" text="Page 0 of 0" />
+                    <Button fx:id="nextButton" text="Next" onAction="#next" />
+                </HBox>
+            </VBox>
+            <ScrollPane fitToWidth="true" minWidth="300">
+                <VBox fx:id="editor" spacing="10" styleClass="content-card">
+                    <Label fx:id="editorTitle" styleClass="card-heading" />
+                    <Label text="Username" labelFor="$usernameField" /><TextField fx:id="usernameField" />
+                    <Label text="Email" labelFor="$emailField" /><TextField fx:id="emailField" />
+                    <Label text="Password" labelFor="$passwordField" /><PasswordField fx:id="passwordField" />
+                    <Label text="Required for new users. Leave blank when editing to keep the existing password." wrapText="true" styleClass="hint-label" />
+                    <Label text="Role" labelFor="$roleField" /><ComboBox fx:id="roleField" maxWidth="Infinity" />
+                    <CheckBox fx:id="activeField" text="Active account" />
+                    <Button fx:id="saveButton" text="_Save user" mnemonicParsing="true" onAction="#save" styleClass="primary-button" />
+                </VBox>
+            </ScrollPane>
+        </SplitPane>
+    </VBox></center>
+</BorderPane>

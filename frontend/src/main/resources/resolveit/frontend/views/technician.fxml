@@ -15,7 +15,7 @@
                 <Label text="R" styleClass="shell-logo-text" />
             </StackPane>
             <Label text="ResolveIT" styleClass="shell-brand-name" />
-            <Label text="Technician workspace" styleClass="portal-label technician-portal-label" />
+            <Label fx:id="workspaceLabel" text="Technician workspace" styleClass="portal-label technician-portal-label" />
             <Region HBox.hgrow="ALWAYS" />
             <VBox alignment="CENTER_RIGHT" spacing="1.0">
                 <Label fx:id="userNameLabel" styleClass="user-name" />
@@ -34,6 +34,8 @@
             <Label text="SUPPORT" styleClass="nav-section-label" />
             <Button fx:id="queueNavButton" accessibleText="Open Ticket Queue" maxWidth="Infinity"
                     mnemonicParsing="true" onAction="#showQueue" text="▤  Ticket _Queue" styleClass="nav-button" />
+            <Button fx:id="requestsNavButton" text="Submit / edit requests" onAction="#showRequests" styleClass="nav-button" maxWidth="Infinity" />
+            <Button fx:id="usersNavButton" text="_User Management" onAction="#showUsers" mnemonicParsing="true" styleClass="nav-button" maxWidth="Infinity" />
             <Region VBox.vgrow="ALWAYS" />
         </VBox>
     </left>
@@ -44,9 +46,9 @@
             <StackPane fx:id="queuePage">
                 <VBox spacing="18.0">
                     <VBox spacing="5.0">
-                        <Label text="Ticket Queue" styleClass="workspace-heading" />
-                        <Label text="Review unresolved requests, take ownership, and keep work moving."
-                               styleClass="workspace-description" />
+                        <Label fx:id="queueHeading" text="Ticket Queue" styleClass="workspace-heading" />
+                        <Label fx:id="queueDescription" text="Review unresolved requests, take ownership, and keep work moving."
+                               styleClass="workspace-description" wrapText="true" />
                     </VBox>
                     <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="toolbar">
                         <ComboBox fx:id="statusFilter" prefWidth="145.0" promptText="All statuses"
@@ -99,7 +101,7 @@
                                 <Label fx:id="detailStatusLabel" styleClass="status-pill" />
                             </HBox>
                             <Label text="Request details, support actions, and complete conversation"
-                                   styleClass="workspace-description" />
+                                   styleClass="workspace-description" wrapText="true" />
                         </VBox>
                         <Region HBox.hgrow="ALWAYS" />
                         <ProgressIndicator fx:id="detailProgress" maxHeight="23.0" maxWidth="23.0"
@@ -119,6 +121,7 @@
                                             text="_Take ticket" styleClass="primary-button compact-button" />
                                     <Button fx:id="beginWorkButton" mnemonicParsing="true" onAction="#beginWork"
                                             text="_Begin work" styleClass="primary-button compact-button" />
+                                    <Button fx:id="cancelButton" text="Cancel ticket" onAction="#cancelTicket" styleClass="secondary-button compact-button" visible="false" managed="false" />
                                     <Button fx:id="reopenButton" mnemonicParsing="true" onAction="#reopenTicket"
                                             text="_Reopen" styleClass="secondary-button compact-button" />
                                 </HBox>
@@ -166,6 +169,14 @@
                             </VBox>
 
                             <VBox spacing="12.0" styleClass="content-card">
+                                <VBox fx:id="assignmentBox" spacing="8.0">
+                                    <Label text="Assign or reassign" labelFor="$assigneeField" styleClass="field-label" />
+                                    <ComboBox fx:id="assigneeField" maxWidth="Infinity" />
+                                    <HBox spacing="10.0">
+                                        <Button fx:id="assignButton" text="Assign" onAction="#assignTicket" styleClass="primary-button compact-button" />
+                                        <Button fx:id="refreshAssigneesButton" text="Refresh assignable users" onAction="#refreshAssignees" styleClass="secondary-button compact-button" />
+                                    </HBox>
+                                </VBox>
                                 <Label text="Support actions" styleClass="card-heading" />
                                 <HBox alignment="CENTER_LEFT" spacing="10.0">
                                     <Label text="Priority" styleClass="field-label" labelFor="$priorityField" />

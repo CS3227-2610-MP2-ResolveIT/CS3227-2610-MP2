@@ -1,6 +1,6 @@
 # ResolveIT frontend
 
-ResolveIT's desktop client is a Java 25 and JavaFX 25 application. The current frontend provides sign-in plus the employee and technician ticket workspaces described in `PROJECT.md`.
+ResolveIT's desktop client is a Java 25 and JavaFX 25 application. The current frontend provides sign-in plus the employee, technician, and manager workspaces described in `PROJECT.md`.
 
 Employees can:
 
@@ -17,6 +17,15 @@ Technicians can:
 - Take an eligible unassigned ticket or begin work on a ticket assigned to them.
 - Change ticket priority, reopen a resolved ticket, and resolve assigned work with a required resolution note.
 - Read the complete ticket conversation and add either public comments or IT-only internal notes.
+
+Managers can:
+
+- View all tickets, including resolved and cancelled requests, using status, priority, and assignment filters.
+- Assign or reassign open/in-progress tickets to active technicians or managers, and refresh the assignable-user list.
+- Perform support actions on other assignees’ tickets and cancel eligible tickets.
+- List paginated user accounts; create and edit usernames, emails, passwords, roles, and activation status.
+- Confirm account access changes; saving their own account signs them out so the next login reflects the updated account.
+- Open the request workspace to submit tickets and edit their own eligible requests.
 
 Ticket requests run away from the JavaFX Application Thread. In-progress actions display a loading indicator and prevent duplicate submissions, and authentication, authorization, validation, conflict, connection, and server failures are surfaced in the relevant view.
 
@@ -62,4 +71,4 @@ Use HTTPS outside local development. The access token and signed-in user are ret
 ./gradlew build
 ```
 
-Tests cover client-side validation, configuration, session lifecycle, authentication and ticket request/response mapping, technician filter and action requests, failure handling, and employee/technician workspace FXML wiring. Manager-specific ticket assignment and user-management screens are not implemented yet. The backend does not yet expose the refresh and logout endpoints described by `PROJECT.md`, so sign-out in this increment clears only the local in-memory session.
+Tests cover client-side validation, configuration, session lifecycle, authentication and ticket request/response mapping, technician filter and action requests, failure handling, manager API request contracts, and employee/technician/manager workspace FXML wiring. The backend does not yet expose the refresh and logout endpoints described by `PROJECT.md`, so sign-out in this increment clears only the local in-memory session.
