@@ -93,9 +93,14 @@ public final class Navigator {
             if (activeController != null) {
                 activeController.dispose();
             }
-            var scene = new Scene(root, 1120, 720);
-            scene.getStylesheets().add(requiredResource(STYLESHEET).toExternalForm());
-            stage.setScene(scene);
+            var scene = stage.getScene();
+            if (scene == null) {
+                scene = new Scene(root, 1120, 720);
+                scene.getStylesheets().add(requiredResource(STYLESHEET).toExternalForm());
+                stage.setScene(scene);
+            } else {
+                scene.setRoot(root);
+            }
             activeController = nextController;
             activeController.onShown();
         } catch (IOException exception) {
