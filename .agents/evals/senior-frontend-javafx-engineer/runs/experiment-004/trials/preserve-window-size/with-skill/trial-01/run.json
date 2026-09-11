@@ -1,0 +1,32 @@
+{
+  "skill": "senior-frontend-javafx-engineer",
+  "skill_sha256": "e1adb31df48b85655a584e961370159c068edb680b9a9dd1a2fb7a4ae258a00c",
+  "test_case": "preserve-window-size",
+  "configuration": "with-skill",
+  "trial": 1,
+  "fixture_sha256": "c2497aa3eeff20b773bec66a4e6115185049cf10768e8fdc433a61fed98fb193",
+  "fixture_revision": "f3733c0055a07a91732b0e310409518c41c5f130",
+  "workspace_base_revision": "1c8091d1ba4f622946d8c2b6fce81c69c0b581fe",
+  "fixture_path": "C:\\Users\\Keng Jer\\CS3227 Projects\\CS3227-2610-MP2\\.agents\\evals\\senior-frontend-javafx-engineer\\test-cases\\preserve-window-size\\fixture",
+  "prompt_sha256": "d9a7a82ffb7b582233032912e02f6a8e4834c4312043619de8d454c1dc2c35e2",
+  "supporting_skills": [],
+  "supporting_skill_sha256": {},
+  "interactions": [],
+  "worker_turns_planned": 1,
+  "model": "codex-configured-default",
+  "sandbox": "workspace-write",
+  "semantic_grading": false,
+  "semantic_judges": 0,
+  "workspace_git_metadata_removed": true,
+  "initial_git_state": {
+    "revision": "1c8091d1ba4f622946d8c2b6fce81c69c0b581fe",
+    "status": [],
+    "clean": true
+  },
+  "started_at": "2026-09-11T13:25:36.442327+00:00",
+  "skill_invocation": "implicit-candidate",
+  "worker_prompt_sha256": "e5d7f92a2b44103913bead551ec959fe5da0abaf57463f6a8a5cf26c5d908d29",
+  "worker_turns_completed": 1,
+  "thread_id": null,
+  "completed_at": "2026-09-11T13:26:37.713108+00:00"
+}

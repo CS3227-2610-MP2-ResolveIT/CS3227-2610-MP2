@@ -1,0 +1,4 @@
+interface:
+  display_name: "Senior JavaFX Frontend Engineer"
+  short_description: "Engineer robust, responsive JavaFX interfaces"
+  default_prompt: "Use $senior-frontend-javafx-engineer to implement and verify this JavaFX UI change."

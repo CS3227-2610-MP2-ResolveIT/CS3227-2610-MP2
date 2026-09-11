@@ -1,0 +1,62 @@
+{
+  "id": "experiment-004",
+  "skill": "senior-frontend-javafx-engineer",
+  "test_cases": [
+    "preserve-window-size"
+  ],
+  "configurations": [
+    "with-skill"
+  ],
+  "trials": 1,
+  "worker_trials": 1,
+  "worker_calls": 1,
+  "model": "codex-configured-default",
+  "timeout_seconds": 600,
+  "semantic_grading": false,
+  "semantic_judges": 0,
+  "started_at": "2026-09-11T13:25:34.897120+00:00",
+  "status": "completed",
+  "completed_at": "2026-09-11T13:26:37.719107+00:00",
+  "graded_trials": 1,
+  "passed_trials": 1,
+  "completed_trials": 1,
+  "mean_score": 100.0,
+  "overall_pass": true,
+  "aggregates": {
+    "cells": {
+      "preserve-window-size": {
+        "with-skill": {
+          "passed_trials": 1,
+          "total_trials": 1,
+          "mean_score": 100.0
+        }
+      }
+    },
+    "comparisons": {}
+  },
+  "results": [
+    {
+      "status": "graded",
+      "skill": "senior-frontend-javafx-engineer",
+      "test_case": "preserve-window-size",
+      "configuration": "with-skill",
+      "trial": 1,
+      "overall_pass": true,
+      "score": 100,
+      "deterministic_score": 100,
+      "semantic_score": null,
+      "deterministic_pass": true,
+      "semantic_pass": null,
+      "semantic_judges": 0,
+      "worker_exit_code": 0,
+      "worker_turns_planned": 1,
+      "worker_turns_completed": 1,
+      "protected_inputs_intact": true,
+      "deterministic_status": "completed",
+      "semantic_status": "not_requested",
+      "workspace_git_metadata_removed": true,
+      "failure_reasons": [],
+      "run_directory": "C:\\Users\\Keng Jer\\CS3227 Projects\\CS3227-2610-MP2\\.agents\\evals\\senior-frontend-javafx-engineer\\runs\\experiment-004\\trials\\preserve-window-size\\with-skill\\trial-01"
+    }
+  ]
+}

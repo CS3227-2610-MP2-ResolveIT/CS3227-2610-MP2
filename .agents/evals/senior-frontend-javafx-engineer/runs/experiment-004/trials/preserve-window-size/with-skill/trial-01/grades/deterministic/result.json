@@ -1,0 +1,46 @@
+{
+  "status": "completed",
+  "exit_code": 0,
+  "result": {
+    "overall_pass": true,
+    "score": 100,
+    "checks": [
+      {
+        "id": "compiles",
+        "pass": true,
+        "points": 10,
+        "notes": "Compile against probe API doubles. "
+      },
+      {
+        "id": "initial",
+        "pass": true,
+        "points": 15,
+        "notes": "Behavioral probe: initial. "
+      },
+      {
+        "id": "reuse",
+        "pass": true,
+        "points": 40,
+        "notes": "Behavioral probe: reuse. "
+      },
+      {
+        "id": "styles",
+        "pass": true,
+        "points": 15,
+        "notes": "Behavioral probe: styles. "
+      },
+      {
+        "id": "lifecycle",
+        "pass": true,
+        "points": 20,
+        "notes": "Behavioral probe: lifecycle. "
+      }
+    ],
+    "limitations": [
+      "JavaFX API doubles verify navigation interactions, not native window behavior or rendering.",
+      "Uses the fixture's public View/Navigator contract and a limited JavaFX API surface; new JavaFX APIs may require extending the probe doubles.",
+      "Root-cause explanation, scope discipline, verification attempts and honest handoff are assessed by expected.md; trace/run inputs are accepted but not scored here."
+    ]
+  },
+  "errors": []
+}

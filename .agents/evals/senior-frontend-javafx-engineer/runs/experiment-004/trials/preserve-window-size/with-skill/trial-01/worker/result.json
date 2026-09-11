@@ -1,0 +1,37 @@
+{
+  "exit_code": 0,
+  "elapsed_seconds": 58.703,
+  "turns_planned": 1,
+  "turns_completed": 1,
+  "metrics": {
+    "event_count": 16,
+    "parse_errors": 0,
+    "command_count": 8,
+    "failed_command_count": 0,
+    "repeated_command_count": 4,
+    "prohibited_commands": [],
+    "skill_read_observed": true,
+    "input_tokens": 96473,
+    "output_tokens": 806,
+    "skill_invocation_mode": "implicit-candidate",
+    "worker_elapsed_seconds": 58.703
+  },
+  "final_git_state": {
+    "revision": "1c8091d1ba4f622946d8c2b6fce81c69c0b581fe",
+    "status": [
+      " M src/main/java/resolveit/ui/Navigator.java"
+    ],
+    "clean": false,
+    "worker_exit_code": 0,
+    "completed_at": "2026-09-11T13:26:35.681520+00:00",
+    "protected_inputs_intact": true,
+    "task_prompt_intact": true,
+    "injected_skill_intact": true,
+    "supporting_skills_intact": {}
+  },
+  "protected_inputs_intact": true,
+  "task_prompt_intact": true,
+  "injected_skill_intact": true,
+  "supporting_skills_intact": {},
+  "untracked_files": []
+}

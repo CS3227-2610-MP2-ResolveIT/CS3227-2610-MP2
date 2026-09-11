@@ -1,0 +1,23 @@
+{
+  "status": "graded",
+  "skill": "senior-frontend-javafx-engineer",
+  "test_case": "preserve-window-size",
+  "configuration": "with-skill",
+  "trial": 1,
+  "overall_pass": true,
+  "score": 100,
+  "deterministic_score": 100,
+  "semantic_score": null,
+  "deterministic_pass": true,
+  "semantic_pass": null,
+  "semantic_judges": 0,
+  "worker_exit_code": 0,
+  "worker_turns_planned": 1,
+  "worker_turns_completed": 1,
+  "protected_inputs_intact": true,
+  "deterministic_status": "completed",
+  "semantic_status": "not_requested",
+  "workspace_git_metadata_removed": true,
+  "failure_reasons": [],
+  "run_directory": "C:\\Users\\Keng Jer\\CS3227 Projects\\CS3227-2610-MP2\\.agents\\evals\\senior-frontend-javafx-engineer\\runs\\experiment-004\\trials\\preserve-window-size\\with-skill\\trial-01"
+}

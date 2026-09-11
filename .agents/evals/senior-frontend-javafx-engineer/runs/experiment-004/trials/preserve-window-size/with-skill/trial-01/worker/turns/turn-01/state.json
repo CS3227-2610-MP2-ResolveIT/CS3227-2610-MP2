@@ -1,0 +1,9 @@
+{
+  "revision": "1c8091d1ba4f622946d8c2b6fce81c69c0b581fe",
+  "status": [
+    " M src/main/java/resolveit/ui/Navigator.java"
+  ],
+  "clean": false,
+  "worker_exit_code": 0,
+  "completed_at": "2026-09-11T13:26:35.148919+00:00"
+}

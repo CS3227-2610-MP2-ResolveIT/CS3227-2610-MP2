@@ -1,0 +1,22 @@
+diff --git a/src/main/java/resolveit/ui/Navigator.java b/src/main/java/resolveit/ui/Navigator.java
+index 6895d2b..708886e 100644
+--- a/src/main/java/resolveit/ui/Navigator.java
++++ b/src/main/java/resolveit/ui/Navigator.java
+@@ -17,9 +17,14 @@ public final class Navigator {
+             currentView.dispose();
+         }
+         Parent root = view.root();
+-        Scene scene = new Scene(root, 1120, 720);
+-        scene.getStylesheets().add(Navigator.class.getResource("/styles/app.css").toExternalForm());
+-        stage.setScene(scene);
++        Scene scene = stage.getScene();
++        if (scene == null) {
++            scene = new Scene(root, 1120, 720);
++            scene.getStylesheets().add(Navigator.class.getResource("/styles/app.css").toExternalForm());
++            stage.setScene(scene);
++        } else {
++            scene.setRoot(root);
++        }
+         currentView = view;
+         stage.show();
+         currentView.onShown();
