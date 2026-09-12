@@ -1,5 +1,6 @@
 package resolveit.config;
 
+import java.time.Clock;
 import java.util.Base64;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -29,6 +30,11 @@ import resolveit.user.UserRepository;
 @Configuration
 public class SecurityConfig {
     @Bean
+    Clock clock() {
+        return Clock.systemUTC();
+    }
+
+    @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
@@ -55,7 +61,8 @@ public class SecurityConfig {
                 .map(user -> OAuth2TokenValidatorResult.success())
                 .orElseGet(() -> OAuth2TokenValidatorResult.failure(
                         new OAuth2Error("invalid_token", "The user is inactive or no longer exists.", null)));
-        decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(JwtValidators.createDefaultWithIssuer(issuer), activeUser));
+        decoder.setJwtValidator(new DelegatingOAuth2TokenValidator<>(
+                JwtValidators.createDefaultWithIssuer(issuer), activeUser));
         return decoder;
     }
 
@@ -65,11 +72,12 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/auth/login").permitAll()
+                        .requestMatchers("/api/v1/auth/login", "/api/v1/auth/refresh").permitAll()
                         .requestMatchers("/api/v1/users/**", "/api/v1/technicians").hasRole("MANAGER")
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth -> oauth
-                        .jwt(jwt -> jwt.jwtAuthenticationConverter(token -> users.findByEmailIgnoreCase(token.getSubject())
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(token -> users
+                                .findByEmailIgnoreCase(token.getSubject())
                                 .map(user -> new JwtAuthenticationToken(token,
                                         java.util.List.of(new SimpleGrantedAuthority("ROLE_" + user.getRole().name())),
                                         user.getEmail()))

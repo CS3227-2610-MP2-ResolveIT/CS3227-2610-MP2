@@ -26,4 +26,5 @@ resolveit:
   jwt:
     issuer: resolveit-backend
     access-token-ttl: 15m
+    refresh-token-ttl: 7d
     secret: ${RESOLVEIT_JWT_SECRET:VGhpcy1pcy1hLWxvY2FsLWRldmVsb3BtZW50LWtleS1mb3ItUmVzb2x2ZUlULQ==}

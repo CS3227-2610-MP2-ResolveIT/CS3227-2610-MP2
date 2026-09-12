@@ -41,3 +41,16 @@ CREATE TABLE IF NOT EXISTS ticket_messages (
 );
 
 CREATE INDEX IF NOT EXISTS idx_ticket_messages_order ON ticket_messages(ticket_id, created_at, id);
+
+CREATE TABLE IF NOT EXISTS refresh_tokens (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token_hash VARCHAR(64) NOT NULL UNIQUE,
+    expires_at VARCHAR(30) NOT NULL,
+    revoked_at VARCHAR(30),
+    created_at VARCHAR(30) NOT NULL,
+    version INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE INDEX IF NOT EXISTS idx_refresh_tokens_user ON refresh_tokens(user_id);
+CREATE INDEX IF NOT EXISTS idx_refresh_tokens_expiry ON refresh_tokens(expires_at);
