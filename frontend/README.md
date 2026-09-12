@@ -1,6 +1,6 @@
 # ResolveIT frontend
 
-ResolveIT's desktop client is a Java 25 and JavaFX 25 application. The current frontend provides sign-in plus the employee, technician, and manager workspaces described in `PROJECT.md`.
+ResolveIT's desktop client is a Java 25 and JavaFX 25 application. The current frontend provides sign-in plus the employee, technician, and manager workspaces described in `../requirements/PROJECT.md`.
 
 Employees can:
 

@@ -49,7 +49,7 @@ manual rather than real-time.
 
 ## Software engineering process
 
-[`PROJECT.md`](../PROJECT.md) is the product and API source of truth. Work is divided
+[`requirements/PROJECT.md`](../requirements/PROJECT.md) is the product and API source of truth. Work is divided
 by role and layer, then implemented with repository-specific backend, JavaFX,
 review, logging, and commit skills under [`.agents/skills`](../.agents/skills).
 Material AI interactions are summarised under [`logs`](../logs).
@@ -66,7 +66,7 @@ cd ../frontend && ./gradlew test
 Visible JavaFX behaviour is checked manually; no FXML/UI test remains in the current
 suite. GitHub Actions runs the backend and frontend suites as independent CI jobs on
 pushes and pull requests, then uploads one cross-platform executable JAR for each
-module. Changes should be reviewed against `PROJECT.md`, tested in the affected
+module. Changes should be reviewed against `requirements/PROJECT.md`, tested in the affected
 module, documented, and committed as focused Conventional Commits.
 
 ## Key extension points
@@ -82,7 +82,7 @@ module, documented, and committed as focused Conventional Commits.
 
 ## Acknowledgements
 
-- The course specification in [`docs/MP2-requirements.md`](MP2-requirements.md)
+- The course specification in [`requirements/MP2-requirements.md`](../requirements/MP2-requirements.md)
   defines the assignment constraints and documentation requirements.
 - The backend uses [Spring Boot](https://spring.io/projects/spring-boot/), Spring
   MVC, Spring Data JPA, Spring Security, Hibernate's community SQLite dialect, and

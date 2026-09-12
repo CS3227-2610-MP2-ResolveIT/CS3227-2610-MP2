@@ -5,7 +5,7 @@
 ResolveIT was developed with a single Codex agent customised through repository-level
 instructions and task-specific skills. The agent was not treated as an autonomous
 replacement for the team. It was used as an implementation, testing, review, and
-process assistant whose work remained constrained by [`PROJECT.md`](../PROJECT.md),
+process assistant whose work remained constrained by [`requirements/PROJECT.md`](../requirements/PROJECT.md),
 the course requirements, the existing code, and human decisions.
 
 The main evidence for this reflection is the repository history, the customised
@@ -90,7 +90,7 @@ used to guide those implementations. Verification occurred at several levels:
 
 The code-review skill was designed as an independent quality gate. It defines an
 evidence hierarchy headed by observed behaviour and approved acceptance criteria,
-then `PROJECT.md`, the MP2 requirements, current guides, and finally general
+then `requirements/PROJECT.md`, the MP2 requirements, current guides, and finally general
 engineering guidance. It requires compilation, tests, realistic workflows, code
 quality, security, documentation consistency, and explicit limitations. Findings
 must have stable identifiers, severity, reproduction evidence, fix direction, and
@@ -110,7 +110,7 @@ findings are accurate and actionable.
 ## What the agent handled effectively
 
 The agent was most effective when the task had a clear contract and a bounded
-technical surface. It translated `PROJECT.md` into backend APIs and three
+technical surface. It translated `requirements/PROJECT.md` into backend APIs and three
 role-specific frontend workflows, connected the JavaFX client to the REST API, and
 created repeatable tests for backend integration, client validation, session state,
 configuration, HTTP request/response mapping, filtering, manager operations, and
@@ -178,7 +178,7 @@ The next version of the agent instructions and skills should:
 The technical skills could also be made more project-specific by linking directly
 to a compact ResolveIT checklist of role permissions, workflow transitions, API
 errors, and optimistic-lock cases. This would reduce repeated rediscovery while
-keeping `PROJECT.md` as the authoritative source.
+keeping `requirements/PROJECT.md` as the authoritative source.
 
 ## Lessons about designing one effective AI engineering agent
 

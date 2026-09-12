@@ -19,8 +19,8 @@ branch, or repository evidence, report `BLOCKED` and ask for it.
 ## Truth and gates
 
 Use this order: verified behaviour/evidence, approved issue and acceptance
-criteria, `PROJECT.md`, `docs/MP2-requirements.md`, current guides, then textbook
-guidance. Project sources define behaviour.
+criteria, `requirements/PROJECT.md`, `requirements/MP2-requirements.md`, current
+guides, then textbook guidance. Project sources define behaviour.
 
 Use Codex's native todo/plan facility to create one item for every applicable
 review check. Mark an item complete only after obtaining evidence; do not

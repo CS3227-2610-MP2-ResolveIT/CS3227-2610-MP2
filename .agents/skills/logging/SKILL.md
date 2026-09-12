@@ -9,7 +9,7 @@ Maintain accurate summaries of AI-assisted development work in the repository's 
 
 Before logging:
 
-- Read `AGENTS.md`, `PROJECT.md`, and `docs/MP2-requirements.md` for every session in this repository. These documents explain the ResolveIT requirements and why these logs exist: to support reflection on basic Agentic SE and at least three explained skills in `docs/Reflections.md`.
+- Read `AGENTS.md`, `requirements/PROJECT.md`, and `requirements/MP2-requirements.md` for every session in this repository. These documents explain the ResolveIT requirements and why these logs exist: to support reflection on basic Agentic SE and at least three explained skills in `docs/Reflections.md`.
 - Inspect existing files in `logs/` and follow their naming conventions.
 - Do not overwrite an existing log without inspecting it first.
 
