@@ -37,7 +37,8 @@ class HttpAuthClientTest {
         startServer(exchange -> {
             requestBody.set(new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8));
             respond(exchange, 200, """
-                    {"accessToken":"abc123","tokenType":"Bearer","expiresIn":900,
+                    {"accessToken":"abc123","refreshToken":"refresh123","tokenType":"Bearer","expiresIn":900,
+                     "refreshExpiresIn":604800,
                      "user":{"id":1,"username":"manager","email":"manager@resolveit.local",
                      "role":"MANAGER","active":true,"createdAt":"2026-09-04T00:00:00Z",
                      "updatedAt":"2026-09-04T00:00:00Z"}}
@@ -48,9 +49,39 @@ class HttpAuthClientTest {
                 .toCompletableFuture().join();
 
         assertEquals("abc123", response.accessToken());
+        assertEquals("refresh123", response.refreshToken());
         assertEquals("manager", response.user().username());
         assertTrue(requestBody.get().contains("\"email\":\"manager@resolveit.local\""));
         assertTrue(requestBody.get().contains("\"password\":\"secret\""));
+    }
+
+    @Test
+    void refreshesAndLogsOutUsingAuthenticationContracts() throws Exception {
+        var refreshBody = new AtomicReference<String>();
+        var logoutBody = new AtomicReference<String>();
+        var logoutAuthorization = new AtomicReference<String>();
+        startServer(exchange -> respond(exchange, 500, "not-used"));
+        server.createContext("/api/v1/auth/refresh", exchange -> {
+            refreshBody.set(new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8));
+            respond(exchange, 200, """
+                    {"accessToken":"new-access","refreshToken":"new-refresh","tokenType":"Bearer",
+                     "expiresIn":900,"refreshExpiresIn":604800}
+                    """);
+        });
+        server.createContext("/api/v1/auth/logout", exchange -> {
+            logoutBody.set(new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8));
+            logoutAuthorization.set(exchange.getRequestHeaders().getFirst("Authorization"));
+            exchange.sendResponseHeaders(204, -1);
+            exchange.close();
+        });
+
+        var refreshed = client.refresh(new RefreshRequest("old-refresh")).toCompletableFuture().join();
+        client.logout(new LogoutRequest("new-refresh"), "Bearer new-access").toCompletableFuture().join();
+
+        assertEquals("new-access", refreshed.accessToken());
+        assertTrue(refreshBody.get().contains("\"refreshToken\":\"old-refresh\""));
+        assertTrue(logoutBody.get().contains("\"refreshToken\":\"new-refresh\""));
+        assertEquals("Bearer new-access", logoutAuthorization.get());
     }
 
     @Test

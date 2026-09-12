@@ -1,22 +1,18 @@
 package resolveit.frontend.auth;
 
-import resolveit.frontend.model.User;
-
 /**
- * Successful login payload containing the user and initial token pair.
+ * Replacement access and refresh credentials returned after rotation.
  *
  * @param accessToken short-lived bearer token
- * @param refreshToken opaque refresh credential
+ * @param refreshToken rotated opaque refresh credential
  * @param tokenType HTTP authorization scheme
  * @param expiresIn access-token lifetime in seconds
  * @param refreshExpiresIn refresh-token lifetime in seconds
- * @param user authenticated user
  */
-public record LoginResponse(
+public record RefreshResponse(
         String accessToken,
         String refreshToken,
         String tokenType,
         long expiresIn,
-        long refreshExpiresIn,
-        User user) {
+        long refreshExpiresIn) {
 }

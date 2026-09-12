@@ -16,6 +16,9 @@ public final class AuthFailure extends RuntimeException {
         TIMEOUT,
         /** The backend returned a server-side failure. */
         SERVER,
+        /** The current credentials can no longer renew the session. */
+        SESSION_EXPIRED,
+        /** The backend returned an invalid success payload. */
         INVALID_RESPONSE
     }
 
