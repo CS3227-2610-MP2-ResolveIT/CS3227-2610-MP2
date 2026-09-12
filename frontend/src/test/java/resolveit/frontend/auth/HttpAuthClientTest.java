@@ -65,6 +65,22 @@ class HttpAuthClientTest {
     }
 
     @Test
+    void mapsRateLimitToSafeFailure() throws Exception {
+        startServer(exchange -> {
+            exchange.getResponseHeaders().set("Retry-After", "60");
+            respond(exchange, 429,
+                    "{\"status\":429,\"code\":\"LOGIN_RATE_LIMITED\","
+                            + "\"message\":\"Too many sign-in attempts. Please wait 1 minute before trying again.\"}");
+        });
+
+        var failure = failureFromLogin();
+
+        assertEquals(AuthFailure.Kind.RATE_LIMITED, failure.kind());
+        assertEquals("Too many sign-in attempts. Please wait 1 minute before trying again.",
+                failure.getMessage());
+    }
+
+    @Test
     void mapsValidationAndServerFailures() throws Exception {
         startServer(exchange -> respond(exchange, 400,
                 "{\"status\":400,\"code\":\"VALIDATION_FAILED\",\"message\":\"Invalid fields: email.\"}"));

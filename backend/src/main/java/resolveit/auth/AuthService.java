@@ -31,6 +31,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtEncoder jwtEncoder;
     private final RefreshTokenService refreshTokens;
+    private final LoginAttemptLimiter loginAttempts;
     private final Clock clock;
     private final String issuer;
     private final Duration accessTokenTtl;
@@ -43,18 +44,20 @@ public class AuthService {
      * @param passwordEncoder password verifier
      * @param jwtEncoder access-token encoder
      * @param refreshTokens refresh-token service
+     * @param loginAttempts repeated-login limiter
      * @param clock authentication clock
      * @param issuer access-token issuer
      * @param accessTokenTtl access-token lifetime
      */
     public AuthService(UserRepository users, PasswordEncoder passwordEncoder, JwtEncoder jwtEncoder,
-                       RefreshTokenService refreshTokens, Clock clock,
+                       RefreshTokenService refreshTokens, LoginAttemptLimiter loginAttempts, Clock clock,
                        @Value("${resolveit.jwt.issuer}") String issuer,
                        @Value("${resolveit.jwt.access-token-ttl}") Duration accessTokenTtl) {
         this.users = users;
         this.passwordEncoder = passwordEncoder;
         this.jwtEncoder = jwtEncoder;
         this.refreshTokens = refreshTokens;
+        this.loginAttempts = loginAttempts;
         this.clock = clock;
         this.issuer = issuer;
         this.accessTokenTtl = accessTokenTtl;
@@ -64,15 +67,20 @@ public class AuthService {
      * Authenticates credentials and issues the initial access and refresh pair.
      *
      * @param request submitted credentials
+     * @param remoteAddress direct client address used by the login limiter
      * @return the authenticated user and issued credentials
      */
     @Transactional
-    public LoginResponse login(LoginRequest request) {
-        var user = users.findByEmailIgnoreCase(request.email().trim())
-                .filter(User::isActive)
-                .filter(candidate -> passwordEncoder.matches(request.password(), candidate.getPasswordHash()))
-                .orElseThrow(() -> ApiException.unauthorized(
-                        "INVALID_CREDENTIALS", "The email or password is incorrect."));
+    public LoginResponse login(LoginRequest request, String remoteAddress) {
+        var email = request.email().trim();
+        loginAttempts.checkAllowed(email, remoteAddress);
+        var user = users.findByEmailIgnoreCase(email).orElse(null);
+        if (user == null || !user.isActive()
+                || !passwordEncoder.matches(request.password(), user.getPasswordHash())) {
+            loginAttempts.recordFailure(email, remoteAddress);
+            throw ApiException.unauthorized("INVALID_CREDENTIALS", "The email or password is incorrect.");
+        }
+        loginAttempts.recordSuccess(email, remoteAddress);
         var now = clock.instant();
         var accessToken = issueAccessToken(user, now);
         var refreshToken = refreshTokens.issue(user, now);

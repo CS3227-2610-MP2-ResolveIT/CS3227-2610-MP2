@@ -23,6 +23,12 @@ server:
     include-stacktrace: never
 
 resolveit:
+  auth:
+    login-rate-limit:
+      max-failures: 5
+      window: 10m
+      block-duration: 1m
+      max-entries: 10000
   jwt:
     issuer: resolveit-backend
     access-token-ttl: 15m

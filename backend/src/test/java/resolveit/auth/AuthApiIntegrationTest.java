@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -151,6 +152,33 @@ class AuthApiIntegrationTest {
             var statuses = java.util.List.of(first.get(), second.get()).stream().sorted().toList();
             assertEquals(java.util.List.of(200, 401), statuses);
         }
+    }
+
+    @Test
+    void repeatedLoginFailuresReturnRateLimitResponse() throws Exception {
+        for (int attempt = 0; attempt < 5; attempt++) {
+            mvc.perform(post("/api/v1/auth/login")
+                            .with(request -> {
+                                request.setRemoteAddr("10.0.0.50");
+                                return request;
+                            })
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content("{\"email\":\"employee@test.local\",\"password\":\"wrong\"}"))
+                    .andExpect(status().isUnauthorized())
+                    .andExpect(jsonPath("$.code").value("INVALID_CREDENTIALS"));
+        }
+
+        mvc.perform(post("/api/v1/auth/login")
+                        .with(request -> {
+                            request.setRemoteAddr("10.0.0.50");
+                            return request;
+                        })
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"email\":\"employee@test.local\",\"password\":\"secret\"}"))
+                .andExpect(status().isTooManyRequests())
+                .andExpect(header().string("Retry-After", "60"))
+                .andExpect(jsonPath("$.code").value("LOGIN_RATE_LIMITED"))
+                .andExpect(jsonPath("$.message").value("Too many sign-in attempts. Please try again later."));
     }
 
     private JsonNode login(String email, String password) throws Exception {

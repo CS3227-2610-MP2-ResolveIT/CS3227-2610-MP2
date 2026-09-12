@@ -6,6 +6,7 @@ import static resolveit.auth.AuthDtos.LogoutRequest;
 import static resolveit.auth.AuthDtos.RefreshRequest;
 import static resolveit.auth.AuthDtos.RefreshResponse;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -38,14 +39,15 @@ public class AuthController {
     }
 
     /**
-     * Authenticates submitted credentials.
+     * Authenticates submitted credentials for the direct client address.
      *
      * @param request submitted credentials
+     * @param servletRequest HTTP request containing the direct client address
      * @return authenticated user and initial token pair
      */
     @PostMapping("/login")
-    public LoginResponse login(@Valid @RequestBody LoginRequest request) {
-        return authService.login(request);
+    public LoginResponse login(@Valid @RequestBody LoginRequest request, HttpServletRequest servletRequest) {
+        return authService.login(request, servletRequest.getRemoteAddr());
     }
 
     /**

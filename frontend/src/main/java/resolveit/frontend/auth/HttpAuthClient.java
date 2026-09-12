@@ -95,6 +95,10 @@ public final class HttpAuthClient implements AuthClient, AutoCloseable {
             throw new AuthFailure(AuthFailure.Kind.INVALID_REQUEST,
                     apiError == null ? "The sign-in details are invalid." : apiError.message());
         }
+        if (status == 429) {
+            throw new AuthFailure(AuthFailure.Kind.RATE_LIMITED,
+                    "Too many sign-in attempts. Please wait 1 minute before trying again.");
+        }
         if (status >= 500) {
             throw new AuthFailure(AuthFailure.Kind.SERVER,
                     "ResolveIT is temporarily unavailable. Please try again.");

@@ -10,6 +10,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import resolveit.auth.LoginRateLimitException;
 
 @RestControllerAdvice
 public class ApiExceptionHandler {
@@ -19,6 +20,13 @@ public class ApiExceptionHandler {
     ResponseEntity<ApiError> apiException(ApiException exception) {
         return ResponseEntity.status(exception.status())
                 .body(new ApiError(exception.status().value(), exception.code(), exception.getMessage()));
+    }
+
+    @ExceptionHandler(LoginRateLimitException.class)
+    ResponseEntity<ApiError> loginRateLimit(LoginRateLimitException exception) {
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS)
+                .header("Retry-After", Long.toString(exception.retryAfterSeconds()))
+                .body(new ApiError(429, "LOGIN_RATE_LIMITED", exception.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
