@@ -66,6 +66,7 @@ public final class AuthenticatedController implements ViewLifecycle {
     @FXML private Label avatarLabel;
     @FXML private Label userNameLabel;
     @FXML private Label userRoleLabel;
+    @FXML private Button logoutButton;
     @FXML private Button myTicketsNavButton;
     @FXML private Button submitNavButton;
     @FXML private StackPane myTicketsPage;
@@ -646,8 +647,11 @@ public final class AuthenticatedController implements ViewLifecycle {
 
     @FXML
     private void logout() {
-        session.clear();
-        navigator.showLogin();
+        if (logoutButton.isDisabled()) {
+            return;
+        }
+        logoutButton.setDisable(true);
+        navigator.signOut();
     }
 
     @Override

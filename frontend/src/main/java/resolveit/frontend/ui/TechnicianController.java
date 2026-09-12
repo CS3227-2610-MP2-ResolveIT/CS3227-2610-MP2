@@ -63,7 +63,8 @@ public final class TechnicianController implements ViewLifecycle {
     private int pageCount;
 
     @FXML private Label workspaceLabel, queueHeading, queueDescription;
-    @FXML private Button usersNavButton, requestsNavButton, cancelButton, assignButton, refreshAssigneesButton;
+    @FXML private Button usersNavButton, requestsNavButton, logoutButton;
+    @FXML private Button cancelButton, assignButton, refreshAssigneesButton;
     @FXML private VBox assignmentBox;
     @FXML private ComboBox<resolveit.frontend.model.User> assigneeField;
     private boolean assigneesLoading;
@@ -583,8 +584,11 @@ public final class TechnicianController implements ViewLifecycle {
     }
 
     @FXML private void logout() {
-        session.clear();
-        navigator.showLogin();
+        if (logoutButton.isDisabled()) {
+            return;
+        }
+        logoutButton.setDisable(true);
+        navigator.signOut();
     }
 
     @Override

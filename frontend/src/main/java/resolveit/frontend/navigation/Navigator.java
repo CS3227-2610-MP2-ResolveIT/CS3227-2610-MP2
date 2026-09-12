@@ -2,6 +2,7 @@ package resolveit.frontend.navigation;
 
 import java.io.IOException;
 import java.net.URL;
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -81,6 +82,11 @@ public final class Navigator {
             }
             throw new IllegalArgumentException("Unsupported FXML controller: " + type.getName());
         });
+    }
+
+    /** Revokes the current server session and returns to login after local cleanup. */
+    public void signOut() {
+        authService.logout().whenComplete((ignored, failure) -> Platform.runLater(this::showLogin));
     }
 
     private void show(String viewPath, javafx.util.Callback<Class<?>, Object> controllerFactory) {

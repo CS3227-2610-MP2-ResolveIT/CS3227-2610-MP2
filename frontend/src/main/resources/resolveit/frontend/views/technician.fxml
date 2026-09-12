@@ -24,7 +24,7 @@
             <StackPane minHeight="38.0" minWidth="38.0" prefHeight="38.0" prefWidth="38.0" styleClass="header-avatar">
                 <Label fx:id="avatarLabel" styleClass="header-avatar-text" />
             </StackPane>
-            <Button accessibleText="Sign out of ResolveIT" mnemonicParsing="true" onAction="#logout"
+            <Button fx:id="logoutButton" accessibleText="Sign out of ResolveIT" mnemonicParsing="true" onAction="#logout"
                     text="Sign _out" styleClass="secondary-button" />
         </HBox>
     </top>

@@ -36,7 +36,7 @@ These accounts are demo data and must not be used in production.
 
 ## Authentication
 
-Log in to obtain a 15-minute bearer token:
+Log in to obtain a 15-minute bearer access token and a seven-day refresh token:
 
 ```bash
 curl -s http://localhost:8080/api/v1/auth/login \
@@ -44,7 +44,7 @@ curl -s http://localhost:8080/api/v1/auth/login \
   -d '{"email":"manager@resolveit.local","password":"Manager123!"}'
 ```
 
-All endpoints except login require the returned token:
+Protected endpoints use the returned access token:
 
 ```http
 Authorization: Bearer <accessToken>
@@ -53,7 +53,13 @@ Authorization: Bearer <accessToken>
 | Method | Endpoint | Access |
 |---|---|---|
 | `POST` | `/auth/login` | Public |
+| `POST` | `/auth/refresh` | Public; rotates a valid refresh token |
+| `POST` | `/auth/logout` | Authenticated user; revokes the presented refresh token |
 | `GET` | `/auth/me` | Authenticated user |
+
+Repeated failed logins for the same normalized email and direct client address
+are temporarily rate-limited. Refresh tokens are stored only as hashes, rotate
+after successful use, expire, and can no longer be used after logout.
 
 ## User management endpoints
 

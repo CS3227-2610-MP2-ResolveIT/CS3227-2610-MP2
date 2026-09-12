@@ -41,8 +41,11 @@ On Windows, use `gradlew.bat` instead. The client connects to
   create or edit user accounts, roles, and activation status.
 
 Use the refresh controls to retrieve changes; real-time updates are not supported.
-Signing out clears the local session. Demo accounts and the default JWT secret are
-for local development only.
+The app renews an active session automatically when possible. Signing out revokes
+the current server session and clears local credentials; closing the app also
+clears those credentials, so the next launch requires a new sign-in. Repeated
+failed sign-ins are temporarily limited. Demo accounts and the default JWT secret
+are for local development only.
 
 ## Testing
 

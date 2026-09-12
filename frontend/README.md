@@ -54,7 +54,12 @@ The client connects to `http://localhost:8080/api/v1` by default. Override that 
 RESOLVEIT_API_BASE_URL=https://resolveit.example.com/api/v1 ./gradlew run
 ```
 
-Use HTTPS outside local development. The access token and signed-in user are retained in memory only and are cleared when the user signs out or closes the application.
+Use HTTPS outside local development. Access and refresh credentials and the
+signed-in user are retained in memory only. The client automatically renews a
+near-expiry access token. Signing out revokes the current refresh token on the
+backend when possible and always clears local state; closing the application also
+clears that state, so the next launch requires a new sign-in. Repeated failed
+sign-in attempts are temporarily rate-limited.
 
 ## Demo accounts
 

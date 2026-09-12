@@ -8,7 +8,8 @@
         <Label text="ResolveIT" styleClass="shell-brand-name" />
         <Button fx:id="backButton" text="All _Tickets" mnemonicParsing="true" onAction="#back" styleClass="secondary-button" />
         <Region HBox.hgrow="ALWAYS" /><Label fx:id="profileLabel" />
-        <Button text="Sign _out" mnemonicParsing="true" onAction="#logout" styleClass="secondary-button" />
+        <Button fx:id="logoutButton" text="Sign _out" mnemonicParsing="true" onAction="#logout"
+                styleClass="secondary-button" />
     </HBox></top>
     <center><VBox spacing="14">
         <padding><Insets top="24" bottom="24" left="24" right="24" /></padding>

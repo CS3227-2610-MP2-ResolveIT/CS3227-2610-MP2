@@ -36,7 +36,7 @@ public final class UsersController implements ViewLifecycle {
     @FXML private CheckBox activeField;
     @FXML private Label errorLabel, noticeLabel, pageLabel, editorTitle, profileLabel;
     @FXML private ProgressIndicator progress;
-    @FXML private Button previousButton, nextButton, refreshButton, newButton, saveButton, backButton;
+    @FXML private Button previousButton, nextButton, refreshButton, newButton, saveButton, backButton, logoutButton;
     @FXML private VBox editor;
 
     public UsersController(SessionState session, ManagerService service, Navigator navigator) {
@@ -62,7 +62,13 @@ public final class UsersController implements ViewLifecycle {
     }
     @Override public void onShown() { refresh(); }
     @FXML private void back() { navigator.showAuthenticated(); }
-    @FXML private void logout() { session.clear(); navigator.showLogin(); }
+    @FXML private void logout() {
+        if (logoutButton.isDisabled()) {
+            return;
+        }
+        logoutButton.setDisable(true);
+        navigator.signOut();
+    }
     @FXML private void newUser() {
         if (busy) return;
         editing = null;
@@ -124,6 +130,7 @@ public final class UsersController implements ViewLifecycle {
         progress.setVisible(value); progress.setManaged(value);
         editor.setDisable(value); usersTable.setDisable(value);
         refreshButton.setDisable(value); newButton.setDisable(value); saveButton.setDisable(value); backButton.setDisable(value);
+        logoutButton.setDisable(value);
         previousButton.setDisable(value || page == 0); nextButton.setDisable(value || page + 1 >= pages);
     }
     private <T> void run(CompletionStage<T> operation, Consumer<T> success) {

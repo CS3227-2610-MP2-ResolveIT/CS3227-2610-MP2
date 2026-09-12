@@ -27,7 +27,9 @@ flowchart LR
 - `auth`, `ticket`, and `user` services contain validation and use-case logic.
 - `HttpAuthClient` and `HttpTicketClient` perform JSON REST calls asynchronously so
   network work does not block the JavaFX Application Thread.
-- `SessionState` stores the access token and user in memory only.
+- `SessionState` stores access and refresh credentials, their expiry times, and
+  the signed-in user in memory only. `AuthService` renews near-expiry access
+  tokens and shares one refresh operation among concurrent requests.
 
 ### Backend
 
@@ -39,13 +41,18 @@ flowchart LR
 - SQLite uses one pooled connection with foreign keys enabled. Ticket `version`
   provides optimistic-lock protection, while taking a ticket uses an atomic update.
 - Spring Security issues 15-minute HS256 JWT access tokens, checks that the user is
-  still active, and protects manager endpoints by role. The checked-in secret is
-  for local development only.
+  still active, and protects manager endpoints by role. Opaque refresh tokens are
+  stored as hashes, expire after seven days, rotate on use, and can be revoked.
+  Repeated failed logins are temporarily rate-limited by normalized email and
+  direct client address. The checked-in JWT secret is for local development only.
 
-The API currently implements login and current-user lookup, ticket and message
-workflows, and manager user administration. Refresh tokens and server-side logout
-are not implemented; frontend sign-out clears local session state. Updates are
-manual rather than real-time.
+The API implements login, token refresh, authenticated logout, current-user lookup,
+ticket and message workflows, and manager user administration. The frontend
+renews a near-expiry access token before protected requests and retries one request
+after a `401`. Sign-out asks the backend to revoke the current refresh token and
+always clears local state. Closing the application clears its in-memory state, so
+the user signs in again on the next launch. Updates are manual rather than
+real-time.
 
 ## Software engineering process
 
