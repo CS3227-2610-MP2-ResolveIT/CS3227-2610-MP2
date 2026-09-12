@@ -1,12 +1,12 @@
 package resolveit.frontend.ticket;
 
 import java.util.concurrent.CompletionStage;
-import resolveit.frontend.ticket.TicketRequests.CreateMessage;
-import resolveit.frontend.ticket.TicketRequests.CreateTicket;
-import resolveit.frontend.ticket.TicketRequests.UpdateTicket;
 import resolveit.frontend.ticket.TicketRequests.ChangePriority;
 import resolveit.frontend.ticket.TicketRequests.ChangeStatus;
+import resolveit.frontend.ticket.TicketRequests.CreateMessage;
+import resolveit.frontend.ticket.TicketRequests.CreateTicket;
 import resolveit.frontend.ticket.TicketRequests.ResolveTicket;
+import resolveit.frontend.ticket.TicketRequests.UpdateTicket;
 
 public interface TicketClient {
     CompletionStage<PageResponse<Ticket>> list(TicketStatus status, int page, int size);

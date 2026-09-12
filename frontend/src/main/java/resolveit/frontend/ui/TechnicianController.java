@@ -68,25 +68,39 @@ public final class TechnicianController implements ViewLifecycle {
     @FXML private VBox assignmentBox;
     @FXML private ComboBox<resolveit.frontend.model.User> assigneeField;
     private boolean assigneesLoading;
-    private boolean isManager() { return session.current().orElseThrow().user().role() == resolveit.frontend.model.Role.MANAGER; }
+    private boolean isManager() {
+        return session.current().orElseThrow().user().role() == resolveit.frontend.model.Role.MANAGER;
+    }
     @FXML private void showRequests() { navigator.showRequesterWorkspace(); }
     @FXML private void showUsers() { navigator.showUsers(); }
     @FXML private void refreshAssignees() {
-        if (assigneesLoading || disposed) return;
+        if (assigneesLoading || disposed) {
+            return;
+        }
         assigneesLoading = true;
         updateBusyState();
         run(managerService.technicians(), users -> {
             assigneesLoading = false;
             assigneeField.setItems(FXCollections.observableArrayList(users));
             updateBusyState();
-        }, failure -> { assigneesLoading = false; updateBusyState(); showFailure(detailErrorLabel, failure); });
+        }, failure -> {
+            assigneesLoading = false;
+            updateBusyState();
+            showFailure(detailErrorLabel, failure);
+        });
     }
     @FXML private void assignTicket() {
-        if (selectedTicket == null || actionLoading || assigneeField.getValue() == null) return;
+        if (selectedTicket == null || actionLoading || assigneeField.getValue() == null) {
+            return;
+        }
         mutate(managerService.assign(selectedTicket.id(), assigneeField.getValue().id()), "Assignment updated.");
     }
     @FXML private void cancelTicket() {
-        if (selectedTicket == null || actionLoading || !confirm("Cancel ticket", "Cancel " + selectedTicket.ticketNumber() + "?", "Cancelled tickets cannot be reopened.")) return;
+        if (selectedTicket == null || actionLoading
+                || !confirm("Cancel ticket", "Cancel " + selectedTicket.ticketNumber() + "?",
+                        "Cancelled tickets cannot be reopened.")) {
+            return;
+        }
         mutate(ticketService.cancel(selectedTicket.id()), "Ticket cancelled.");
     }
 
@@ -164,7 +178,9 @@ public final class TechnicianController implements ViewLifecycle {
         statusFilter.setItems(FXCollections.observableArrayList(
                 TicketStatus.OPEN, TicketStatus.IN_PROGRESS, TicketStatus.RESOLVED));
         statusFilter.getItems().addFirst(null);
-        if (isManager()) statusFilter.getItems().add(TicketStatus.CANCELLED);
+        if (isManager()) {
+            statusFilter.getItems().add(TicketStatus.CANCELLED);
+        }
         usersNavButton.setVisible(isManager());
         usersNavButton.setManaged(isManager());
         assignmentBox.setVisible(isManager());
@@ -172,11 +188,14 @@ public final class TechnicianController implements ViewLifecycle {
         if (isManager()) {
             workspaceLabel.setText("Manager workspace");
             queueHeading.setText("All Tickets");
-            queueDescription.setText("Review all requests, including resolved and cancelled tickets, and manage assignments.");
+            queueDescription.setText(
+                    "Review all requests, including resolved and cancelled tickets, and manage assignments.");
             queueNavButton.setText("All _Tickets");
             ticketsTable.setAccessibleText("All tickets");
         }
-        assigneeField.setConverter(nullableConverter("Choose an active technician or manager", candidate -> candidate.username() + " (" + candidate.role() + ")"));
+        assigneeField.setConverter(nullableConverter(
+                "Choose an active technician or manager",
+                candidate -> candidate.username() + " (" + candidate.role() + ")"));
         assigneeField.valueProperty().addListener((o, a, b) -> updateBusyState());
         priorityFilter.setItems(FXCollections.observableArrayList(TicketPriority.values()));
         priorityFilter.getItems().addFirst(null);
@@ -205,7 +224,9 @@ public final class TechnicianController implements ViewLifecycle {
         updatedColumn.setCellValueFactory(cell -> text(formatDate(cell.getValue().updatedAt())));
         ticketsTable.setRowFactory(ignored -> ticketRow());
         ticketsTable.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) openSelectedTicket();
+            if (event.getCode() == KeyCode.ENTER) {
+                openSelectedTicket();
+            }
         });
         messagesList.setCellFactory(ignored -> new MessageCell());
 
@@ -240,24 +261,31 @@ public final class TechnicianController implements ViewLifecycle {
 
     @FXML
     private void refreshQueue() {
-        if (listLoading || disposed) return;
+        if (listLoading || disposed) {
+            return;
+        }
         listLoading = true;
         queueErrorLabel.setText("");
         updateBusyState();
-        run(ticketService.list(statusFilter.getValue(), priorityFilter.getValue(),
-                assignmentFilter.getValue(), currentPage), page -> {
-            ticketsTable.setItems(FXCollections.observableArrayList(page.content()));
-            ticketCountLabel.setText(page.totalElements() == 1 ? "1 ticket" : page.totalElements() + " tickets");
-            pageCount = page.totalPages();
-            currentPage = page.page();
-            pageLabel.setText(pageCount == 0 ? "Page 0 of 0" : "Page " + (currentPage + 1) + " of " + pageCount);
-            listLoading = false;
-            updateBusyState();
-        }, failure -> {
-            listLoading = false;
-            updateBusyState();
-            showFailure(queueErrorLabel, failure);
-        });
+        run(
+                ticketService.list(statusFilter.getValue(), priorityFilter.getValue(),
+                        assignmentFilter.getValue(), currentPage),
+                page -> {
+                    ticketsTable.setItems(FXCollections.observableArrayList(page.content()));
+                    ticketCountLabel.setText(
+                            page.totalElements() == 1 ? "1 ticket" : page.totalElements() + " tickets");
+                    pageCount = page.totalPages();
+                    currentPage = page.page();
+                    pageLabel.setText(pageCount == 0
+                            ? "Page 0 of 0" : "Page " + (currentPage + 1) + " of " + pageCount);
+                    listLoading = false;
+                    updateBusyState();
+                },
+                failure -> {
+                    listLoading = false;
+                    updateBusyState();
+                    showFailure(queueErrorLabel, failure);
+                });
     }
 
     @FXML private void previousPage() {
@@ -270,11 +298,15 @@ public final class TechnicianController implements ViewLifecycle {
 
     @FXML private void openSelectedTicket() {
         var ticket = ticketsTable.getSelectionModel().getSelectedItem();
-        if (ticket != null) openTicket(ticket.id());
+        if (ticket != null) {
+            openTicket(ticket.id());
+        }
     }
 
     private void openTicket(int ticketId) {
-        if (detailLoading || actionLoading) return;
+        if (detailLoading || actionLoading) {
+            return;
+        }
         detailTicketId = ticketId;
         assigneeField.setValue(null);
         showPage(detailPage);
@@ -284,15 +316,21 @@ public final class TechnicianController implements ViewLifecycle {
         detailContent.setVisible(false);
         detailContent.setManaged(false);
         loadDetails(ticketId, null);
-        if (isManager()) refreshAssignees();
+        if (isManager()) {
+            refreshAssignees();
+        }
     }
 
     @FXML private void refreshDetails() {
-        if (detailTicketId != null) loadDetails(detailTicketId, null);
+        if (detailTicketId != null) {
+            loadDetails(detailTicketId, null);
+        }
     }
 
     private void loadDetails(int ticketId, String notice) {
-        if (detailLoading || actionLoading || disposed) return;
+        if (detailLoading || actionLoading || disposed) {
+            return;
+        }
         detailLoading = true;
         detailErrorLabel.setText("");
         detailNoticeLabel.setText("");
@@ -307,7 +345,9 @@ public final class TechnicianController implements ViewLifecycle {
             inFlight.remove(ticketFuture);
             inFlight.remove(messagesFuture);
             inFlight.remove(combined);
-            if (disposed) return;
+            if (disposed) {
+                return;
+            }
             detailLoading = false;
             updateBusyState();
             if (failure != null) {
@@ -326,23 +366,31 @@ public final class TechnicianController implements ViewLifecycle {
     @FXML private void takeTicket() {
         if (selectedTicket == null || actionLoading || !confirm("Take ticket",
                 "Take " + selectedTicket.ticketNumber() + "?",
-                "The ticket will be assigned to you and moved to In progress.")) return;
+                "The ticket will be assigned to you and moved to In progress.")) {
+            return;
+        }
         mutate(ticketService.take(selectedTicket.id()), "Ticket assigned to you.");
     }
 
     @FXML private void beginWork() {
-        if (selectedTicket == null || actionLoading) return;
+        if (selectedTicket == null || actionLoading) {
+            return;
+        }
         mutate(ticketService.beginWork(selectedTicket.id()), "Work started on this ticket.");
     }
 
     @FXML private void changePriority() {
         if (selectedTicket == null || actionLoading || priorityField.getValue() == null
-                || priorityField.getValue() == selectedTicket.priority()) return;
+                || priorityField.getValue() == selectedTicket.priority()) {
+            return;
+        }
         mutate(ticketService.changePriority(selectedTicket.id(), priorityField.getValue()), "Priority updated.");
     }
 
     @FXML private void resolveTicket() {
-        if (selectedTicket == null || actionLoading) return;
+        if (selectedTicket == null || actionLoading) {
+            return;
+        }
         var note = resolutionField.getText();
         if (note == null || note.isBlank()) {
             resolutionErrorLabel.setText("Enter a resolution note before resolving the ticket.");
@@ -355,19 +403,25 @@ public final class TechnicianController implements ViewLifecycle {
             return;
         }
         if (!confirm("Resolve ticket", "Resolve " + selectedTicket.ticketNumber() + "?",
-                "The requester will see the resolution note and can reopen the ticket.")) return;
+                "The requester will see the resolution note and can reopen the ticket.")) {
+            return;
+        }
         mutate(ticketService.resolve(selectedTicket.id(), note), "Ticket resolved.");
     }
 
     @FXML private void reopenTicket() {
         if (selectedTicket == null || actionLoading || !confirm("Reopen ticket",
                 "Reopen " + selectedTicket.ticketNumber() + "?",
-                "The ticket will return to the open queue and its assignment and resolution will be cleared.")) return;
+                "The ticket will return to the open queue and its assignment and resolution will be cleared.")) {
+            return;
+        }
         mutate(ticketService.reopen(selectedTicket.id()), "Ticket reopened and returned to the queue.");
     }
 
     @FXML private void addMessage() {
-        if (selectedTicket == null || actionLoading) return;
+        if (selectedTicket == null || actionLoading) {
+            return;
+        }
         var error = TicketValidator.validateMessage(messageField.getText());
         if (error != null) {
             messageErrorLabel.setText(error);
@@ -376,19 +430,23 @@ public final class TechnicianController implements ViewLifecycle {
         }
         actionLoading = true;
         updateBusyState();
-        run(ticketService.addMessage(selectedTicket.id(), messageTypeField.getValue(), messageField.getText()), message -> {
-            actionLoading = false;
-            messageField.clear();
-            messagesList.getItems().add(message);
-            messagesList.scrollTo(message);
-            detailNoticeLabel.setText(message.messageType().equals("INTERNAL_NOTE")
-                    ? "Internal note added. It is visible only to IT staff." : "Public comment posted.");
-            updateBusyState();
-        }, failure -> {
-            actionLoading = false;
-            updateBusyState();
-            showFailure(messageErrorLabel, failure);
-        });
+        run(
+                ticketService.addMessage(
+                        selectedTicket.id(), messageTypeField.getValue(), messageField.getText()),
+                message -> {
+                    actionLoading = false;
+                    messageField.clear();
+                    messagesList.getItems().add(message);
+                    messagesList.scrollTo(message);
+                    detailNoticeLabel.setText(message.messageType().equals("INTERNAL_NOTE")
+                            ? "Internal note added. It is visible only to IT staff." : "Public comment posted.");
+                    updateBusyState();
+                },
+                failure -> {
+                    actionLoading = false;
+                    updateBusyState();
+                    showFailure(messageErrorLabel, failure);
+                });
     }
 
     private void mutate(CompletionStage<Ticket> operation, String notice) {
@@ -426,7 +484,8 @@ public final class TechnicianController implements ViewLifecycle {
         detailCategoryLabel.setText(ticket.category().displayName());
         detailPriorityLabel.setText(ticket.priority().displayName());
         detailRequesterLabel.setText(ticket.requesterUsername());
-        detailAssigneeLabel.setText(ticket.assignedToUsername() == null ? "Unassigned" : ticket.assignedToUsername());
+        detailAssigneeLabel.setText(
+                ticket.assignedToUsername() == null ? "Unassigned" : ticket.assignedToUsername());
         detailCreatedLabel.setText(formatDate(ticket.createdAt()));
         priorityField.setValue(ticket.priority());
 
@@ -436,13 +495,16 @@ public final class TechnicianController implements ViewLifecycle {
         resolutionLabel.setText(hasResolution ? ticket.resolutionNote() : "");
         takeButton.setVisible(ticket.status() == TicketStatus.OPEN && ticket.assignedToId() == null);
         takeButton.setManaged(takeButton.isVisible());
-        beginWorkButton.setVisible(ticket.status() == TicketStatus.OPEN && (assignedToCurrentUser || isManager()) && ticket.assignedToId() != null);
+        beginWorkButton.setVisible(ticket.status() == TicketStatus.OPEN
+                && (assignedToCurrentUser || isManager()) && ticket.assignedToId() != null);
         beginWorkButton.setManaged(beginWorkButton.isVisible());
         reopenButton.setVisible(ticket.status() == TicketStatus.RESOLVED);
         reopenButton.setManaged(reopenButton.isVisible());
-        resolveBox.setVisible(ticket.status() == TicketStatus.IN_PROGRESS && (assignedToCurrentUser || isManager()));
+        resolveBox.setVisible(
+                ticket.status() == TicketStatus.IN_PROGRESS && (assignedToCurrentUser || isManager()));
         resolveBox.setManaged(resolveBox.isVisible());
-        cancelButton.setVisible(isManager() && (ticket.status() == TicketStatus.OPEN || ticket.status() == TicketStatus.IN_PROGRESS));
+        cancelButton.setVisible(isManager()
+                && (ticket.status() == TicketStatus.OPEN || ticket.status() == TicketStatus.IN_PROGRESS));
         cancelButton.setManaged(cancelButton.isVisible());
         resolutionField.clear();
         resolutionErrorLabel.setText("");
@@ -459,8 +521,9 @@ public final class TechnicianController implements ViewLifecycle {
         cancelButton.setDisable(detailBusy);
         assigneeField.setDisable(detailBusy || assigneesLoading);
         refreshAssigneesButton.setDisable(detailBusy || assigneesLoading);
-        assignButton.setDisable(detailBusy || assigneesLoading || selectedTicket == null || assigneeField.getValue() == null
-                || selectedTicket.status() == TicketStatus.RESOLVED || selectedTicket.status() == TicketStatus.CANCELLED);
+        assignButton.setDisable(detailBusy || assigneesLoading || selectedTicket == null
+                || assigneeField.getValue() == null || selectedTicket.status() == TicketStatus.RESOLVED
+                || selectedTicket.status() == TicketStatus.CANCELLED);
         queueProgress.setVisible(listLoading);
         queueProgress.setManaged(listLoading);
         refreshQueueButton.setDisable(listLoading);
@@ -486,7 +549,9 @@ public final class TechnicianController implements ViewLifecycle {
     }
 
     private void refreshQueueInBackground() {
-        if (!listLoading) refreshQueue();
+        if (!listLoading) {
+            refreshQueue();
+        }
     }
 
     private void showPage(StackPane page) {
@@ -500,7 +565,9 @@ public final class TechnicianController implements ViewLifecycle {
     private TableRow<Ticket> ticketRow() {
         var row = new TableRow<Ticket>();
         row.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2 && !row.isEmpty()) openTicket(row.getItem().id());
+            if (event.getClickCount() == 2 && !row.isEmpty()) {
+                openTicket(row.getItem().id());
+            }
         });
         return row;
     }
@@ -517,8 +584,14 @@ public final class TechnicianController implements ViewLifecycle {
         track(future);
         future.whenComplete((result, problem) -> Platform.runLater(() -> {
             inFlight.remove(future);
-            if (disposed) return;
-            if (problem == null) success.accept(result); else failure.accept(problem);
+            if (disposed) {
+                return;
+            }
+            if (problem == null) {
+                success.accept(result);
+            } else {
+                failure.accept(problem);
+            }
         }));
     }
 
@@ -548,7 +621,9 @@ public final class TechnicianController implements ViewLifecycle {
 
     private Throwable unwrap(Throwable problem) {
         var current = problem;
-        while (current instanceof CompletionException && current.getCause() != null) current = current.getCause();
+        while (current instanceof CompletionException && current.getCause() != null) {
+            current = current.getCause();
+        }
         return current;
     }
 
@@ -560,7 +635,9 @@ public final class TechnicianController implements ViewLifecycle {
     private SimpleStringProperty text(String value) { return new SimpleStringProperty(value == null ? "" : value); }
 
     private String formatDate(String value) {
-        if (value == null || value.isBlank()) return "—";
+        if (value == null || value.isBlank()) {
+            return "—";
+        }
         try {
             return DATE_FORMAT.format(Instant.parse(value).atZone(ZoneId.systemDefault()));
         } catch (DateTimeParseException ignored) {
@@ -569,9 +646,13 @@ public final class TechnicianController implements ViewLifecycle {
     }
 
     private String initials(String username) {
-        if (username == null || username.isBlank()) return "RI";
+        if (username == null || username.isBlank()) {
+            return "RI";
+        }
         var parts = username.trim().split("[._\\-\\s]+", 2);
-        if (parts.length == 1) return parts[0].substring(0, Math.min(2, parts[0].length())).toUpperCase();
+        if (parts.length == 1) {
+            return parts[0].substring(0, Math.min(2, parts[0].length())).toUpperCase();
+        }
         return (parts[0].substring(0, 1) + parts[1].substring(0, 1)).toUpperCase();
     }
 
@@ -594,7 +675,9 @@ public final class TechnicianController implements ViewLifecycle {
     @Override
     public void dispose() {
         disposed = true;
-        for (var future : Set.copyOf(inFlight)) future.cancel(true);
+        for (var future : Set.copyOf(inFlight)) {
+            future.cancel(true);
+        }
         inFlight.clear();
     }
 
@@ -622,7 +705,9 @@ public final class TechnicianController implements ViewLifecycle {
             setText(null);
             setGraphic(box);
             getStyleClass().remove("internal-note-cell");
-            if (internal) getStyleClass().add("internal-note-cell");
+            if (internal) {
+                getStyleClass().add("internal-note-cell");
+            }
         }
     }
 }

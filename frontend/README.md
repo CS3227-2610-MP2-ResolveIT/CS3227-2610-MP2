@@ -72,6 +72,9 @@ sign-in attempts are temporarily rate-limited.
 ## Tests and build
 
 ```bash
-./gradlew test
+./gradlew check
 ./gradlew build
 ```
+
+`check` runs the frontend tests and Checkstyle across all Java source and test files. Run
+`./gradlew checkstyleMain checkstyleTest` to execute only the static checks.

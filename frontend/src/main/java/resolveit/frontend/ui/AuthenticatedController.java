@@ -179,7 +179,9 @@ public final class AuthenticatedController implements ViewLifecycle {
         updatedColumn.setCellValueFactory(cell -> new SimpleStringProperty(formatDate(cell.getValue().updatedAt())));
         ticketsTable.setRowFactory(ignored -> ticketRow());
         ticketsTable.setOnKeyPressed(event -> {
-            if (event.getCode() == KeyCode.ENTER) openSelectedTicket();
+            if (event.getCode() == KeyCode.ENTER) {
+                openSelectedTicket();
+            }
         });
 
         messagesList.setCellFactory(ignored -> new MessageCell());
@@ -219,7 +221,9 @@ public final class AuthenticatedController implements ViewLifecycle {
 
     @FXML
     private void refreshTickets() {
-        if (listLoading || disposed) return;
+        if (listLoading || disposed) {
+            return;
+        }
         listLoading = true;
         ticketsErrorLabel.setText("");
         updateBusyState();
@@ -258,7 +262,9 @@ public final class AuthenticatedController implements ViewLifecycle {
     @FXML
     private void openSelectedTicket() {
         var ticket = ticketsTable.getSelectionModel().getSelectedItem();
-        if (ticket != null) openTicket(ticket.id());
+        if (ticket != null) {
+            openTicket(ticket.id());
+        }
     }
 
     private void openTicket(int ticketId) {
@@ -273,7 +279,9 @@ public final class AuthenticatedController implements ViewLifecycle {
 
     @FXML
     private void refreshDetails() {
-        if (selectedTicket != null) loadDetails(selectedTicket.id());
+        if (selectedTicket != null) {
+            loadDetails(selectedTicket.id());
+        }
     }
 
     private void loadDetails(int ticketId) {
@@ -281,7 +289,9 @@ public final class AuthenticatedController implements ViewLifecycle {
     }
 
     private void loadDetails(int ticketId, String noticeAfterLoad) {
-        if (detailLoading || actionLoading || disposed) return;
+        if (detailLoading || actionLoading || disposed) {
+            return;
+        }
         detailLoading = true;
         detailErrorLabel.setText("");
         updateBusyState();
@@ -295,7 +305,9 @@ public final class AuthenticatedController implements ViewLifecycle {
             inFlight.remove(ticketFuture);
             inFlight.remove(messagesFuture);
             inFlight.remove(combined);
-            if (disposed) return;
+            if (disposed) {
+                return;
+            }
             detailLoading = false;
             updateBusyState();
             if (failure != null) {
@@ -307,18 +319,24 @@ public final class AuthenticatedController implements ViewLifecycle {
             messagesList.setItems(FXCollections.observableArrayList(data.messages().content()));
             detailContent.setVisible(true);
             detailContent.setManaged(true);
-            if (noticeAfterLoad != null) detailErrorLabel.setText(noticeAfterLoad);
+            if (noticeAfterLoad != null) {
+                detailErrorLabel.setText(noticeAfterLoad);
+            }
         }));
     }
 
     @FXML
     private void submitTicket() {
-        if (actionLoading) return;
+        if (actionLoading) {
+            return;
+        }
         clearCreateFeedback();
         var validation = TicketValidator.validateTicket(createSubjectField.getText(), createDescriptionField.getText(),
                 createCategoryField.getValue(), createPriorityField.getValue());
         showCreateValidation(validation);
-        if (!validation.isValid()) return;
+        if (!validation.isValid()) {
+            return;
+        }
         actionLoading = true;
         updateBusyState();
         var request = new CreateTicket(createSubjectField.getText().trim(), createDescriptionField.getText().trim(),
@@ -337,7 +355,9 @@ public final class AuthenticatedController implements ViewLifecycle {
 
     @FXML
     private void beginEdit() {
-        if (selectedTicket == null || !selectedTicket.isEditableByRequester()) return;
+        if (selectedTicket == null || !selectedTicket.isEditableByRequester()) {
+            return;
+        }
         editSubjectField.setText(selectedTicket.subject());
         editDescriptionField.setText(selectedTicket.description());
         editCategoryField.setValue(selectedTicket.category());
@@ -354,7 +374,9 @@ public final class AuthenticatedController implements ViewLifecycle {
 
     @FXML
     private void saveEdit() {
-        if (selectedTicket == null || actionLoading) return;
+        if (selectedTicket == null || actionLoading) {
+            return;
+        }
         var validation = TicketValidator.validateTicket(editSubjectField.getText(), editDescriptionField.getText(),
                 editCategoryField.getValue(), editPriorityField.getValue());
         if (!validation.isValid()) {
@@ -387,7 +409,9 @@ public final class AuthenticatedController implements ViewLifecycle {
     private void cancelTicket() {
         if (selectedTicket == null || actionLoading || !confirm(
                 "Cancel ticket", "Cancel " + selectedTicket.ticketNumber() + "?",
-                "This ticket cannot be reopened after it is cancelled.")) return;
+                "This ticket cannot be reopened after it is cancelled.")) {
+            return;
+        }
         mutateTicket(ticketService.cancel(selectedTicket.id()));
     }
 
@@ -395,13 +419,18 @@ public final class AuthenticatedController implements ViewLifecycle {
     private void reopenTicket() {
         if (selectedTicket == null || actionLoading || !confirm(
                 "Reopen ticket", "Reopen " + selectedTicket.ticketNumber() + "?",
-                "The ticket will return to the open queue and its previous assignment and resolution will be cleared.")) return;
+                "The ticket will return to the open queue and its previous "
+                        + "assignment and resolution will be cleared.")) {
+            return;
+        }
         mutateTicket(ticketService.reopen(selectedTicket.id()));
     }
 
     @FXML
     private void addComment() {
-        if (selectedTicket == null || actionLoading) return;
+        if (selectedTicket == null || actionLoading) {
+            return;
+        }
         var error = TicketValidator.validateMessage(commentField.getText());
         if (error != null) {
             commentErrorLabel.setText(error);
@@ -452,16 +481,20 @@ public final class AuthenticatedController implements ViewLifecycle {
         detailDescriptionLabel.setText(ticket.description());
         detailCategoryLabel.setText(ticket.category().displayName());
         detailPriorityLabel.setText(ticket.priority().displayName());
-        detailAssigneeLabel.setText(ticket.assignedToUsername() == null ? "Not assigned yet" : ticket.assignedToUsername());
+        detailAssigneeLabel.setText(
+                ticket.assignedToUsername() == null ? "Not assigned yet" : ticket.assignedToUsername());
         detailCreatedLabel.setText(formatDate(ticket.createdAt()));
         resolutionBox.setVisible(ticket.resolutionNote() != null && !ticket.resolutionNote().isBlank());
         resolutionBox.setManaged(resolutionBox.isVisible());
         resolutionLabel.setText(ticket.resolutionNote() == null ? "" : ticket.resolutionNote());
-        editButton.setVisible(ticket.requesterId() == session.current().orElseThrow().user().id() && ticket.isEditableByRequester());
+        editButton.setVisible(ticket.requesterId() == session.current().orElseThrow().user().id()
+                && ticket.isEditableByRequester());
         editButton.setManaged(editButton.isVisible());
-        cancelActionButton.setVisible(ticket.requesterId() == session.current().orElseThrow().user().id() && ticket.isCancellableByRequester());
+        cancelActionButton.setVisible(ticket.requesterId() == session.current().orElseThrow().user().id()
+                && ticket.isCancellableByRequester());
         cancelActionButton.setManaged(cancelActionButton.isVisible());
-        reopenActionButton.setVisible(ticket.requesterId() == session.current().orElseThrow().user().id() && ticket.isReopenableByRequester());
+        reopenActionButton.setVisible(ticket.requesterId() == session.current().orElseThrow().user().id()
+                && ticket.isReopenableByRequester());
         reopenActionButton.setManaged(reopenActionButton.isVisible());
         setEditing(false);
     }
@@ -496,7 +529,9 @@ public final class AuthenticatedController implements ViewLifecycle {
     }
 
     private void refreshTicketsInBackground() {
-        if (!listLoading) refreshTickets();
+        if (!listLoading) {
+            refreshTickets();
+        }
     }
 
     private void showPage(StackPane page) {
@@ -510,7 +545,9 @@ public final class AuthenticatedController implements ViewLifecycle {
     private void setActiveNavigation(Button active) {
         for (var button : new Button[] { myTicketsNavButton, submitNavButton }) {
             button.getStyleClass().remove("nav-button-active");
-            if (button == active) button.getStyleClass().add("nav-button-active");
+            if (button == active) {
+                button.getStyleClass().add("nav-button-active");
+            }
         }
     }
 
@@ -527,7 +564,9 @@ public final class AuthenticatedController implements ViewLifecycle {
     private TableRow<Ticket> ticketRow() {
         var row = new TableRow<Ticket>();
         row.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2 && !row.isEmpty()) openTicket(row.getItem().id());
+            if (event.getClickCount() == 2 && !row.isEmpty()) {
+                openTicket(row.getItem().id());
+            }
         });
         return row;
     }
@@ -540,9 +579,15 @@ public final class AuthenticatedController implements ViewLifecycle {
     }
 
     private String firstError(TicketValidator.Validation validation) {
-        if (validation.subjectError() != null) return validation.subjectError();
-        if (validation.descriptionError() != null) return validation.descriptionError();
-        if (validation.categoryError() != null) return validation.categoryError();
+        if (validation.subjectError() != null) {
+            return validation.subjectError();
+        }
+        if (validation.descriptionError() != null) {
+            return validation.descriptionError();
+        }
+        if (validation.categoryError() != null) {
+            return validation.categoryError();
+        }
         return validation.priorityError();
     }
 
@@ -575,8 +620,14 @@ public final class AuthenticatedController implements ViewLifecycle {
         track(future);
         future.whenComplete((result, problem) -> Platform.runLater(() -> {
             inFlight.remove(future);
-            if (disposed) return;
-            if (problem == null) success.accept(result); else failure.accept(problem);
+            if (disposed) {
+                return;
+            }
+            if (problem == null) {
+                success.accept(result);
+            } else {
+                failure.accept(problem);
+            }
         }));
     }
 
@@ -611,7 +662,9 @@ public final class AuthenticatedController implements ViewLifecycle {
 
     private Throwable unwrap(Throwable problem) {
         var current = problem;
-        while (current instanceof CompletionException && current.getCause() != null) current = current.getCause();
+        while (current instanceof CompletionException && current.getCause() != null) {
+            current = current.getCause();
+        }
         return current;
     }
 
@@ -621,7 +674,9 @@ public final class AuthenticatedController implements ViewLifecycle {
     }
 
     private String formatDate(String value) {
-        if (value == null || value.isBlank()) return "—";
+        if (value == null || value.isBlank()) {
+            return "—";
+        }
         try {
             return DATE_FORMAT.format(Instant.parse(value).atZone(ZoneId.systemDefault()));
         } catch (DateTimeParseException ignored) {
@@ -630,9 +685,13 @@ public final class AuthenticatedController implements ViewLifecycle {
     }
 
     private String initials(String username) {
-        if (username == null || username.isBlank()) return "RI";
+        if (username == null || username.isBlank()) {
+            return "RI";
+        }
         var parts = username.trim().split("[._\\-\\s]+", 2);
-        if (parts.length == 1) return parts[0].substring(0, Math.min(2, parts[0].length())).toUpperCase();
+        if (parts.length == 1) {
+            return parts[0].substring(0, Math.min(2, parts[0].length())).toUpperCase();
+        }
         return (parts[0].substring(0, 1) + parts[1].substring(0, 1)).toUpperCase();
     }
 
@@ -657,7 +716,9 @@ public final class AuthenticatedController implements ViewLifecycle {
     @Override
     public void dispose() {
         disposed = true;
-        for (var future : Set.copyOf(inFlight)) future.cancel(true);
+        for (var future : Set.copyOf(inFlight)) {
+            future.cancel(true);
+        }
         inFlight.clear();
     }
 

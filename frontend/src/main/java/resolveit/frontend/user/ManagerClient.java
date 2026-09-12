@@ -2,8 +2,8 @@ package resolveit.frontend.user;
 
 import java.util.List;
 import java.util.concurrent.CompletionStage;
-import resolveit.frontend.model.User;
 import resolveit.frontend.model.Role;
+import resolveit.frontend.model.User;
 import resolveit.frontend.ticket.PageResponse;
 import resolveit.frontend.ticket.Ticket;
 

@@ -9,7 +9,7 @@ permissions:
 
 jobs:
   backend-tests:
-    name: Backend tests
+    name: Backend checks
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -26,11 +26,11 @@ jobs:
           cache-dependency-path: |
             backend/*.gradle
             backend/gradle/wrapper/gradle-wrapper.properties
-      - name: Run backend tests
-        run: ./gradlew test --no-daemon
+      - name: Run backend tests and static checks
+        run: ./gradlew check --no-daemon
 
   frontend-tests:
-    name: Frontend tests
+    name: Frontend checks
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -47,8 +47,8 @@ jobs:
           cache-dependency-path: |
             frontend/*.gradle
             frontend/gradle/wrapper/gradle-wrapper.properties
-      - name: Run frontend tests
-        run: ./gradlew test --no-daemon
+      - name: Run frontend tests and static checks
+        run: ./gradlew check --no-daemon
 
   package-jars:
     name: Package cross-platform JARs

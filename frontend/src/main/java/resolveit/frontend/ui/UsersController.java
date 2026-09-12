@@ -9,7 +9,17 @@ import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import resolveit.frontend.model.Role;
 import resolveit.frontend.model.User;
@@ -52,7 +62,9 @@ public final class UsersController implements ViewLifecycle {
         activeColumn.setCellValueFactory(c -> new SimpleStringProperty(c.getValue().active() ? "Active" : "Inactive"));
         roleField.setItems(FXCollections.observableArrayList(Role.values()));
         usersTable.getSelectionModel().selectedItemProperty().addListener((o, old, user) -> {
-            if (!busy && user != null) edit(user);
+            if (!busy && user != null) {
+                edit(user);
+            }
         });
         for (var label : new Label[] {errorLabel, noticeLabel}) {
             label.visibleProperty().bind(label.textProperty().isNotEmpty());
@@ -70,7 +82,9 @@ public final class UsersController implements ViewLifecycle {
         navigator.signOut();
     }
     @FXML private void newUser() {
-        if (busy) return;
+        if (busy) {
+            return;
+        }
         editing = null;
         usersTable.getSelectionModel().clearSelection();
         editorTitle.setText("Create user");
@@ -87,30 +101,42 @@ public final class UsersController implements ViewLifecycle {
         errorLabel.setText(""); noticeLabel.setText("");
     }
     @FXML private void refresh() {
-        if (busy || disposed) return;
+        if (busy || disposed) {
+            return;
+        }
         setBusy(true);
         errorLabel.setText("");
         run(service.users(page), result -> {
             usersTable.setItems(FXCollections.observableArrayList(result.content()));
             page = result.page(); pages = result.totalPages();
-            pageLabel.setText((pages == 0 ? "Page 0 of 0" : "Page " + (page + 1) + " of " + pages) + " · " + result.totalElements() + " users");
+            pageLabel.setText((pages == 0 ? "Page 0 of 0" : "Page " + (page + 1) + " of " + pages)
+                    + " · " + result.totalElements() + " users");
             setBusy(false);
         });
     }
     @FXML private void previous() { if (!busy && page > 0) { page--; refresh(); } }
     @FXML private void next() { if (!busy && page + 1 < pages) { page++; refresh(); } }
     @FXML private void save() {
-        if (busy) return;
-        var error = ManagerService.validate(usernameField.getText(), emailField.getText(), passwordField.getText(), editing == null);
+        if (busy) {
+            return;
+        }
+        var error = ManagerService.validate(
+                usernameField.getText(), emailField.getText(), passwordField.getText(), editing == null);
         if (error != null || roleField.getValue() == null) {
             errorLabel.setText(error == null ? "Choose a role." : error);
             return;
         }
-        if (editing != null && (editing.active() != activeField.isSelected() || editing.role() != roleField.getValue())) {
-            var alert = new Alert(Alert.AlertType.CONFIRMATION, "Save access changes for " + editing.username() + "?"
-                    + (editing.id() == session.current().orElseThrow().user().id() ? " You will be signed out after changing your own access." : ""), ButtonType.CANCEL, ButtonType.OK);
+        if (editing != null && (editing.active() != activeField.isSelected()
+                || editing.role() != roleField.getValue())) {
+            var ownAccessMessage = editing.id() == session.current().orElseThrow().user().id()
+                    ? " You will be signed out after changing your own access." : "";
+            var alert = new Alert(Alert.AlertType.CONFIRMATION,
+                    "Save access changes for " + editing.username() + "?" + ownAccessMessage,
+                    ButtonType.CANCEL, ButtonType.OK);
             alert.setHeaderText("Change account access");
-            if (alert.showAndWait().filter(ButtonType.OK::equals).isEmpty()) return;
+            if (alert.showAndWait().filter(ButtonType.OK::equals).isEmpty()) {
+                return;
+            }
         }
         Integer id = editing == null ? null : editing.id();
         var password = passwordField.getText();
@@ -129,7 +155,10 @@ public final class UsersController implements ViewLifecycle {
         busy = value;
         progress.setVisible(value); progress.setManaged(value);
         editor.setDisable(value); usersTable.setDisable(value);
-        refreshButton.setDisable(value); newButton.setDisable(value); saveButton.setDisable(value); backButton.setDisable(value);
+        refreshButton.setDisable(value);
+        newButton.setDisable(value);
+        saveButton.setDisable(value);
+        backButton.setDisable(value);
         logoutButton.setDisable(value);
         previousButton.setDisable(value || page == 0); nextButton.setDisable(value || page + 1 >= pages);
     }
@@ -137,20 +166,32 @@ public final class UsersController implements ViewLifecycle {
         var future = operation.toCompletableFuture(); pending.add(future);
         future.whenComplete((result, failure) -> Platform.runLater(() -> {
             pending.remove(future);
-            if (disposed) return;
+            if (disposed) {
+                return;
+            }
             if (failure == null) { success.accept(result); return; }
             setBusy(false);
             var cause = failure;
-            while (cause instanceof java.util.concurrent.CompletionException && cause.getCause() != null) cause = cause.getCause();
+            while (cause instanceof java.util.concurrent.CompletionException && cause.getCause() != null) {
+                cause = cause.getCause();
+            }
             if (cause instanceof TicketFailure problem) {
-                if (problem.kind() == TicketFailure.Kind.UNAUTHORIZED) { session.clear(); navigator.showLogin(); return; }
+                if (problem.kind() == TicketFailure.Kind.UNAUTHORIZED) {
+                    session.clear();
+                    navigator.showLogin();
+                    return;
+                }
                 errorLabel.setText(problem.getMessage());
-            } else errorLabel.setText("Unable to complete the request. Please try again.");
+            } else {
+                errorLabel.setText("Unable to complete the request. Please try again.");
+            }
         }));
     }
     @Override public void dispose() {
         disposed = true; passwordField.clear();
-        for (var future : Set.copyOf(pending)) future.cancel(true);
+        for (var future : Set.copyOf(pending)) {
+            future.cancel(true);
+        }
         pending.clear();
     }
 }

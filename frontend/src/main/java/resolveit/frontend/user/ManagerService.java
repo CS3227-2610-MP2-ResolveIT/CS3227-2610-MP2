@@ -16,9 +16,16 @@ public final class ManagerService {
         return id == null ? client.createUser(request) : client.updateUser(id, request);
     }
     public static String validate(String username, String email, String password, boolean creating) {
-        if (username.trim().length() < 3 || username.trim().length() > 50) return "Username must contain 3–50 characters.";
-        if (email.trim().length() > 254 || !email.trim().matches("[^\\s@]+@[^\\s@]+\\.[^\\s@]+")) return "Enter a valid email address (at most 254 characters).";
-        if ((creating || !password.isEmpty()) && (password.isBlank() || password.length() < 5 || password.length() > 100)) return "Password must contain 5–100 characters.";
+        if (username.trim().length() < 3 || username.trim().length() > 50) {
+            return "Username must contain 3–50 characters.";
+        }
+        if (email.trim().length() > 254 || !email.trim().matches("[^\\s@]+@[^\\s@]+\\.[^\\s@]+")) {
+            return "Enter a valid email address (at most 254 characters).";
+        }
+        if ((creating || !password.isEmpty())
+                && (password.isBlank() || password.length() < 5 || password.length() > 100)) {
+            return "Password must contain 5–100 characters.";
+        }
         return null;
     }
 }

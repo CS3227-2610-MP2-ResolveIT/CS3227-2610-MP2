@@ -28,7 +28,8 @@ public final class ResolveItApplication extends Application {
         var technicianTicketService = new TechnicianTicketService(ticketClient);
         var managerService = new ManagerService(ticketClient);
 
-        var navigator = new Navigator(stage, authService, ticketService, technicianTicketService, managerService, session);
+        var navigator = new Navigator(
+                stage, authService, ticketService, technicianTicketService, managerService, session);
 
         stage.setTitle("ResolveIT");
         stage.setMinWidth(900);

@@ -66,15 +66,24 @@ ticket/user workflows. Frontend tests cover validation, session/configuration,
 services, HTTP contracts, and error mapping using local test servers. Run:
 
 ```bash
-cd backend && ./gradlew test
-cd ../frontend && ./gradlew test
+cd backend && ./gradlew check
+cd ../frontend && ./gradlew check
 ```
 
+Each `check` runs the module's tests and Checkstyle across all production and
+test Java source. Run `./gradlew checkstyleMain checkstyleTest` in either module
+when only static source checks are needed. The shared rules are in
+`config/checkstyle/checkstyle.xml`; HTML reports are written under each module's
+`build/reports/checkstyle/` directory. Checkstyle enforces objective formatting
+rules globally; the code-review workflow separately checks whether changed
+public APIs and non-trivial methods need useful Javadocs.
+
 Visible JavaFX behaviour is checked manually; no FXML/UI test remains in the current
-suite. GitHub Actions runs the backend and frontend suites as independent CI jobs on
-pushes and pull requests, then uploads one cross-platform executable JAR for each
-module. Changes should be reviewed against `requirements/PROJECT.md`, tested in the affected
-module, documented, and committed as focused Conventional Commits.
+suite. GitHub Actions runs each module's tests and repository-wide Checkstyle gate as
+independent CI jobs on pushes and pull requests, then uploads one cross-platform
+executable JAR for each module. Changes should be reviewed against
+`requirements/PROJECT.md`, tested in the affected module, documented, and
+committed as focused Conventional Commits.
 
 ## Key extension points
 

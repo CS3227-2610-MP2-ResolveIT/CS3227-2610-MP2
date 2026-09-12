@@ -8,6 +8,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import resolveit.frontend.auth.AuthService;
+import resolveit.frontend.model.Role;
 import resolveit.frontend.session.SessionState;
 import resolveit.frontend.ticket.EmployeeTicketService;
 import resolveit.frontend.ticket.TechnicianTicketService;
@@ -15,7 +16,6 @@ import resolveit.frontend.ui.AuthenticatedController;
 import resolveit.frontend.ui.LoginController;
 import resolveit.frontend.ui.TechnicianController;
 import resolveit.frontend.user.ManagerService;
-import resolveit.frontend.model.Role;
 
 public final class Navigator {
     private static final String STYLESHEET = "/resolveit/frontend/styles/app.css";
@@ -29,17 +29,20 @@ public final class Navigator {
     private ViewLifecycle activeController;
 
     public void showUsers() {
-        if (session.current().orElseThrow().user().role() != Role.MANAGER) return;
-        show("/resolveit/frontend/views/users.fxml", type -> new resolveit.frontend.ui.UsersController(session, managerService, this));
+        if (session.current().orElseThrow().user().role() != Role.MANAGER) {
+            return;
+        }
+        show("/resolveit/frontend/views/users.fxml",
+                type -> new resolveit.frontend.ui.UsersController(session, managerService, this));
     }
 
     public Navigator(
-        Stage stage,
-        AuthService authService,
-        EmployeeTicketService ticketService,
-        TechnicianTicketService technicianTicketService,
-        ManagerService managerService,
-        SessionState session
+            Stage stage,
+            AuthService authService,
+            EmployeeTicketService ticketService,
+            TechnicianTicketService technicianTicketService,
+            ManagerService managerService,
+            SessionState session
     ) {
         this.stage = stage;
         this.authService = authService;

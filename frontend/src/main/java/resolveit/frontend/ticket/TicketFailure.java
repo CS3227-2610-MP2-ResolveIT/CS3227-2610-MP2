@@ -1,7 +1,17 @@
 package resolveit.frontend.ticket;
 
 public final class TicketFailure extends RuntimeException {
-    public enum Kind { UNAUTHORIZED, FORBIDDEN, NOT_FOUND, CONFLICT, INVALID_REQUEST, CONNECTION, TIMEOUT, SERVER, INVALID_RESPONSE }
+    public enum Kind {
+        UNAUTHORIZED,
+        FORBIDDEN,
+        NOT_FOUND,
+        CONFLICT,
+        INVALID_REQUEST,
+        CONNECTION,
+        TIMEOUT,
+        SERVER,
+        INVALID_RESPONSE
+    }
 
     private final Kind kind;
     private final String code;
