@@ -5,16 +5,16 @@ description: Review an implemented ResolveIT change after testing and documentat
 
 # Code review
 
-Review; do not fix. Inspect the implementation, tests, specifications,
-acceptance evidence, User Guide, Developer Guide, diagrams, and Git diff.
+Review the scope requested by the user; do not fix. Inspect the relevant
+implementation, tests, specifications, acceptance evidence, User Guide,
+Developer Guide, diagrams, and Git diff.
 Preserve unrelated changes. Do not edit code, tests, guides, specifications,
 build files, logs, Git, or GitHub; do not install tools or dependencies.
 
-Write every review to exactly one canonical report:
-`reviews/issue-<number>.md`. Create `reviews/` when needed. For a rerun,
-update that same issue file; do not create a dated, numbered, or parallel
-report. If the issue number cannot be established from the request, issue,
-branch, or repository evidence, report `BLOCKED` and ask for it.
+Write each review to a unique, logical report under `reviews/`, using a number
+when useful, for example `reviews/technician-resolution-01.md` or
+`reviews/release-readiness-01.md`. For a rerun, update only the matching report;
+do not overwrite unrelated reviews.
 
 ## Truth and gates
 
@@ -27,13 +27,13 @@ review check. Mark an item complete only after obtaining evidence; do not
 report `PASS` while any applicable check is incomplete, unverified, or marked
 not applicable without a reason.
 
-Stop or report `BLOCKED` if the review target, release status, or required
+Stop or report `BLOCKED` if the requested scope, release status, or required
 evidence is unavailable. Never call an unavailable check passed. Do not call
 unverified behaviour available.
 
 ## Workflow
 
-1. Identify the target issue/release, diff, changed files, requirements,
+1. Identify the requested scope, target issue/release if any, diff, changed files,
    tests, docs, diagrams, and unrelated changes.
 2. Read [checks](references/project-checks.md); discover and run applicable
    configured compilation, tests, smoke checks, static analysis, packaging,
@@ -75,7 +75,7 @@ requirement, evidence, expected/actual behaviour, reproduction or inspection
 path, impact, likely cause and confidence, fix direction, files/responsibility,
 tests, documentation impact, and post-fix checks.
 
-Give every finding a stable ID in the form `CR-<issue>-<number>` and a status.
+Give every finding a stable ID in the form `CR-<review>-<number>` and a status.
 Keep the ID unchanged when the report is rerun. Use `Open`, `Accepted`,
 `In progress`, `Fixed`, `Rejected`, `Not reproducible`, or `Deferred`.
 `Open` is the default for a new evidence-based finding. A resolved status must
