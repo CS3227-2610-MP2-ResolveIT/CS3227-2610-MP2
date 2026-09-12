@@ -22,9 +22,8 @@ public final class ResolveItApplication extends Application {
         authClient = HttpAuthClient.create(config.apiBaseUrl());
 
         var session = new SessionState();
-        ticketClient = HttpTicketClient.create(config.apiBaseUrl(), session);
-
         var authService = new AuthService(authClient, session);
+        ticketClient = HttpTicketClient.create(config.apiBaseUrl(), authService);
         var ticketService = new EmployeeTicketService(ticketClient);
         var technicianTicketService = new TechnicianTicketService(ticketClient);
         var managerService = new ManagerService(ticketClient);

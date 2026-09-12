@@ -10,37 +10,54 @@ import java.net.http.HttpTimeoutException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import resolveit.frontend.auth.AuthFailure;
+import resolveit.frontend.auth.AuthenticatedSession;
 import resolveit.frontend.session.SessionState;
-import resolveit.frontend.ticket.TicketRequests.CreateMessage;
-import resolveit.frontend.ticket.TicketRequests.CreateTicket;
-import resolveit.frontend.ticket.TicketRequests.UpdateTicket;
+import resolveit.frontend.session.SessionState.Session;
 import resolveit.frontend.ticket.TicketRequests.ChangePriority;
 import resolveit.frontend.ticket.TicketRequests.ChangeStatus;
+import resolveit.frontend.ticket.TicketRequests.CreateMessage;
+import resolveit.frontend.ticket.TicketRequests.CreateTicket;
 import resolveit.frontend.ticket.TicketRequests.ResolveTicket;
+import resolveit.frontend.ticket.TicketRequests.UpdateTicket;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
+/** Sends authenticated ticket and manager requests with one renewal retry. */
 public final class HttpTicketClient implements TicketClient, resolveit.frontend.user.ManagerClient, AutoCloseable {
     private static final Duration CONNECT_TIMEOUT = Duration.ofSeconds(5);
     private static final Duration REQUEST_TIMEOUT = Duration.ofSeconds(15);
 
     private final URI ticketsUrl;
-    private final SessionState session;
+    private final AuthenticatedSession authenticatedSession;
     private final Duration requestTimeout;
     private final ObjectMapper objectMapper = new ObjectMapper();
     private final ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor();
     private final HttpClient httpClient;
 
-    public static HttpTicketClient create(URI apiBaseUrl, SessionState session) {
-        return new HttpTicketClient(apiBaseUrl, session, CONNECT_TIMEOUT, REQUEST_TIMEOUT);
+    /**
+     * Creates a client that obtains valid access credentials from the session coordinator.
+     *
+     * @param apiBaseUrl API base URL ending before the ticket path
+     * @param authenticatedSession coordinator for current and refreshed credentials
+     * @return authenticated ticket HTTP client
+     */
+    public static HttpTicketClient create(URI apiBaseUrl, AuthenticatedSession authenticatedSession) {
+        return new HttpTicketClient(apiBaseUrl, authenticatedSession, CONNECT_TIMEOUT, REQUEST_TIMEOUT);
     }
 
     HttpTicketClient(URI apiBaseUrl, SessionState session, Duration connectTimeout, Duration requestTimeout) {
+        this(apiBaseUrl, fixedSession(session), connectTimeout, requestTimeout);
+    }
+
+    HttpTicketClient(URI apiBaseUrl, AuthenticatedSession authenticatedSession,
+                     Duration connectTimeout, Duration requestTimeout) {
         this.ticketsUrl = apiBaseUrl.resolve("tickets");
-        this.session = session;
+        this.authenticatedSession = authenticatedSession;
         this.requestTimeout = requestTimeout;
         this.httpClient = HttpClient.newBuilder().connectTimeout(connectTimeout).executor(executor).build();
     }
@@ -144,17 +161,29 @@ public final class HttpTicketClient implements TicketClient, resolveit.frontend.
 
     @Override
     public CompletionStage<Ticket> assign(int id, int technicianId) {
-        return send("POST", URI.create(ticketUrl(id) + "/assign"), java.util.Map.of("technicianId", technicianId), new TypeReference<>() {});
+        return send("POST", URI.create(ticketUrl(id) + "/assign"),
+                java.util.Map.of("technicianId", technicianId), new TypeReference<>() {});
     }
 
     private <T> CompletionStage<T> send(String method, URI uri, Object body, TypeReference<T> type) {
-        return CompletableFuture.supplyAsync(() -> sendBlocking(method, uri, body, type), executor);
+        return CompletableFuture.supplyAsync(() -> sendWithRefresh(method, uri, body, type), executor);
     }
 
-    private <T> T sendBlocking(String method, URI uri, Object body, TypeReference<T> type) {
+    private <T> T sendWithRefresh(String method, URI uri, Object body, TypeReference<T> type) {
+        var current = await(authenticatedSession.validSession());
         try {
-            var current = session.current().orElseThrow(() -> new TicketFailure(
-                    TicketFailure.Kind.UNAUTHORIZED, "UNAUTHORIZED", "Your session has ended. Please sign in again."));
+            return sendBlocking(method, uri, body, type, current);
+        } catch (TicketFailure failure) {
+            if (failure.kind() != TicketFailure.Kind.UNAUTHORIZED) {
+                throw failure;
+            }
+            var refreshed = await(authenticatedSession.refreshSession());
+            return sendBlocking(method, uri, body, type, refreshed);
+        }
+    }
+
+    private <T> T sendBlocking(String method, URI uri, Object body, TypeReference<T> type, Session current) {
+        try {
             var publisher = body == null
                     ? HttpRequest.BodyPublishers.noBody()
                     : HttpRequest.BodyPublishers.ofString(objectMapper.writeValueAsString(body));
@@ -185,6 +214,21 @@ public final class HttpTicketClient implements TicketClient, resolveit.frontend.
         } catch (IOException exception) {
             throw new TicketFailure(TicketFailure.Kind.CONNECTION, "CONNECTION_FAILED",
                     "Unable to reach ResolveIT. Check that the backend is running.", exception);
+        }
+    }
+
+    private Session await(CompletionStage<Session> operation) {
+        try {
+            return operation.toCompletableFuture().join();
+        } catch (CompletionException exception) {
+            var cause = exception.getCause();
+            if (cause instanceof TicketFailure failure) {
+                throw failure;
+            }
+            var message = cause instanceof AuthFailure failure
+                    ? failure.getMessage()
+                    : "Your session has ended. Please sign in again.";
+            throw new TicketFailure(TicketFailure.Kind.UNAUTHORIZED, "SESSION_EXPIRED", message, cause);
         }
     }
 
@@ -225,6 +269,26 @@ public final class HttpTicketClient implements TicketClient, resolveit.frontend.
 
     private static String queryParameter(String name, Object value) {
         return value == null ? "" : "&" + name + "=" + encode(value.toString());
+    }
+
+    private static AuthenticatedSession fixedSession(SessionState session) {
+        return new AuthenticatedSession() {
+            @Override
+            public CompletionStage<Session> validSession() {
+                return session.current()
+                        .<CompletionStage<Session>>map(CompletableFuture::completedFuture)
+                        .orElseGet(() -> CompletableFuture.failedFuture(new TicketFailure(
+                                TicketFailure.Kind.UNAUTHORIZED, "SESSION_EXPIRED",
+                                "Your session has ended. Please sign in again.")));
+            }
+
+            @Override
+            public CompletionStage<Session> refreshSession() {
+                return CompletableFuture.failedFuture(new TicketFailure(
+                        TicketFailure.Kind.UNAUTHORIZED, "SESSION_EXPIRED",
+                        "Your session has ended. Please sign in again."));
+            }
+        };
     }
 
     @Override

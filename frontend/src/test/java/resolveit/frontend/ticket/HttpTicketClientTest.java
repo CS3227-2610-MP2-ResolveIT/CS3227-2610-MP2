@@ -11,19 +11,24 @@ import java.net.InetSocketAddress;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.CompletionStage;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import resolveit.frontend.auth.AuthenticatedSession;
 import resolveit.frontend.auth.LoginResponse;
 import resolveit.frontend.model.Role;
 import resolveit.frontend.model.User;
 import resolveit.frontend.session.SessionState;
-import resolveit.frontend.ticket.TicketRequests.CreateTicket;
+import resolveit.frontend.session.SessionState.Session;
 import resolveit.frontend.ticket.TicketRequests.ChangePriority;
 import resolveit.frontend.ticket.TicketRequests.ChangeStatus;
 import resolveit.frontend.ticket.TicketRequests.CreateMessage;
+import resolveit.frontend.ticket.TicketRequests.CreateTicket;
 import resolveit.frontend.ticket.TicketRequests.ResolveTicket;
 
 class HttpTicketClientTest {
@@ -36,7 +41,7 @@ class HttpTicketClientTest {
         server = HttpServer.create(new InetSocketAddress("127.0.0.1", 0), 0);
         server.start();
         var session = new SessionState();
-        session.start(new LoginResponse("test-token", "Bearer", 900,
+        session.start(new LoginResponse("test-token", "test-refresh", "Bearer", 900, 604_800,
                 new User(7, "employee01", "employee@example.test", Role.EMPLOYEE, true, null, null)));
         var baseUrl = URI.create("http://127.0.0.1:" + server.getAddress().getPort() + "/api/v1/");
         client = new HttpTicketClient(baseUrl, session, Duration.ofSeconds(1), Duration.ofSeconds(2));
@@ -52,13 +57,16 @@ class HttpTicketClientTest {
     void managerEndpointsMatchBackendContracts() {
         var body = new AtomicReference<String>();
         var method = new AtomicReference<String>();
-        String user = "{\"id\":9,\"username\":\"support\",\"email\":\"support@example.test\",\"role\":\"TECHNICIAN\",\"active\":true}";
+        String user = "{\"id\":9,\"username\":\"support\",\"email\":\"support@example.test\","
+                + "\"role\":\"TECHNICIAN\",\"active\":true}";
         server.createContext("/api/v1/users", exchange -> {
             exchangeSeen.set(exchange);
             body.set(new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8));
             method.set(exchange.getRequestMethod());
             respond(exchange, 200, exchange.getRequestMethod().equals("GET")
-                    ? "{\"content\":[" + user + "],\"page\":1,\"size\":20,\"totalElements\":21,\"totalPages\":2}" : user);
+                    ? "{\"content\":[" + user
+                            + "],\"page\":1,\"size\":20,\"totalElements\":21,\"totalPages\":2}"
+                    : user);
         });
         server.createContext("/api/v1/technicians", exchange -> respond(exchange, 200, "[" + user + "]"));
         server.createContext("/api/v1/tickets/3/assign", exchange -> {
@@ -70,11 +78,14 @@ class HttpTicketClientTest {
         assertEquals("page=1&size=20", exchangeSeen.get().getRequestURI().getQuery());
         assertEquals("Bearer test-token", exchangeSeen.get().getRequestHeaders().getFirst("Authorization"));
         assertEquals(Role.TECHNICIAN, client.technicians().toCompletableFuture().join().getFirst().role());
-        var request = new resolveit.frontend.user.ManagerClient.UserRequest("support", "support@example.test", "secret123", Role.TECHNICIAN, true);
+        var request = new resolveit.frontend.user.ManagerClient.UserRequest(
+                "support", "support@example.test", "secret123", Role.TECHNICIAN, true);
         client.createUser(request).toCompletableFuture().join();
         assertEquals("POST", method.get());
         assertTrue(body.get().contains("\"password\":\"secret123\""));
-        client.updateUser(9, new resolveit.frontend.user.ManagerClient.UserRequest("support", "support@example.test", null, Role.MANAGER, false)).toCompletableFuture().join();
+        client.updateUser(9, new resolveit.frontend.user.ManagerClient.UserRequest(
+                "support", "support@example.test", null, Role.MANAGER, false))
+                .toCompletableFuture().join();
         assertEquals("PATCH", method.get());
         assertEquals("/api/v1/users/9", exchangeSeen.get().getRequestURI().getPath());
         assertTrue(body.get().contains("\"active\":false"));
@@ -198,6 +209,57 @@ class HttpTicketClientTest {
         assertEquals("Ticket changed.", failure.getMessage());
     }
 
+    @Test
+    void refreshesAndRetriesOnceAfterUnauthorizedResponse() {
+        client.close();
+        var accessTokens = new java.util.ArrayList<String>();
+        var requests = new AtomicInteger();
+        server.createContext("/api/v1/tickets", exchange -> {
+            accessTokens.add(exchange.getRequestHeaders().getFirst("Authorization"));
+            if (requests.getAndIncrement() == 0) {
+                respond(exchange, 401,
+                        "{\"status\":401,\"code\":\"UNAUTHORIZED\",\"message\":\"Expired.\"}");
+                return;
+            }
+            respond(exchange, 200,
+                    "{\"content\":[],\"page\":0,\"size\":20,\"totalElements\":0,\"totalPages\":0}");
+        });
+        var sessions = new StubAuthenticatedSession();
+        var baseUrl = URI.create("http://127.0.0.1:" + server.getAddress().getPort() + "/api/v1/");
+        client = new HttpTicketClient(baseUrl, sessions, Duration.ofSeconds(1), Duration.ofSeconds(2));
+
+        client.list(null, 0, 20).toCompletableFuture().join();
+
+        assertEquals(1, sessions.refreshCalls);
+        assertEquals(java.util.List.of("Bearer old-access", "Bearer new-access"), accessTokens);
+    }
+
+    @Test
+    void doesNotRetryMoreThanOnce() {
+        client.close();
+        var requests = new AtomicInteger();
+        server.createContext("/api/v1/tickets", exchange -> {
+            requests.incrementAndGet();
+            respond(exchange, 401,
+                    "{\"status\":401,\"code\":\"UNAUTHORIZED\",\"message\":\"Expired.\"}");
+        });
+        var sessions = new StubAuthenticatedSession();
+        var baseUrl = URI.create("http://127.0.0.1:" + server.getAddress().getPort() + "/api/v1/");
+        client = new HttpTicketClient(baseUrl, sessions, Duration.ofSeconds(1), Duration.ofSeconds(2));
+
+        TicketFailure failure;
+        try {
+            client.list(null, 0, 20).toCompletableFuture().join();
+            throw new AssertionError("Expected request to fail");
+        } catch (CompletionException exception) {
+            failure = assertInstanceOf(TicketFailure.class, exception.getCause());
+        }
+
+        assertEquals(TicketFailure.Kind.UNAUTHORIZED, failure.kind());
+        assertEquals(1, sessions.refreshCalls);
+        assertEquals(2, requests.get());
+    }
+
     private static String ticketJson(String status, int version) {
         return """
                 {"id":3,"ticketNumber":"TKT-003","subject":"Office Wi-Fi unavailable",
@@ -214,6 +276,31 @@ class HttpTicketClientTest {
         exchange.sendResponseHeaders(status, bytes.length);
         try (var output = exchange.getResponseBody()) {
             output.write(bytes);
+        }
+    }
+
+    private static final class StubAuthenticatedSession implements AuthenticatedSession {
+        private final Session oldSession = session("old-access", "old-refresh");
+        private final Session newSession = session("new-access", "new-refresh");
+        private int refreshCalls;
+
+        @Override
+        public CompletionStage<Session> validSession() {
+            return CompletableFuture.completedFuture(oldSession);
+        }
+
+        @Override
+        public CompletionStage<Session> refreshSession() {
+            refreshCalls++;
+            return CompletableFuture.completedFuture(newSession);
+        }
+
+        private static Session session(String accessToken, String refreshToken) {
+            return new Session(accessToken, refreshToken, "Bearer",
+                    java.time.Instant.now().plusSeconds(900),
+                    java.time.Instant.now().plusSeconds(604_800),
+                    new User(7, "employee01", "employee@example.test",
+                            Role.EMPLOYEE, true, null, null));
         }
     }
 }
