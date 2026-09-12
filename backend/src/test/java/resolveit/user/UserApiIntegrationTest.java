@@ -14,12 +14,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 
 @SpringBootTest(properties = "resolveit.demo-data.enabled=false")
 @AutoConfigureMockMvc
@@ -50,15 +50,18 @@ class UserApiIntegrationTest {
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"username":" tech.one ","email":"TECH.ONE@test.local","password":"abcde","role":"TECHNICIAN"}
+                                {"username":" tech.one ","email":"TECH.ONE@test.local",\
+                                 "password":"abcde","role":"TECHNICIAN"}
                                 """))
                 .andExpect(status().isCreated())
-                .andExpect(header().string("Location", org.hamcrest.Matchers.matchesPattern("/api/v1/users/\\d+")))
+                .andExpect(header().string("Location",
+                        org.hamcrest.Matchers.matchesPattern("/api/v1/users/\\d+")))
                 .andExpect(jsonPath("$.username").value("tech.one"))
                 .andExpect(jsonPath("$.email").value("tech.one@test.local"))
                 .andReturn();
 
-        var id = new tools.jackson.databind.ObjectMapper().readTree(result.getResponse().getContentAsString()).get("id").asInt();
+        var id = new tools.jackson.databind.ObjectMapper()
+                .readTree(result.getResponse().getContentAsString()).get("id").asInt();
         mvc.perform(patch("/api/v1/users/{id}", id)
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
@@ -102,7 +105,8 @@ class UserApiIntegrationTest {
         mvc.perform(post("/api/v1/users")
                         .header("Authorization", "Bearer " + token)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"username\":\"MANAGER\",\"email\":\"other@test.local\",\"password\":\"abcde\",\"role\":\"EMPLOYEE\"}"))
+                        .content("{\"username\":\"MANAGER\",\"email\":\"other@test.local\","
+                                + "\"password\":\"abcde\",\"role\":\"EMPLOYEE\"}"))
                 .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value("USER_ALREADY_EXISTS"));
 

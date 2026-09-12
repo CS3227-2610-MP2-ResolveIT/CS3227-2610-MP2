@@ -1,6 +1,9 @@
 package resolveit.user;
 
-import static resolveit.user.UserDtos.*;
+import static resolveit.user.UserDtos.CreateUserRequest;
+import static resolveit.user.UserDtos.PageResponse;
+import static resolveit.user.UserDtos.UpdateUserRequest;
+import static resolveit.user.UserDtos.UserResponse;
 
 import java.util.List;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -24,7 +27,8 @@ public class UserService {
     @Transactional(readOnly = true)
     public PageResponse<UserResponse> list(int page, int size, Role role) {
         if (page < 0 || size < 1 || size > 100) {
-            throw ApiException.badRequest("INVALID_PAGINATION", "Page must be non-negative and size must be between 1 and 100.");
+            throw ApiException.badRequest(
+                    "INVALID_PAGINATION", "Page must be non-negative and size must be between 1 and 100.");
         }
         var pageable = PageRequest.of(page, size, Sort.by("id").ascending());
         var result = role == null ? users.findAll(pageable) : users.findAllByRole(role, pageable);
@@ -63,9 +67,15 @@ public class UserService {
         ensureUnique(username, email, id);
         user.setUsername(username);
         user.setEmail(email);
-        if (request.password() != null) user.setPasswordHash(passwordEncoder.encode(request.password()));
-        if (request.role() != null) user.setRole(request.role());
-        if (request.active() != null) user.setActive(request.active());
+        if (request.password() != null) {
+            user.setPasswordHash(passwordEncoder.encode(request.password()));
+        }
+        if (request.role() != null) {
+            user.setRole(request.role());
+        }
+        if (request.active() != null) {
+            user.setActive(request.active());
+        }
         try {
             return UserResponse.from(users.saveAndFlush(user));
         } catch (DataIntegrityViolationException exception) {
@@ -76,9 +86,13 @@ public class UserService {
     private void ensureUnique(String username, String email, Integer currentId) {
         users.findAll().stream()
                 .filter(user -> !user.getId().equals(currentId))
-                .filter(user -> user.getUsername().equalsIgnoreCase(username) || user.getEmail().equalsIgnoreCase(email))
+                .filter(user -> user.getUsername().equalsIgnoreCase(username)
+                        || user.getEmail().equalsIgnoreCase(email))
                 .findAny()
-                .ifPresent(user -> { throw ApiException.conflict("USER_ALREADY_EXISTS", "A user with that username or email already exists."); });
+                .ifPresent(user -> {
+                    throw ApiException.conflict(
+                            "USER_ALREADY_EXISTS", "A user with that username or email already exists.");
+                });
     }
 
     private static String normalizeUsername(String username) {

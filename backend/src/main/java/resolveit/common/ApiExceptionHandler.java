@@ -6,10 +6,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.validation.FieldError;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import resolveit.auth.LoginRateLimitException;
 
 @RestControllerAdvice
@@ -41,12 +41,14 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
     ResponseEntity<ApiError> malformedBody() {
-        return ResponseEntity.badRequest().body(new ApiError(400, "INVALID_REQUEST", "The request body is invalid."));
+        return ResponseEntity.badRequest()
+                .body(new ApiError(400, "INVALID_REQUEST", "The request body is invalid."));
     }
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     ResponseEntity<ApiError> invalidParameter() {
-        return ResponseEntity.badRequest().body(new ApiError(400, "INVALID_PARAMETER", "A request parameter is invalid."));
+        return ResponseEntity.badRequest()
+                .body(new ApiError(400, "INVALID_PARAMETER", "A request parameter is invalid."));
     }
 
     @ExceptionHandler(ObjectOptimisticLockingFailureException.class)

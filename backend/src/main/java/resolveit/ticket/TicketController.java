@@ -1,6 +1,15 @@
 package resolveit.ticket;
 
-import static resolveit.ticket.TicketDtos.*;
+import static resolveit.ticket.TicketDtos.AssignTicketRequest;
+import static resolveit.ticket.TicketDtos.ChangePriorityRequest;
+import static resolveit.ticket.TicketDtos.ChangeStatusRequest;
+import static resolveit.ticket.TicketDtos.CreateMessageRequest;
+import static resolveit.ticket.TicketDtos.CreateTicketRequest;
+import static resolveit.ticket.TicketDtos.MessageResponse;
+import static resolveit.ticket.TicketDtos.PageResponse;
+import static resolveit.ticket.TicketDtos.ResolveTicketRequest;
+import static resolveit.ticket.TicketDtos.TicketResponse;
+import static resolveit.ticket.TicketDtos.UpdateTicketRequest;
 
 import jakarta.validation.Valid;
 import java.net.URI;

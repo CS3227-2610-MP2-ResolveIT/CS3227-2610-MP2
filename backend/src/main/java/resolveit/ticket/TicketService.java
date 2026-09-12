@@ -1,6 +1,15 @@
 package resolveit.ticket;
 
-import static resolveit.ticket.TicketDtos.*;
+import static resolveit.ticket.TicketDtos.AssignTicketRequest;
+import static resolveit.ticket.TicketDtos.ChangePriorityRequest;
+import static resolveit.ticket.TicketDtos.ChangeStatusRequest;
+import static resolveit.ticket.TicketDtos.CreateMessageRequest;
+import static resolveit.ticket.TicketDtos.CreateTicketRequest;
+import static resolveit.ticket.TicketDtos.MessageResponse;
+import static resolveit.ticket.TicketDtos.PageResponse;
+import static resolveit.ticket.TicketDtos.ResolveTicketRequest;
+import static resolveit.ticket.TicketDtos.TicketResponse;
+import static resolveit.ticket.TicketDtos.UpdateTicketRequest;
 
 import jakarta.persistence.criteria.Predicate;
 import java.time.Instant;
@@ -63,13 +72,21 @@ public class TicketService {
                         root.get("status").in(TicketStatus.OPEN, TicketStatus.IN_PROGRESS),
                         builder.equal(root.get("assignedTo").get("id"), currentUser.getId())));
             }
-            if (status != null) predicates.add(builder.equal(root.get("status"), status));
-            if (priority != null) predicates.add(builder.equal(root.get("priority"), priority));
-            if (assignedToId != null) predicates.add(builder.equal(root.get("assignedTo").get("id"), assignedToId));
+            if (status != null) {
+                predicates.add(builder.equal(root.get("status"), status));
+            }
+            if (priority != null) {
+                predicates.add(builder.equal(root.get("priority"), priority));
+            }
+            if (assignedToId != null) {
+                predicates.add(builder.equal(root.get("assignedTo").get("id"), assignedToId));
+            }
             if (Boolean.TRUE.equals(assignedToMe)) {
                 predicates.add(builder.equal(root.get("assignedTo").get("id"), currentUser.getId()));
             }
-            if (Boolean.TRUE.equals(unassigned)) predicates.add(builder.isNull(root.get("assignedTo")));
+            if (Boolean.TRUE.equals(unassigned)) {
+                predicates.add(builder.isNull(root.get("assignedTo")));
+            }
             return builder.and(predicates.toArray(Predicate[]::new));
         };
         var pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("createdAt"), Sort.Order.desc("id")));
@@ -93,17 +110,27 @@ public class TicketService {
         }
         var currentUser = currentUser(authentication);
         var ticket = tickets.findById(id).orElseThrow(TicketService::ticketNotFound);
-        if (!ticket.getRequester().getId().equals(currentUser.getId())) throw ticketNotFound();
+        if (!ticket.getRequester().getId().equals(currentUser.getId())) {
+            throw ticketNotFound();
+        }
         if (ticket.getStatus() != TicketStatus.OPEN || ticket.getAssignedTo() != null) {
             throw ApiException.conflict("TICKET_NOT_EDITABLE", "Only an open, unassigned ticket can be edited.");
         }
         if (request.version() < 0 || ticket.getVersion() != request.version()) {
             throw ApiException.conflict("TICKET_VERSION_CONFLICT", "The ticket was modified by another request.");
         }
-        if (request.hasSubject()) ticket.setSubject(normalizeSubject(request.subject()));
-        if (request.hasDescription()) ticket.setDescription(normalizeDescription(request.description()));
-        if (request.hasCategory()) ticket.setCategory(request.category());
-        if (request.hasPriority()) ticket.setPriority(request.priority());
+        if (request.hasSubject()) {
+            ticket.setSubject(normalizeSubject(request.subject()));
+        }
+        if (request.hasDescription()) {
+            ticket.setDescription(normalizeDescription(request.description()));
+        }
+        if (request.hasCategory()) {
+            ticket.setCategory(request.category());
+        }
+        if (request.hasPriority()) {
+            ticket.setPriority(request.priority());
+        }
         return TicketResponse.from(tickets.saveAndFlush(ticket));
     }
 
@@ -253,8 +280,12 @@ public class TicketService {
     }
 
     private static boolean canView(User user, Ticket ticket) {
-        if (user.getRole() == Role.MANAGER) return true;
-        if (ticket.getRequester().getId().equals(user.getId())) return true;
+        if (user.getRole() == Role.MANAGER) {
+            return true;
+        }
+        if (ticket.getRequester().getId().equals(user.getId())) {
+            return true;
+        }
         return user.getRole() == Role.TECHNICIAN
                 && (ticket.getStatus() == TicketStatus.OPEN
                     || ticket.getStatus() == TicketStatus.IN_PROGRESS

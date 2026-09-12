@@ -14,10 +14,10 @@ The API starts at `http://localhost:8080/api/v1` by default. The SQLite database
 
 The checked-in JWT secret is for local development only. Outside local development, set `RESOLVEIT_JWT_SECRET` to a base64-encoded secret containing at least 32 bytes.
 
-Run the automated tests with:
+Run the automated tests and repository-wide static checks with:
 
 ```bash
-./gradlew test
+./gradlew check
 ```
 
 ## Demo logins

@@ -25,7 +25,9 @@ public class DemoDataSeeder implements ApplicationRunner {
     @Override
     @Transactional
     public void run(ApplicationArguments args) {
-        if (users.count() != 0) return;
+        if (users.count() != 0) {
+            return;
+        }
 
         var demoUsers = new ArrayList<User>();
         var managerPassword = passwordEncoder.encode("Manager123!");

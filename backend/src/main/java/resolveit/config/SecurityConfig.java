@@ -42,7 +42,9 @@ public class SecurityConfig {
     @Bean
     SecretKey jwtSecret(@Value("${resolveit.jwt.secret}") String encodedSecret) {
         var decoded = Base64.getDecoder().decode(encodedSecret);
-        if (decoded.length < 32) throw new IllegalStateException("JWT secret must contain at least 256 bits.");
+        if (decoded.length < 32) {
+            throw new IllegalStateException("JWT secret must contain at least 256 bits.");
+        }
         return new SecretKeySpec(decoded, "HmacSHA256");
     }
 

@@ -1,6 +1,9 @@
 package resolveit.user;
 
-import static resolveit.user.UserDtos.*;
+import static resolveit.user.UserDtos.CreateUserRequest;
+import static resolveit.user.UserDtos.PageResponse;
+import static resolveit.user.UserDtos.UpdateUserRequest;
+import static resolveit.user.UserDtos.UserResponse;
 
 import jakarta.validation.Valid;
 import java.net.URI;
