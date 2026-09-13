@@ -7,6 +7,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.css.PseudoClass;
 import javafx.fxml.FXML;
+import javafx.scene.AccessibleAttribute;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -49,7 +50,7 @@ public final class LoginController implements ViewLifecycle {
     private void initialize() {
         emailLabel.setLabelFor(emailField);
         passwordLabel.setLabelFor(passwordField);
-        emailField.setAccessibleHelp("Enter the email address assigned to your ResolveIT account.");
+        emailField.setAccessibleHelp("Enter the email address for your ResolveIT account.");
         passwordField.setAccessibleHelp("Enter your ResolveIT password.");
         visiblePasswordField.setAccessibleHelp("Enter your ResolveIT password. The password is currently visible.");
 
@@ -58,6 +59,10 @@ public final class LoginController implements ViewLifecycle {
         visiblePasswordField.managedProperty().bind(visiblePasswordField.visibleProperty());
         passwordField.visibleProperty().bind(showPasswordCheckBox.selectedProperty().not());
         passwordField.managedProperty().bind(passwordField.visibleProperty());
+        showPasswordCheckBox.selectedProperty().addListener((ignored, wasSelected, isSelected) -> {
+            var activeField = isSelected ? visiblePasswordField : passwordField;
+            passwordLabel.setLabelFor(activeField);
+        });
 
         emailField.disableProperty().bind(loading);
         passwordField.disableProperty().bind(loading);
@@ -122,6 +127,7 @@ public final class LoginController implements ViewLifecycle {
         formErrorLabel.setText(cause instanceof AuthFailure authFailure
                 ? authFailure.getMessage()
                 : "Sign-in could not be completed. Please try again.");
+        formErrorLabel.notifyAccessibleAttributeChanged(AccessibleAttribute.TEXT);
         activePasswordField().requestFocus();
         activePasswordField().selectAll();
     }

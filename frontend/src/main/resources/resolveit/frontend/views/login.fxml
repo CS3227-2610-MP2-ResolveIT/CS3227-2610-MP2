@@ -7,6 +7,8 @@
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.shape.Circle?>
+<?import javafx.scene.shape.SVGPath?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
@@ -38,23 +40,43 @@
 
         <Region VBox.vgrow="ALWAYS" />
         <VBox spacing="16.0">
-            <Label text="Support that keeps everyone moving." wrapText="true" styleClass="brand-heading" />
+            <Label maxWidth="1.7976931348623157E308" minHeight="-Infinity"
+                   text="Support that keeps everyone moving." wrapText="true" styleClass="brand-heading" />
             <Label text="A single place to report issues, follow progress, and get help from your IT team."
+                   maxWidth="1.7976931348623157E308" minHeight="-Infinity"
                    wrapText="true" styleClass="brand-description" />
         </VBox>
 
         <VBox spacing="14.0">
             <HBox alignment="CENTER_LEFT" spacing="12.0">
-                <Label text="✓" styleClass="feature-icon" />
-                <Label text="Track requests from report to resolution" wrapText="true" styleClass="feature-text" />
+                <StackPane minHeight="28.0" minWidth="28.0" mouseTransparent="true"
+                           prefHeight="28.0" prefWidth="28.0" styleClass="feature-icon">
+                    <SVGPath content="M 3 2 H 13 V 14 H 3 Z M 5 5 H 11 M 5 8 H 11 M 5 11 H 9"
+                             styleClass="feature-icon-path" />
+                </StackPane>
+                <Label maxWidth="1.7976931348623157E308" minHeight="-Infinity"
+                       text="Track requests from report to resolution" wrapText="true"
+                       styleClass="feature-text" HBox.hgrow="ALWAYS" />
             </HBox>
             <HBox alignment="CENTER_LEFT" spacing="12.0">
-                <Label text="✓" styleClass="feature-icon" />
-                <Label text="Keep every update in one clear timeline" wrapText="true" styleClass="feature-text" />
+                <StackPane minHeight="28.0" minWidth="28.0" mouseTransparent="true"
+                           prefHeight="28.0" prefWidth="28.0" styleClass="feature-icon">
+                    <SVGPath content="M 3 4 H 6 M 8 4 H 13 M 3 8 H 8 M 10 8 H 13 M 3 12 H 5 M 7 12 H 13"
+                             styleClass="feature-icon-path" />
+                </StackPane>
+                <Label maxWidth="1.7976931348623157E308" minHeight="-Infinity"
+                       text="Keep every update in one clear timeline" wrapText="true"
+                       styleClass="feature-text" HBox.hgrow="ALWAYS" />
             </HBox>
             <HBox alignment="CENTER_LEFT" spacing="12.0">
-                <Label text="✓" styleClass="feature-icon" />
-                <Label text="Connect directly with your support team" wrapText="true" styleClass="feature-text" />
+                <StackPane minHeight="28.0" minWidth="28.0" mouseTransparent="true"
+                           prefHeight="28.0" prefWidth="28.0" styleClass="feature-icon">
+                    <SVGPath content="M 2 9 V 12 H 5 V 8 H 2 V 7 A 6 6 0 0 1 14 7 V 8 H 11 V 12 H 14 V 10 C 14 13 12 14 9 14"
+                             styleClass="feature-icon-path" />
+                </StackPane>
+                <Label maxWidth="1.7976931348623157E308" minHeight="-Infinity"
+                       text="Connect directly with your support team" wrapText="true"
+                       styleClass="feature-text" HBox.hgrow="ALWAYS" />
             </HBox>
         </VBox>
         <Region VBox.vgrow="ALWAYS" />
@@ -63,10 +85,10 @@
 
     <StackPane GridPane.columnIndex="1" styleClass="login-surface">
         <padding><Insets bottom="48.0" left="64.0" right="64.0" top="48.0" /></padding>
-        <VBox maxWidth="430.0" spacing="28.0" styleClass="login-card">
+        <VBox maxHeight="-Infinity" maxWidth="430.0" spacing="28.0" styleClass="login-card">
             <VBox spacing="8.0">
                 <Label text="Welcome back" styleClass="page-heading" />
-                <Label text="Sign in with your work account to continue." wrapText="true" styleClass="page-description" />
+                <Label text="Sign in to your ResolveIT account." wrapText="true" styleClass="page-description" />
             </VBox>
 
             <VBox spacing="18.0">
@@ -74,7 +96,8 @@
                     <Label fx:id="emailLabel" text="Email address" styleClass="field-label" />
                     <TextField fx:id="emailField" accessibleText="Email address" promptText="you@company.com"
                                prefHeight="48.0" />
-                    <Label fx:id="emailErrorLabel" accessibleText="Email validation error" text=""
+                    <Label fx:id="emailErrorLabel" accessibleText="Email validation error"
+                           maxWidth="1.7976931348623157E308" minHeight="-Infinity" text=""
                            wrapText="true" styleClass="field-error" />
                 </VBox>
 
@@ -86,26 +109,31 @@
                         <TextField fx:id="visiblePasswordField" accessibleText="Visible password" onAction="#submitLogin"
                                    prefHeight="48.0" promptText="Enter your password" />
                     </StackPane>
-                    <Label fx:id="passwordErrorLabel" accessibleText="Password validation error" text=""
+                    <Label fx:id="passwordErrorLabel" accessibleText="Password validation error"
+                           maxWidth="1.7976931348623157E308" minHeight="-Infinity" text=""
                            wrapText="true" styleClass="field-error" />
                     <CheckBox fx:id="showPasswordCheckBox" mnemonicParsing="true" text="Show _password"
                               styleClass="show-password" />
                 </VBox>
 
-                <Label fx:id="formErrorLabel" accessibleText="Sign-in error" text="" wrapText="true"
-                       styleClass="form-error" />
+                <Label fx:id="formErrorLabel" accessibleText="Sign-in error"
+                       maxWidth="1.7976931348623157E308" minHeight="-Infinity" text=""
+                       wrapText="true" styleClass="form-error" />
 
-                <HBox alignment="CENTER_LEFT" spacing="14.0">
+                <StackPane>
                     <Button fx:id="loginButton" defaultButton="true" mnemonicParsing="true" onAction="#submitLogin"
                             prefHeight="48.0" maxWidth="1.7976931348623157E308" text="_Sign in"
-                            styleClass="primary-button" HBox.hgrow="ALWAYS" />
+                            styleClass="primary-button" />
                     <ProgressIndicator fx:id="progressIndicator" accessibleText="Signing in" maxHeight="26.0"
-                                       maxWidth="26.0" minHeight="26.0" minWidth="26.0" visible="false" />
-                </HBox>
+                                       maxWidth="26.0" minHeight="26.0" minWidth="26.0" mouseTransparent="true"
+                                       visible="false" StackPane.alignment="CENTER_RIGHT">
+                        <StackPane.margin><Insets right="14.0" /></StackPane.margin>
+                    </ProgressIndicator>
+                </StackPane>
             </VBox>
 
             <HBox alignment="CENTER_LEFT" spacing="7.0" styleClass="security-note">
-                <Label text="●" styleClass="security-dot" />
+                <Circle mouseTransparent="true" radius="3.0" styleClass="security-dot" />
                 <Label text="Your session is kept only on this device while ResolveIT is open."
                        wrapText="true" styleClass="security-text" />
             </HBox>

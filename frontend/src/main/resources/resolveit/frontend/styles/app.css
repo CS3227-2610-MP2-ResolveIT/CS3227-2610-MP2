@@ -5,11 +5,14 @@
     -brand-cyan: #38bdf8;
     -surface: #ffffff;
     -surface-muted: #f5f7fb;
+    -surface-subtle: #f8fafc;
     -text-primary: #162238;
+    -text-strong: #334155;
     -text-secondary: #64748b;
+    -text-placeholder: #52627a;
     -border: #d8e0ec;
     -danger: #b42318;
-    -fx-font-family: "Inter", "Segoe UI", "Arial", sans-serif;
+    -fx-font-family: "sans-serif";
     -fx-font-size: 14px;
 }
 
@@ -42,9 +45,9 @@
 }
 
 .brand-heading {
-    -fx-font-size: 34px;
-    -fx-font-weight: 800;
-    -fx-line-spacing: 2px;
+    -fx-font-size: 36px;
+    -fx-font-weight: 700;
+    -fx-line-spacing: 3px;
     -fx-text-fill: white;
 }
 
@@ -58,13 +61,18 @@
     -fx-alignment: center;
     -fx-background-color: rgba(56, 189, 248, 0.17);
     -fx-background-radius: 20px;
-    -fx-font-size: 13px;
-    -fx-font-weight: 800;
     -fx-min-height: 28px;
     -fx-min-width: 28px;
     -fx-pref-height: 28px;
     -fx-pref-width: 28px;
-    -fx-text-fill: #7dd3fc;
+}
+
+.feature-icon-path {
+    -fx-fill: transparent;
+    -fx-stroke: #7dd3fc;
+    -fx-stroke-line-cap: round;
+    -fx-stroke-line-join: round;
+    -fx-stroke-width: 1.6px;
 }
 
 .feature-text {
@@ -92,20 +100,20 @@
 
 .page-heading {
     -fx-font-size: 30px;
-    -fx-font-weight: 800;
+    -fx-font-weight: 700;
     -fx-text-fill: -text-primary;
 }
 
 .page-description, .welcome-description {
     -fx-font-size: 14px;
-    -fx-line-spacing: 2px;
+    -fx-line-spacing: 3px;
     -fx-text-fill: -text-secondary;
 }
 
 .field-label {
     -fx-font-size: 13px;
     -fx-font-weight: 700;
-    -fx-text-fill: #334155;
+    -fx-text-fill: -text-strong;
 }
 
 .text-field {
@@ -120,17 +128,29 @@
     -fx-text-fill: -text-primary;
 }
 
+.login-card .text-field {
+    -fx-border-color: #7c8da5;
+    -fx-font-size: 15px;
+    -fx-prompt-text-fill: -text-placeholder;
+}
+
 .text-field:hover {
     -fx-border-color: #a9b7ca;
 }
 
-.text-field:focused {
+.login-card .text-field:hover {
+    -fx-border-color: -text-secondary;
+}
+
+.text-field:focused,
+.login-card .text-field:focused {
     -fx-border-color: -brand-blue;
     -fx-border-width: 2px;
     -fx-effect: dropshadow(gaussian, rgba(37, 99, 235, 0.16), 7, 0.2, 0, 0);
 }
 
-.text-field:invalid {
+.text-field:invalid,
+.login-card .text-field:invalid {
     -fx-border-color: -danger;
 }
 
@@ -150,7 +170,7 @@
 }
 
 .show-password {
-    -fx-font-size: 12px;
+    -fx-font-size: 13px;
     -fx-text-fill: -text-secondary;
 }
 
@@ -158,6 +178,10 @@
     -fx-background-color: white;
     -fx-border-color: #a9b7ca;
     -fx-border-radius: 4px;
+}
+
+.login-card .check-box .box {
+    -fx-border-color: #7c8da5;
 }
 
 .check-box:selected .box {
@@ -195,19 +219,31 @@
 }
 
 .security-note {
-    -fx-background-color: #f8fafc;
+    -fx-background-color: -surface-subtle;
     -fx-background-radius: 9px;
     -fx-padding: 12px;
 }
 
 .security-dot {
-    -fx-font-size: 11px;
-    -fx-text-fill: #16a34a;
+    -fx-fill: #16a34a;
 }
 
 .security-text {
-    -fx-font-size: 11px;
+    -fx-font-size: 12px;
+    -fx-line-spacing: 1px;
     -fx-text-fill: -text-secondary;
+}
+
+.login-card .primary-button {
+    -fx-font-size: 15px;
+}
+
+.login-card .primary-button:disabled {
+    -fx-opacity: 1;
+}
+
+.login-card .progress-indicator {
+    -fx-progress-color: white;
 }
 
 .shell-background {
@@ -243,11 +279,11 @@
     -fx-cursor: hand;
     -fx-font-weight: 700;
     -fx-padding: 10px 17px;
-    -fx-text-fill: #334155;
+    -fx-text-fill: -text-strong;
 }
 
 .secondary-button:hover {
-    -fx-background-color: #f8fafc;
+    -fx-background-color: -surface-subtle;
     -fx-border-color: #b5c1d1;
 }
 
@@ -333,7 +369,7 @@
 }
 
 .sidebar {
-    -fx-background-color: #10233f;
+    -fx-background-color: -brand-navy;
 }
 
 .nav-section-label {
@@ -360,7 +396,7 @@
 }
 
 .nav-button-active {
-    -fx-background-color: #2563eb;
+    -fx-background-color: -brand-blue;
     -fx-text-fill: white;
 }
 
@@ -487,7 +523,7 @@
 }
 
 .table-view .column-header-background {
-    -fx-background-color: #f8fafc;
+    -fx-background-color: -surface-subtle;
     -fx-background-radius: 12px 12px 0 0;
 }
 
@@ -501,7 +537,7 @@
     -fx-alignment: center-left;
     -fx-font-size: 11px;
     -fx-font-weight: 800;
-    -fx-text-fill: #52627a;
+    -fx-text-fill: -text-placeholder;
 }
 
 .table-row-cell {
@@ -556,7 +592,7 @@
 .detail-value {
     -fx-font-size: 14px;
     -fx-line-spacing: 2px;
-    -fx-text-fill: #334155;
+    -fx-text-fill: -text-strong;
 }
 
 .resolution-box {
@@ -566,7 +602,7 @@
 }
 
 .resolution-action-box {
-    -fx-background-color: #f8fafc;
+    -fx-background-color: -surface-subtle;
     -fx-background-radius: 9px;
     -fx-border-color: -border;
     -fx-border-radius: 9px;
@@ -582,7 +618,7 @@
 
 .status-open {
     -fx-background-color: #e8efff;
-    -fx-text-fill: #1d4ed8;
+    -fx-text-fill: -brand-blue-dark;
 }
 
 .status-in-progress {
@@ -597,7 +633,7 @@
 
 .status-cancelled {
     -fx-background-color: #f1f5f9;
-    -fx-text-fill: #64748b;
+    -fx-text-fill: -text-secondary;
 }
 
 #messagesList {
@@ -612,7 +648,7 @@
 }
 
 .comment-card {
-    -fx-background-color: #f8fafc;
+    -fx-background-color: -surface-subtle;
     -fx-background-radius: 8px;
     -fx-padding: 11px 13px;
 }
@@ -628,7 +664,7 @@
 .comment-author {
     -fx-font-size: 11px;
     -fx-font-weight: 700;
-    -fx-text-fill: #52627a;
+    -fx-text-fill: -text-placeholder;
 }
 
 .comment-message {
