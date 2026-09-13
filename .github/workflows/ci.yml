@@ -48,7 +48,7 @@ jobs:
             frontend/*.gradle
             frontend/gradle/wrapper/gradle-wrapper.properties
       - name: Run frontend tests and static checks
-        run: ./gradlew check --no-daemon
+        run: xvfb-run --auto-servernum ./gradlew check --no-daemon
 
   package-jars:
     name: Package cross-platform JARs

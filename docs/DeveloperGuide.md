@@ -63,7 +63,8 @@ Material AI interactions are summarised under [`logs`](../logs).
 
 Backend integration tests exercise authentication, authorisation, persistence, and
 ticket/user workflows. Frontend tests cover validation, session/configuration,
-services, HTTP contracts, and error mapping using local test servers. Run:
+services, HTTP contracts, error mapping using local test servers, and focused login
+FXML/controller behavior. Run:
 
 ```bash
 cd backend && ./gradlew check
@@ -78,10 +79,13 @@ when only static source checks are needed. The shared rules are in
 rules globally; the code-review workflow separately checks whether changed
 public APIs and non-trivial methods need useful Javadocs.
 
-Visible JavaFX behaviour is checked manually; no FXML/UI test remains in the current
-suite. GitHub Actions runs each module's tests and repository-wide Checkstyle gate as
-independent CI jobs on pushes and pull requests, then uploads one cross-platform
-executable JAR for each module. Changes should be reviewed against
+The focused login UI test loads the real FXML and stylesheet and verifies validation,
+password visibility, loading, duplicate-submission prevention, and failure recovery.
+It runs on the JavaFX Application Thread and uses a virtual display in Linux CI.
+Visual layout, keyboard focus, and assistive-technology announcements still require
+manual native checks. GitHub Actions runs each module's tests and repository-wide
+Checkstyle gate as independent CI jobs on pushes and pull requests, then uploads one
+cross-platform executable JAR for each module. Changes should be reviewed against
 `requirements/PROJECT.md`, tested in the affected module, documented, and
 committed as focused Conventional Commits.
 

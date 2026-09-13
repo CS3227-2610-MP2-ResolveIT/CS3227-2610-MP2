@@ -77,4 +77,6 @@ sign-in attempts are temporarily rate-limited.
 ```
 
 `check` runs the frontend tests and Checkstyle across all Java source and test files. Run
-`./gradlew checkstyleMain checkstyleTest` to execute only the static checks.
+`./gradlew checkstyleMain checkstyleTest` to execute only the static checks. The test
+suite includes a focused login FXML/controller test; Linux environments need a display
+server, so CI runs the suite through `xvfb-run`.

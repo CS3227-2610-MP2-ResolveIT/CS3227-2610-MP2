@@ -68,7 +68,7 @@ tasks.named('jar') {
 tasks.named('test') {
     useJUnitPlatform()
     jvmArgs '--add-modules', 'jdk.httpserver'
-    jvmArgs '--enable-native-access=ALL-UNNAMED'
+    jvmArgs '--enable-native-access=javafx.graphics,ALL-UNNAMED'
 }
 
 tasks.withType(Checkstyle).configureEach {
