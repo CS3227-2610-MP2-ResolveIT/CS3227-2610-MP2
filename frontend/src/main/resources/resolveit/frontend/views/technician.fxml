@@ -15,7 +15,7 @@
                 <Label text="R" styleClass="shell-logo-text" />
             </StackPane>
             <Label text="ResolveIT" styleClass="shell-brand-name" />
-            <Label fx:id="workspaceLabel" text="Technician workspace" styleClass="portal-label technician-portal-label" />
+            <Label fx:id="workspaceLabel" text="Technician workspace" styleClass="portal-label, technician-portal-label" />
             <Region HBox.hgrow="ALWAYS" />
             <VBox alignment="CENTER_RIGHT" spacing="1.0">
                 <Label fx:id="userNameLabel" styleClass="user-name" />
@@ -58,7 +58,7 @@
                         <ComboBox fx:id="assignmentFilter" prefWidth="165.0"
                                   accessibleText="Filter tickets by assignment" />
                         <Button fx:id="refreshQueueButton" mnemonicParsing="true" onAction="#refreshQueue"
-                                text="↻  _Refresh" styleClass="secondary-button compact-button" />
+                                text="↻  _Refresh" styleClass="secondary-button, compact-button" />
                         <ProgressIndicator fx:id="queueProgress" maxHeight="22.0" maxWidth="22.0"
                                            visible="false" managed="false" />
                         <Region HBox.hgrow="ALWAYS" />
@@ -82,10 +82,10 @@
                                styleClass="hint-label" />
                         <Region HBox.hgrow="ALWAYS" />
                         <Button fx:id="previousButton" mnemonicParsing="true" onAction="#previousPage"
-                                text="←  _Previous" styleClass="secondary-button compact-button" />
+                                text="←  _Previous" styleClass="secondary-button, compact-button" />
                         <Label fx:id="pageLabel" text="Page 0 of 0" styleClass="count-label" />
                         <Button fx:id="nextButton" mnemonicParsing="true" onAction="#nextPage"
-                                text="_Next  →" styleClass="secondary-button compact-button" />
+                                text="_Next  →" styleClass="secondary-button, compact-button" />
                     </HBox>
                 </VBox>
             </StackPane>
@@ -94,7 +94,7 @@
                 <VBox spacing="16.0">
                     <HBox alignment="CENTER_LEFT" spacing="12.0">
                         <Button mnemonicParsing="true" onAction="#showQueue" text="←  _Back"
-                                styleClass="secondary-button compact-button" />
+                                styleClass="secondary-button, compact-button" />
                         <VBox spacing="3.0">
                             <HBox alignment="CENTER_LEFT" spacing="10.0">
                                 <Label fx:id="detailNumberLabel" text="Ticket details" styleClass="workspace-heading" />
@@ -107,7 +107,7 @@
                         <ProgressIndicator fx:id="detailProgress" maxHeight="23.0" maxWidth="23.0"
                                            visible="false" managed="false" />
                         <Button fx:id="refreshDetailButton" mnemonicParsing="true" onAction="#refreshDetails"
-                                text="↻  _Refresh" styleClass="secondary-button compact-button" />
+                                text="↻  _Refresh" styleClass="secondary-button, compact-button" />
                     </HBox>
                     <Label fx:id="detailErrorLabel" wrapText="true" styleClass="form-error" />
                     <Label fx:id="detailNoticeLabel" wrapText="true" styleClass="success-message" />
@@ -118,12 +118,12 @@
                                     <Label text="Request" styleClass="card-heading" />
                                     <Region HBox.hgrow="ALWAYS" />
                                     <Button fx:id="takeButton" mnemonicParsing="true" onAction="#takeTicket"
-                                            text="_Take ticket" styleClass="primary-button compact-button" />
+                                            text="_Take ticket" styleClass="primary-button, compact-button" />
                                     <Button fx:id="beginWorkButton" mnemonicParsing="true" onAction="#beginWork"
-                                            text="_Begin work" styleClass="primary-button compact-button" />
-                                    <Button fx:id="cancelButton" text="Cancel ticket" onAction="#cancelTicket" styleClass="secondary-button compact-button" visible="false" managed="false" />
+                                            text="_Begin work" styleClass="primary-button, compact-button" />
+                                    <Button fx:id="cancelButton" text="Cancel ticket" onAction="#cancelTicket" styleClass="secondary-button, compact-button" visible="false" managed="false" />
                                     <Button fx:id="reopenButton" mnemonicParsing="true" onAction="#reopenTicket"
-                                            text="_Reopen" styleClass="secondary-button compact-button" />
+                                            text="_Reopen" styleClass="secondary-button, compact-button" />
                                 </HBox>
                                 <VBox spacing="5.0">
                                     <Label text="SUBJECT" styleClass="detail-key" />
@@ -173,8 +173,8 @@
                                     <Label text="Assign or reassign" labelFor="$assigneeField" styleClass="field-label" />
                                     <ComboBox fx:id="assigneeField" maxWidth="Infinity" />
                                     <HBox spacing="10.0">
-                                        <Button fx:id="assignButton" text="Assign" onAction="#assignTicket" styleClass="primary-button compact-button" />
-                                        <Button fx:id="refreshAssigneesButton" text="Refresh assignable users" onAction="#refreshAssignees" styleClass="secondary-button compact-button" />
+                                        <Button fx:id="assignButton" text="Assign" onAction="#assignTicket" styleClass="primary-button, compact-button" />
+                                        <Button fx:id="refreshAssigneesButton" text="Refresh assignable users" onAction="#refreshAssignees" styleClass="secondary-button, compact-button" />
                                     </HBox>
                                 </VBox>
                                 <Label text="Support actions" styleClass="card-heading" />
@@ -182,7 +182,7 @@
                                     <Label text="Priority" styleClass="field-label" labelFor="$priorityField" />
                                     <ComboBox fx:id="priorityField" prefWidth="150.0" />
                                     <Button fx:id="changePriorityButton" mnemonicParsing="true" onAction="#changePriority"
-                                            text="_Update priority" styleClass="secondary-button compact-button" />
+                                            text="_Update priority" styleClass="secondary-button, compact-button" />
                                 </HBox>
                                 <VBox fx:id="resolveBox" spacing="8.0" visible="false" managed="false"
                                       styleClass="resolution-action-box">
@@ -193,7 +193,7 @@
                                     <Label fx:id="resolutionErrorLabel" wrapText="true" styleClass="field-error" />
                                     <HBox alignment="CENTER_RIGHT">
                                         <Button fx:id="resolveButton" mnemonicParsing="true" onAction="#resolveTicket"
-                                                text="_Resolve ticket" styleClass="primary-button workspace-button" />
+                                                text="_Resolve ticket" styleClass="primary-button, workspace-button" />
                                     </HBox>
                                 </VBox>
                             </VBox>
@@ -216,7 +216,7 @@
                                     <Label fx:id="messageErrorLabel" wrapText="true" styleClass="field-error" />
                                     <HBox alignment="CENTER_RIGHT">
                                         <Button fx:id="addMessageButton" mnemonicParsing="true" onAction="#addMessage"
-                                                text="_Post message" styleClass="primary-button workspace-button" />
+                                                text="_Post message" styleClass="primary-button, workspace-button" />
                                     </HBox>
                                 </VBox>
                             </VBox>
