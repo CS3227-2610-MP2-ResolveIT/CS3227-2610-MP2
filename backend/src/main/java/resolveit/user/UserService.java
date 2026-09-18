@@ -14,16 +14,34 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import resolveit.common.ApiException;
 
+/**
+ * Administers user accounts: listing, creation, updates, and the assignable
+ * technician directory. Enforces username/email uniqueness and hashes passwords.
+ */
 @Service
 public class UserService {
     private final UserRepository users;
     private final PasswordEncoder passwordEncoder;
 
+    /**
+     * Creates the user service.
+     *
+     * @param users user repository
+     * @param passwordEncoder encoder used to hash stored passwords
+     */
     public UserService(UserRepository users, PasswordEncoder passwordEncoder) {
         this.users = users;
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * Lists users with optional role filtering and pagination.
+     *
+     * @param page zero-based page index
+     * @param size page size (1..100)
+     * @param role optional role filter, or {@code null} for all roles
+     * @return a page of users ordered by id
+     */
     @Transactional(readOnly = true)
     public PageResponse<UserResponse> list(int page, int size, Role role) {
         if (page < 0 || size < 1 || size > 100) {
@@ -36,12 +54,23 @@ public class UserService {
                 result.getSize(), result.getTotalElements(), result.getTotalPages());
     }
 
+    /**
+     * Returns active technicians and managers eligible to be ticket assignees.
+     *
+     * @return assignable support users ordered by username
+     */
     @Transactional(readOnly = true)
     public List<UserResponse> technicians() {
         return users.findAllByActiveTrueAndRoleInOrderByUsernameAsc(List.of(Role.TECHNICIAN, Role.MANAGER))
                 .stream().map(UserResponse::from).toList();
     }
 
+    /**
+     * Creates a user with a hashed password; username and email must be unique.
+     *
+     * @param request user details; active defaults to {@code true} when omitted
+     * @return the created user
+     */
     @Transactional
     public UserResponse create(CreateUserRequest request) {
         var username = normalizeUsername(request.username());
@@ -56,6 +85,15 @@ public class UserService {
         }
     }
 
+    /**
+     * Applies a partial update to a user, re-hashing the password when supplied.
+     * At least one field must be present, and any changed username or email must
+     * remain unique.
+     *
+     * @param id user identifier
+     * @param request fields to change
+     * @return the updated user
+     */
     @Transactional
     public UserResponse update(int id, UpdateUserRequest request) {
         if (request.isEmpty()) {

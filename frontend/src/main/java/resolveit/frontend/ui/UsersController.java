@@ -30,6 +30,12 @@ import resolveit.frontend.ticket.TicketFailure;
 import resolveit.frontend.user.ManagerClient.UserRequest;
 import resolveit.frontend.user.ManagerService;
 
+/**
+ * Controls the manager user-administration view: listing, creating, and editing
+ * accounts. Runs operations asynchronously and marshals results to the JavaFX
+ * thread, tracks in-flight requests for cancellation on disposal, and gates the
+ * UI with a busy flag while a request is pending.
+ */
 public final class UsersController implements ViewLifecycle {
     private final SessionState session;
     private final ManagerService service;
@@ -49,6 +55,13 @@ public final class UsersController implements ViewLifecycle {
     @FXML private Button previousButton, nextButton, refreshButton, newButton, saveButton, backButton, logoutButton;
     @FXML private VBox editor;
 
+    /**
+     * Creates the user-administration controller.
+     *
+     * @param session current in-memory session
+     * @param service manager user-administration operations
+     * @param navigator navigator used for sign-out and view switches
+     */
     public UsersController(SessionState session, ManagerService service, Navigator navigator) {
         this.session = session;
         this.service = service;

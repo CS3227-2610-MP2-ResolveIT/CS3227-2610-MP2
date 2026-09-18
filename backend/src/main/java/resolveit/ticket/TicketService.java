@@ -26,18 +26,37 @@ import resolveit.user.Role;
 import resolveit.user.User;
 import resolveit.user.UserRepository;
 
+/**
+ * Applies ticket lifecycle rules: role-based visibility, assignment, status
+ * transitions, priority, messaging, and validation. Public methods run in a
+ * transaction and throw {@link ApiException} when a rule is violated.
+ */
 @Service
 public class TicketService {
     private final TicketRepository tickets;
     private final TicketMessageRepository messages;
     private final UserRepository users;
 
+    /**
+     * Creates the ticket service from its persistence collaborators.
+     *
+     * @param tickets ticket repository
+     * @param messages ticket-message repository
+     * @param users user repository used to resolve the caller and assignees
+     */
     public TicketService(TicketRepository tickets, TicketMessageRepository messages, UserRepository users) {
         this.tickets = tickets;
         this.messages = messages;
         this.users = users;
     }
 
+    /**
+     * Creates a ticket owned by the authenticated requester.
+     *
+     * @param authentication authenticated account identity
+     * @param request ticket details, normalised on save
+     * @return the created ticket
+     */
     @Transactional
     public TicketResponse create(Authentication authentication, CreateTicketRequest request) {
         var currentUser = currentUser(authentication);
@@ -46,6 +65,24 @@ public class TicketService {
         return TicketResponse.from(tickets.saveAndFlush(ticket));
     }
 
+    /**
+     * Lists tickets visible to the caller with role-scoped filtering and pagination.
+     *
+     * <p>Employees see only their own tickets; technicians additionally see open,
+     * in-progress, or self-assigned tickets; managers see all. At most one
+     * assignment filter is permitted, and filtering by another assignee requires
+     * the manager role.
+     *
+     * @param authentication authenticated account identity
+     * @param page zero-based page index
+     * @param size page size (1..100)
+     * @param status optional status filter
+     * @param priority optional priority filter
+     * @param assignedToId optional assignee filter (manager only)
+     * @param assignedToMe optional filter for the caller's own assignments
+     * @param unassigned optional filter for unassigned tickets
+     * @return a page of visible tickets ordered newest first
+     */
     @Transactional(readOnly = true)
     public PageResponse<TicketResponse> list(Authentication authentication, int page, int size,
                                              TicketStatus status, TicketPriority priority,
@@ -95,11 +132,29 @@ public class TicketService {
                 result.getTotalElements(), result.getTotalPages());
     }
 
+    /**
+     * Returns a single ticket the caller may view.
+     *
+     * @param authentication authenticated account identity
+     * @param id ticket identifier
+     * @return the requested ticket
+     */
     @Transactional(readOnly = true)
     public TicketResponse get(Authentication authentication, int id) {
         return TicketResponse.from(accessibleTicket(currentUser(authentication), id));
     }
 
+    /**
+     * Edits the caller's own ticket while it is still open and unassigned.
+     *
+     * <p>Requires a matching optimistic version and at least one editable field;
+     * a version mismatch is reported as a conflict.
+     *
+     * @param authentication authenticated account identity
+     * @param id ticket identifier
+     * @param request editable fields and the expected version
+     * @return the updated ticket
+     */
     @Transactional
     public TicketResponse update(Authentication authentication, int id, UpdateTicketRequest request) {
         if (!request.hasVersion()) {
@@ -134,6 +189,14 @@ public class TicketService {
         return TicketResponse.from(tickets.saveAndFlush(ticket));
     }
 
+    /**
+     * Atomically self-assigns an open, unassigned ticket to the calling support
+     * agent and moves it to in-progress.
+     *
+     * @param authentication authenticated account identity
+     * @param id ticket identifier
+     * @return the taken ticket
+     */
     @Transactional
     public TicketResponse take(Authentication authentication, int id) {
         var currentUser = currentUser(authentication);
@@ -147,6 +210,14 @@ public class TicketService {
         return TicketResponse.from(tickets.findById(visible.getId()).orElseThrow(TicketService::ticketNotFound));
     }
 
+    /**
+     * Assigns a non-terminal ticket to an active technician or manager; manager only.
+     *
+     * @param authentication authenticated account identity
+     * @param id ticket identifier
+     * @param request target assignee
+     * @return the assigned ticket
+     */
     @Transactional
     public TicketResponse assign(Authentication authentication, int id, AssignTicketRequest request) {
         var currentUser = currentUser(authentication);
@@ -164,6 +235,15 @@ public class TicketService {
         return TicketResponse.from(tickets.saveAndFlush(ticket));
     }
 
+    /**
+     * Moves an assigned ticket from open to in-progress; support roles only, and
+     * only the assignee or a manager may perform it.
+     *
+     * @param authentication authenticated account identity
+     * @param id ticket identifier
+     * @param request requested status (only in-progress is permitted here)
+     * @return the updated ticket
+     */
     @Transactional
     public TicketResponse changeStatus(Authentication authentication, int id, ChangeStatusRequest request) {
         var currentUser = currentUser(authentication);
@@ -184,6 +264,14 @@ public class TicketService {
         return TicketResponse.from(tickets.saveAndFlush(ticket));
     }
 
+    /**
+     * Changes a ticket's priority; support roles only.
+     *
+     * @param authentication authenticated account identity
+     * @param id ticket identifier
+     * @param request new priority
+     * @return the updated ticket
+     */
     @Transactional
     public TicketResponse changePriority(Authentication authentication, int id, ChangePriorityRequest request) {
         var currentUser = currentUser(authentication);
@@ -193,6 +281,14 @@ public class TicketService {
         return TicketResponse.from(tickets.saveAndFlush(ticket));
     }
 
+    /**
+     * Cancels an open or in-progress ticket; the requester may cancel their own,
+     * and a manager may cancel any.
+     *
+     * @param authentication authenticated account identity
+     * @param id ticket identifier
+     * @return the cancelled ticket
+     */
     @Transactional
     public TicketResponse cancel(Authentication authentication, int id) {
         var currentUser = currentUser(authentication);
@@ -208,6 +304,14 @@ public class TicketService {
         return TicketResponse.from(tickets.saveAndFlush(ticket));
     }
 
+    /**
+     * Reopens a resolved ticket back to open, clearing its assignment and
+     * resolution note. Employees may reopen only their own tickets.
+     *
+     * @param authentication authenticated account identity
+     * @param id ticket identifier
+     * @return the reopened ticket
+     */
     @Transactional
     public TicketResponse reopen(Authentication authentication, int id) {
         var currentUser = currentUser(authentication);
@@ -225,6 +329,15 @@ public class TicketService {
         return TicketResponse.from(tickets.saveAndFlush(ticket));
     }
 
+    /**
+     * Resolves an in-progress ticket with a resolution note; support roles only,
+     * and only the assignee or a manager may perform it.
+     *
+     * @param authentication authenticated account identity
+     * @param id ticket identifier
+     * @param request resolution note
+     * @return the resolved ticket
+     */
     @Transactional
     public TicketResponse resolve(Authentication authentication, int id, ResolveTicketRequest request) {
         var currentUser = currentUser(authentication);
@@ -243,6 +356,15 @@ public class TicketService {
         return TicketResponse.from(tickets.saveAndFlush(ticket));
     }
 
+    /**
+     * Lists a ticket's messages oldest first; employees receive only public comments.
+     *
+     * @param authentication authenticated account identity
+     * @param id ticket identifier
+     * @param page zero-based page index
+     * @param size page size (1..100)
+     * @return a page of visible messages
+     */
     @Transactional(readOnly = true)
     public PageResponse<MessageResponse> listMessages(Authentication authentication, int id, int page, int size) {
         validatePagination(page, size, 100);
@@ -256,6 +378,15 @@ public class TicketService {
                 result.getTotalElements(), result.getTotalPages());
     }
 
+    /**
+     * Adds a message to a ticket the caller may view; employees cannot post
+     * internal notes.
+     *
+     * @param authentication authenticated account identity
+     * @param id ticket identifier
+     * @param request message content and visibility type
+     * @return the created message
+     */
     @Transactional
     public MessageResponse addMessage(Authentication authentication, int id, CreateMessageRequest request) {
         var currentUser = currentUser(authentication);

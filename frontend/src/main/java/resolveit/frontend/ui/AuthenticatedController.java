@@ -45,6 +45,13 @@ import resolveit.frontend.ticket.TicketRequests.UpdateTicket;
 import resolveit.frontend.ticket.TicketStatus;
 import resolveit.frontend.ticket.TicketValidator;
 
+/**
+ * Controls the requester workspace: browsing, raising, editing, and commenting on
+ * tickets. Runs ticket operations asynchronously and marshals results back to the
+ * JavaFX thread, tracks in-flight requests so they can be cancelled on disposal,
+ * gates the UI with per-area loading flags, and reloads the latest details on an
+ * optimistic-version conflict.
+ */
 public final class AuthenticatedController implements ViewLifecycle {
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("d MMM yyyy, h:mm a");
 
@@ -132,6 +139,13 @@ public final class AuthenticatedController implements ViewLifecycle {
     @FXML private Label commentErrorLabel;
     @FXML private Button addCommentButton;
 
+    /**
+     * Creates the requester workspace controller.
+     *
+     * @param session current in-memory session
+     * @param ticketService employee ticket operations
+     * @param navigator navigator used for sign-out and view switches
+     */
     public AuthenticatedController(SessionState session, EmployeeTicketService ticketService, Navigator navigator) {
         this.session = session;
         this.ticketService = ticketService;

@@ -12,8 +12,16 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import resolveit.auth.LoginRateLimitException;
 
+/** Maps application and framework exceptions to consistent JSON error responses. */
 @RestControllerAdvice
 public class ApiExceptionHandler {
+    /**
+     * Error payload returned to clients.
+     *
+     * @param status HTTP status code
+     * @param code stable client-facing error code
+     * @param message human-readable message
+     */
     public record ApiError(int status, String code, String message) {}
 
     @ExceptionHandler(ApiException.class)

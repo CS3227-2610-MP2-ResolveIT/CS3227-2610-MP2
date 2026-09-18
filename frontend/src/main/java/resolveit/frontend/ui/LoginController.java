@@ -20,6 +20,12 @@ import resolveit.frontend.auth.LoginValidator;
 import resolveit.frontend.navigation.Navigator;
 import resolveit.frontend.navigation.ViewLifecycle;
 
+/**
+ * Controls the login view: validates input, drives the async sign-in call, and
+ * marshals its result back to the JavaFX thread. Disables inputs while a request
+ * is in flight, prevents duplicate submissions, and cancels the pending call on
+ * disposal.
+ */
 public final class LoginController implements ViewLifecycle {
     private static final PseudoClass INVALID = PseudoClass.getPseudoClass("invalid");
 
@@ -41,6 +47,12 @@ public final class LoginController implements ViewLifecycle {
     @FXML private Button loginButton;
     @FXML private ProgressIndicator progressIndicator;
 
+    /**
+     * Creates the login controller.
+     *
+     * @param authService authentication service used to sign in
+     * @param navigator navigator used to move to the authenticated view
+     */
     public LoginController(AuthService authService, Navigator navigator) {
         this.authService = authService;
         this.navigator = navigator;

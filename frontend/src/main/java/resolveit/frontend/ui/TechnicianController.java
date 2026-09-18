@@ -49,6 +49,14 @@ import resolveit.frontend.ticket.TicketStatus;
 import resolveit.frontend.ticket.TicketValidator;
 import resolveit.frontend.user.ManagerService;
 
+/**
+ * Controls the technician and manager workspace: the ticket queue, ticket detail
+ * with support actions (take, begin work, resolve, priority, notes), and manager
+ * assignment. Runs operations asynchronously and marshals results to the JavaFX
+ * thread, tracks in-flight requests for cancellation on disposal, gates the UI
+ * with per-area loading flags, and marks the queue or detail stale when a refresh
+ * fails so the user is not shown outdated data as current.
+ */
 public final class TechnicianController implements ViewLifecycle {
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("d MMM yyyy, h:mm a");
 
@@ -174,6 +182,14 @@ public final class TechnicianController implements ViewLifecycle {
     @FXML private Label assigneeFieldLabel, priorityFieldLabel, resolutionFieldLabel;
     @FXML private Label messageTypeFieldLabel, messageFieldLabel;
 
+    /**
+     * Creates the technician/manager workspace controller.
+     *
+     * @param session current in-memory session
+     * @param ticketService technician ticket operations
+     * @param managerService manager operations used for assignment
+     * @param navigator navigator used for sign-out and view switches
+     */
     public TechnicianController(SessionState session, TechnicianTicketService ticketService,
                                 ManagerService managerService, Navigator navigator) {
         this.session = session;

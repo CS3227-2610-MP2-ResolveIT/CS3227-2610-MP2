@@ -5,6 +5,7 @@ import jakarta.persistence.Converter;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 
+/** Persists {@link Instant} values as ISO-8601 strings for portable timestamp storage. */
 @Converter(autoApply = true)
 public class InstantStringConverter implements AttributeConverter<Instant, String> {
     @Override
