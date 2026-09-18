@@ -4,8 +4,6 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.function.Consumer;
@@ -58,7 +56,7 @@ public final class AuthenticatedController implements ViewLifecycle {
     private final SessionState session;
     private final EmployeeTicketService ticketService;
     private final Navigator navigator;
-    private final Set<CompletableFuture<?>> inFlight = new HashSet<>();
+    private final AsyncOperationTracker operations = new AsyncOperationTracker();
     private Ticket selectedTicket;
     private boolean disposed;
     private boolean listLoading;
@@ -316,9 +314,9 @@ public final class AuthenticatedController implements ViewLifecycle {
         track(messagesFuture);
         track(combined);
         combined.whenComplete((data, failure) -> Platform.runLater(() -> {
-            inFlight.remove(ticketFuture);
-            inFlight.remove(messagesFuture);
-            inFlight.remove(combined);
+            operations.complete(ticketFuture);
+            operations.complete(messagesFuture);
+            operations.complete(combined);
             if (disposed) {
                 return;
             }
@@ -630,23 +628,11 @@ public final class AuthenticatedController implements ViewLifecycle {
 
     private <T> void run(java.util.concurrent.CompletionStage<T> operation,
                          Consumer<T> success, Consumer<Throwable> failure) {
-        var future = operation.toCompletableFuture();
-        track(future);
-        future.whenComplete((result, problem) -> Platform.runLater(() -> {
-            inFlight.remove(future);
-            if (disposed) {
-                return;
-            }
-            if (problem == null) {
-                success.accept(result);
-            } else {
-                failure.accept(problem);
-            }
-        }));
+        operations.run(operation, () -> disposed, success, failure);
     }
 
     private void track(CompletableFuture<?> future) {
-        inFlight.add(future);
+        operations.track(future);
     }
 
     private void showFailure(Label target, Throwable problem) {
@@ -730,10 +716,7 @@ public final class AuthenticatedController implements ViewLifecycle {
     @Override
     public void dispose() {
         disposed = true;
-        for (var future : Set.copyOf(inFlight)) {
-            future.cancel(true);
-        }
-        inFlight.clear();
+        operations.cancelAll();
     }
 
     private record DetailData(Ticket ticket, PageResponse<TicketMessage> messages) {}
