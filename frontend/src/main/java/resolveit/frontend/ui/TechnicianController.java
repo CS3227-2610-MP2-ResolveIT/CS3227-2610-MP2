@@ -16,17 +16,21 @@ import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.ProgressIndicator;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableRow;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.Tooltip;
 import javafx.scene.input.KeyCode;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.util.StringConverter;
@@ -57,7 +61,9 @@ public final class TechnicianController implements ViewLifecycle {
     private Integer detailTicketId;
     private boolean disposed;
     private boolean listLoading;
+    private boolean queueStale;
     private boolean detailLoading;
+    private boolean detailStale;
     private boolean actionLoading;
     private int currentPage;
     private int pageCount;
@@ -137,6 +143,7 @@ public final class TechnicianController implements ViewLifecycle {
     @FXML private Label detailErrorLabel;
     @FXML private Label detailNoticeLabel;
     @FXML private ProgressIndicator detailProgress;
+    @FXML private Label detailBusyLabel;
     @FXML private Button refreshDetailButton;
     @FXML private VBox detailContent;
     @FXML private Label detailSubjectLabel;
@@ -289,6 +296,7 @@ public final class TechnicianController implements ViewLifecycle {
         }
         listLoading = true;
         queueErrorLabel.setText("");
+        updateQueueEmptyCopy();
         updateBusyState();
         run(
                 ticketService.list(statusFilter.getValue(), priorityFilter.getValue(),
@@ -302,12 +310,18 @@ public final class TechnicianController implements ViewLifecycle {
                     pageLabel.setText(pageCount == 0
                             ? "Page 0 of 0" : "Page " + (currentPage + 1) + " of " + pageCount);
                     listLoading = false;
+                    queueStale = false;
                     updateBusyState();
                 },
                 failure -> {
                     listLoading = false;
+                    queueStale = !ticketsTable.getItems().isEmpty();
+                    var displayed = showFailure(queueErrorLabel, failure);
+                    if (displayed && queueStale) {
+                        queueErrorLabel.setText(queueErrorLabel.getText()
+                                + " Previously loaded tickets may be out of date. Refresh before opening a ticket.");
+                    }
                     updateBusyState();
-                    showFailure(queueErrorLabel, failure);
                 });
     }
 
@@ -320,6 +334,9 @@ public final class TechnicianController implements ViewLifecycle {
     }
 
     @FXML private void openSelectedTicket() {
+        if (listLoading || queueStale) {
+            return;
+        }
         var ticket = ticketsTable.getSelectionModel().getSelectedItem();
         if (ticket != null) {
             openTicket(ticket.id());
@@ -331,9 +348,10 @@ public final class TechnicianController implements ViewLifecycle {
             return;
         }
         detailTicketId = ticketId;
+        detailStale = false;
         assigneeField.setValue(null);
         showPage(detailPage);
-        queueNavButton.getStyleClass().remove("nav-button-active");
+        setQueueNavigationActive();
         selectedTicket = null;
         detailNumberLabel.setText("Ticket details");
         detailContent.setVisible(false);
@@ -372,24 +390,32 @@ public final class TechnicianController implements ViewLifecycle {
                 return;
             }
             detailLoading = false;
-            updateBusyState();
             if (failure != null) {
-                showFailure(detailErrorLabel, failure);
+                detailStale = detailContent.isVisible();
+                var displayed = showFailure(detailErrorLabel, failure);
+                if (displayed && detailStale) {
+                    detailErrorLabel.setText(detailErrorLabel.getText()
+                            + " Displayed details may be out of date. Refresh before taking an action.");
+                }
+                updateBusyState();
                 return;
             }
+            detailStale = false;
             selectedTicket = data.ticket();
             renderTicket(selectedTicket);
             messagesList.setItems(FXCollections.observableArrayList(data.messages().content()));
             detailContent.setVisible(true);
             detailContent.setManaged(true);
-            detailNoticeLabel.setText(notice == null ? "" : notice);
+            showDetailNotice(notice, NoticeKind.INFORMATION);
+            updateBusyState();
         }));
     }
 
     @FXML private void takeTicket() {
         if (selectedTicket == null || actionLoading || !confirm("Take ticket",
                 "Take " + selectedTicket.ticketNumber() + "?",
-                "The ticket will be assigned to you and moved to In progress.")) {
+                "The ticket will be assigned to you and moved to In progress.",
+                "Take ticket", "Cancel", false)) {
             return;
         }
         mutate(ticketService.take(selectedTicket.id()), "Ticket assigned to you.");
@@ -421,12 +447,13 @@ public final class TechnicianController implements ViewLifecycle {
             return;
         }
         if (note.trim().length() > 10_000) {
-            resolutionErrorLabel.setText("Resolution note must contain at most 10000 characters.");
+            resolutionErrorLabel.setText("Resolution note must contain at most 10,000 characters.");
             resolutionField.requestFocus();
             return;
         }
         if (!confirm("Resolve ticket", "Resolve " + selectedTicket.ticketNumber() + "?",
-                "The requester will see the resolution note and can reopen the ticket.")) {
+                "The requester will see the resolution note and can reopen the ticket.",
+                "Resolve ticket", "Cancel", false)) {
             return;
         }
         mutate(ticketService.resolve(selectedTicket.id(), note), "Ticket resolved.");
@@ -435,7 +462,8 @@ public final class TechnicianController implements ViewLifecycle {
     @FXML private void reopenTicket() {
         if (selectedTicket == null || actionLoading || !confirm("Reopen ticket",
                 "Reopen " + selectedTicket.ticketNumber() + "?",
-                "The ticket will return to the open queue and its assignment and resolution will be cleared.")) {
+                "The ticket will return to the open queue and its assignment and resolution will be cleared.",
+                "Reopen ticket", "Cancel", false)) {
             return;
         }
         mutate(ticketService.reopen(selectedTicket.id()), "Ticket reopened and returned to the queue.");
@@ -452,6 +480,9 @@ public final class TechnicianController implements ViewLifecycle {
             return;
         }
         actionLoading = true;
+        detailErrorLabel.setText("");
+        detailNoticeLabel.setText("");
+        messageErrorLabel.setText("");
         updateBusyState();
         run(
                 ticketService.addMessage(
@@ -461,8 +492,9 @@ public final class TechnicianController implements ViewLifecycle {
                     messageField.clear();
                     messagesList.getItems().add(message);
                     messagesList.scrollTo(message);
-                    detailNoticeLabel.setText(message.messageType().equals("INTERNAL_NOTE")
-                            ? "Internal note added. It is visible only to IT staff." : "Public comment posted.");
+                    showDetailNotice(message.messageType().equals("INTERNAL_NOTE")
+                            ? "Internal note added. It is visible only to IT staff." : "Public comment posted.",
+                            NoticeKind.SUCCESS);
                     updateBusyState();
                 },
                 failure -> {
@@ -481,7 +513,7 @@ public final class TechnicianController implements ViewLifecycle {
             actionLoading = false;
             selectedTicket = ticket;
             renderTicket(ticket);
-            detailNoticeLabel.setText(notice);
+            showDetailNotice(notice, NoticeKind.SUCCESS);
             updateBusyState();
             refreshQueueInBackground();
         }, failure -> {
@@ -536,11 +568,11 @@ public final class TechnicianController implements ViewLifecycle {
 
     private void updateBusyState() {
         boolean detailBusy = actionLoading || detailLoading;
-        detailContent.setDisable(detailBusy);
+        detailContent.setDisable(detailBusy || detailStale);
         queueNavButton.setDisable(detailBusy);
         usersNavButton.setDisable(detailBusy);
         requestsNavButton.setDisable(detailBusy);
-        ticketsTable.setDisable(detailBusy);
+        ticketsTable.setDisable(detailBusy || listLoading || queueStale);
         cancelButton.setDisable(detailBusy);
         assigneeField.setDisable(detailBusy || assigneesLoading);
         refreshAssigneesButton.setDisable(detailBusy || assigneesLoading);
@@ -549,6 +581,9 @@ public final class TechnicianController implements ViewLifecycle {
                 || selectedTicket.status() == TicketStatus.CANCELLED);
         queueProgress.setVisible(listLoading);
         queueProgress.setManaged(listLoading);
+        queueBusyLabel.setText(ticketsTable.getItems().isEmpty() ? "Loading tickets…" : "Refreshing queue…");
+        queueBusyLabel.setVisible(listLoading);
+        queueBusyLabel.setManaged(listLoading);
         refreshQueueButton.setDisable(listLoading);
         statusFilter.setDisable(listLoading);
         priorityFilter.setDisable(listLoading);
@@ -557,6 +592,11 @@ public final class TechnicianController implements ViewLifecycle {
         nextButton.setDisable(listLoading || currentPage + 1 >= pageCount);
         detailProgress.setVisible(detailLoading || actionLoading || assigneesLoading);
         detailProgress.setManaged(detailProgress.isVisible());
+        detailBusyLabel.setText(actionLoading ? "Saving changes…"
+                : assigneesLoading ? "Loading assignable users…"
+                : selectedTicket == null ? "Loading ticket…" : "Refreshing ticket…");
+        detailBusyLabel.setVisible(detailProgress.isVisible());
+        detailBusyLabel.setManaged(detailBusyLabel.isVisible());
         refreshDetailButton.setDisable(detailLoading || actionLoading);
         takeButton.setDisable(actionLoading);
         beginWorkButton.setDisable(actionLoading);
@@ -588,18 +628,61 @@ public final class TechnicianController implements ViewLifecycle {
     private TableRow<Ticket> ticketRow() {
         var row = new TableRow<Ticket>();
         row.setOnMouseClicked(event -> {
-            if (event.getClickCount() == 2 && !row.isEmpty()) {
+            if (event.getClickCount() == 2 && !row.isEmpty() && !listLoading && !queueStale) {
                 openTicket(row.getItem().id());
             }
         });
         return row;
     }
 
-    private boolean confirm(String title, String header, String content) {
-        var alert = new Alert(Alert.AlertType.CONFIRMATION, content, ButtonType.CANCEL, ButtonType.OK);
+    private void configureQueueCellDiscovery() {
+        numberColumn.setCellFactory(ignored -> tooltipCell());
+        subjectColumn.setCellFactory(ignored -> tooltipCell());
+        requesterColumn.setCellFactory(ignored -> tooltipCell());
+        priorityColumn.setCellFactory(ignored -> tooltipCell());
+        statusColumn.setCellFactory(ignored -> tooltipCell());
+        assigneeColumn.setCellFactory(ignored -> tooltipCell());
+        updatedColumn.setCellFactory(ignored -> tooltipCell());
+    }
+
+    private TableCell<Ticket, String> tooltipCell() {
+        return new TableCell<>() {
+            private final Tooltip tooltip = new Tooltip();
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty ? null : item);
+                tooltip.setText(item);
+                setTooltip(empty || item == null || item.isBlank() ? null : tooltip);
+            }
+        };
+    }
+
+    private void resizeQueueColumns(double tableWidth) {
+        var extraWidth = Math.max(0, tableWidth - 1_010);
+        var ticketWidth = Math.min(190, 125 + extraWidth * 0.45);
+        numberColumn.setPrefWidth(ticketWidth);
+        subjectColumn.setPrefWidth(260 + Math.max(0, extraWidth - (ticketWidth - 125)));
+    }
+
+    private boolean confirm(String title, String header, String content,
+                            String confirmText, String cancelText, boolean destructive) {
+        var confirmButton = new ButtonType(confirmText, ButtonBar.ButtonData.OK_DONE);
+        var cancelButton = new ButtonType(cancelText, ButtonBar.ButtonData.CANCEL_CLOSE);
+        var alert = new Alert(Alert.AlertType.CONFIRMATION, content, cancelButton, confirmButton);
         alert.setTitle(title);
         alert.setHeaderText(header);
-        return alert.showAndWait().filter(ButtonType.OK::equals).isPresent();
+        var dialogPane = alert.getDialogPane();
+        dialogPane.getStyleClass().add("technician-confirmation-dialog");
+        var stylesheet = getClass().getResource("/resolveit/frontend/styles/app.css");
+        if (stylesheet != null) {
+            dialogPane.getStylesheets().add(stylesheet.toExternalForm());
+        }
+        ((Button) dialogPane.lookupButton(confirmButton)).getStyleClass()
+                .add(destructive ? "danger-button" : "primary-button");
+        ((Button) dialogPane.lookupButton(cancelButton)).getStyleClass().add("secondary-button");
+        return alert.showAndWait().filter(confirmButton::equals).isPresent();
     }
 
     private <T> void run(CompletionStage<T> operation, Consumer<T> success, Consumer<Throwable> failure) {
@@ -639,7 +722,38 @@ public final class TechnicianController implements ViewLifecycle {
     }
 
     private String conflictNotice() {
-        return "This ticket changed while you were working. The latest details have been loaded.";
+        return "This ticket changed elsewhere. We reloaded the latest details.";
+    }
+
+    private void setQueueNavigationActive() {
+        if (!queueNavButton.getStyleClass().contains("nav-button-active")) {
+            queueNavButton.getStyleClass().add("nav-button-active");
+        }
+    }
+
+    private void showDetailNotice(String message, NoticeKind kind) {
+        detailNoticeBox.getStyleClass().removeAll("success-message", "information-message");
+        detailNoticeBox.getStyleClass().add(kind == NoticeKind.SUCCESS
+                ? "success-message" : "information-message");
+        detailNoticeMark.setVisible(kind == NoticeKind.SUCCESS);
+        detailNoticeMark.setManaged(kind == NoticeKind.SUCCESS);
+        detailNoticeLabel.setText(message == null ? "" : message);
+    }
+
+    private void updateQueueEmptyCopy() {
+        var defaultFilters = statusFilter.getValue() == null
+                && priorityFilter.getValue() == null
+                && assignmentFilter.getValue() == AssignmentFilter.ALL;
+        queueEmptyLabel.setText(defaultFilters
+                ? "No tickets are currently visible." : "No tickets match these filters.");
+    }
+
+    private void updateMessageComposerCopy(MessageType messageType) {
+        var internal = messageType == MessageType.INTERNAL_NOTE;
+        messageField.setPromptText(internal
+                ? "Write a note visible only to IT staff…"
+                : "Write an update the requester can see…");
+        addMessageButton.setText(internal ? "_Add internal note" : "_Post public comment");
     }
 
     private Throwable unwrap(Throwable problem) {
@@ -653,6 +767,11 @@ public final class TechnicianController implements ViewLifecycle {
     private void bindManaged(Label label) {
         label.visibleProperty().bind(label.textProperty().isNotEmpty());
         label.managedProperty().bind(label.visibleProperty());
+    }
+
+    private void bindManaged(HBox container, Label label) {
+        container.visibleProperty().bind(label.textProperty().isNotEmpty());
+        container.managedProperty().bind(container.visibleProperty());
     }
 
     private SimpleStringProperty text(String value) { return new SimpleStringProperty(value == null ? "" : value); }
@@ -705,6 +824,10 @@ public final class TechnicianController implements ViewLifecycle {
     }
 
     private record DetailData(Ticket ticket, PageResponse<TicketMessage> messages) {}
+
+    private enum NoticeKind {
+        SUCCESS, INFORMATION
+    }
 
     private final class MessageCell extends ListCell<TicketMessage> {
         @Override

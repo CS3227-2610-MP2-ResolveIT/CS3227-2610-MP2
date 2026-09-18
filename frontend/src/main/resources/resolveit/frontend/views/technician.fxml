@@ -3,9 +3,10 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.SVGPath?>
 
 <BorderPane minHeight="620.0" minWidth="900.0" prefHeight="760.0" prefWidth="1200.0"
-            styleClass="shell-background" xmlns="http://javafx.com/javafx/25"
+            styleClass="shell-background, technician-workspace" xmlns="http://javafx.com/javafx/25"
             xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="resolveit.frontend.ui.TechnicianController">
     <top>
@@ -92,16 +93,15 @@
                             <TableColumn fx:id="updatedColumn" minWidth="160.0" prefWidth="170.0" text="Last updated" />
                         </columns>
                     </TableView>
-                    <HBox alignment="CENTER_LEFT" spacing="9.0">
-                        <Label text="Double-click a row or press Enter to view and work on a ticket."
+                    <FlowPane fx:id="queueFooter" alignment="CENTER_LEFT" hgap="9.0" vgap="9.0">
+                        <Label text="Select a row and press Enter, or double-click, to open it."
                                styleClass="hint-label" />
-                        <Region HBox.hgrow="ALWAYS" />
                         <Button fx:id="previousButton" mnemonicParsing="true" onAction="#previousPage"
                                 text="←  _Previous" styleClass="secondary-button, compact-button" />
                         <Label fx:id="pageLabel" text="Page 0 of 0" styleClass="count-label" />
                         <Button fx:id="nextButton" mnemonicParsing="true" onAction="#nextPage"
                                 text="_Next  →" styleClass="secondary-button, compact-button" />
-                    </HBox>
+                    </FlowPane>
                 </VBox>
             </StackPane>
 
@@ -115,17 +115,27 @@
                                 <Label fx:id="detailNumberLabel" text="Ticket details" styleClass="workspace-heading" />
                                 <Label fx:id="detailStatusLabel" styleClass="status-pill" />
                             </HBox>
-                            <Label text="Request details, support actions, and complete conversation"
+                            <Label text="Review request details, take support actions, and follow the conversation."
                                    styleClass="workspace-description" wrapText="true" />
                         </VBox>
                         <Region HBox.hgrow="ALWAYS" />
                         <ProgressIndicator fx:id="detailProgress" maxHeight="23.0" maxWidth="23.0"
+                                           accessibleText="Ticket details are loading"
                                            visible="false" managed="false" />
+                        <Label fx:id="detailBusyLabel" text="Loading ticket…" styleClass="busy-label"
+                               visible="false" managed="false" />
                         <Button fx:id="refreshDetailButton" mnemonicParsing="true" onAction="#refreshDetails"
                                 text="↻  _Refresh" styleClass="secondary-button, compact-button" />
                     </HBox>
                     <Label fx:id="detailErrorLabel" wrapText="true" styleClass="form-error" />
-                    <Label fx:id="detailNoticeLabel" wrapText="true" styleClass="success-message" />
+                    <HBox fx:id="detailNoticeBox" alignment="CENTER_LEFT" spacing="10.0" styleClass="success-message">
+                        <StackPane fx:id="detailNoticeMark" minHeight="24.0" minWidth="24.0"
+                                   prefHeight="24.0" prefWidth="24.0" styleClass="completion-mark">
+                            <SVGPath content="M 5.2 10.9 L 2.3 8.0 L 1 9.3 L 5.2 13.5 L 14 4.7 L 12.7 3.4 Z"
+                                     styleClass="completion-mark-path" />
+                        </StackPane>
+                        <Label fx:id="detailNoticeLabel" maxWidth="Infinity" wrapText="true" HBox.hgrow="ALWAYS" />
+                    </HBox>
                     <ScrollPane fitToWidth="true" hbarPolicy="NEVER" VBox.vgrow="ALWAYS" styleClass="transparent-scroll">
                         <VBox fx:id="detailContent" spacing="18.0" visible="false" managed="false">
                             <VBox spacing="18.0" styleClass="content-card">
@@ -136,9 +146,11 @@
                                             text="_Take ticket" styleClass="primary-button, compact-button" />
                                     <Button fx:id="beginWorkButton" mnemonicParsing="true" onAction="#beginWork"
                                             text="_Begin work" styleClass="primary-button, compact-button" />
-                                    <Button fx:id="cancelButton" text="Cancel ticket" onAction="#cancelTicket" styleClass="secondary-button, compact-button" visible="false" managed="false" />
+                                    <Button fx:id="cancelButton" mnemonicParsing="true" text="_Cancel ticket"
+                                            onAction="#cancelTicket" styleClass="danger-button, compact-button"
+                                            visible="false" managed="false" />
                                     <Button fx:id="reopenButton" mnemonicParsing="true" onAction="#reopenTicket"
-                                            text="_Reopen" styleClass="secondary-button, compact-button" />
+                                            text="_Reopen" styleClass="primary-button, compact-button" />
                                 </HBox>
                                 <VBox spacing="5.0">
                                     <Label text="SUBJECT" styleClass="detail-key" />
@@ -149,33 +161,28 @@
                                     <Label fx:id="detailDescriptionLabel" wrapText="true" styleClass="detail-value" />
                                 </VBox>
                                 <Separator />
-                                <GridPane hgap="30.0" vgap="14.0">
-                                    <columnConstraints>
-                                        <ColumnConstraints percentWidth="33.33" />
-                                        <ColumnConstraints percentWidth="33.33" />
-                                        <ColumnConstraints percentWidth="33.34" />
-                                    </columnConstraints>
-                                    <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                <FlowPane fx:id="detailMetadata" hgap="30.0" vgap="14.0">
+                                    <VBox minWidth="160.0" spacing="4.0">
                                         <Label text="CATEGORY" styleClass="detail-key" />
-                                        <Label fx:id="detailCategoryLabel" styleClass="detail-value" />
+                                        <Label fx:id="detailCategoryLabel" wrapText="true" styleClass="detail-value" />
                                     </VBox>
-                                    <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                                    <VBox minWidth="160.0" spacing="4.0">
                                         <Label text="PRIORITY" styleClass="detail-key" />
-                                        <Label fx:id="detailPriorityLabel" styleClass="detail-value" />
+                                        <Label fx:id="detailPriorityLabel" wrapText="true" styleClass="detail-value" />
                                     </VBox>
-                                    <VBox spacing="4.0" GridPane.columnIndex="2" GridPane.rowIndex="0">
+                                    <VBox minWidth="160.0" spacing="4.0">
                                         <Label text="CREATED" styleClass="detail-key" />
-                                        <Label fx:id="detailCreatedLabel" styleClass="detail-value" />
+                                        <Label fx:id="detailCreatedLabel" wrapText="true" styleClass="detail-value" />
                                     </VBox>
-                                    <VBox spacing="4.0" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                    <VBox minWidth="160.0" spacing="4.0">
                                         <Label text="REQUESTER" styleClass="detail-key" />
-                                        <Label fx:id="detailRequesterLabel" styleClass="detail-value" />
+                                        <Label fx:id="detailRequesterLabel" wrapText="true" styleClass="detail-value" />
                                     </VBox>
-                                    <VBox spacing="4.0" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                                    <VBox minWidth="160.0" spacing="4.0">
                                         <Label text="ASSIGNEE" styleClass="detail-key" />
-                                        <Label fx:id="detailAssigneeLabel" styleClass="detail-value" />
+                                        <Label fx:id="detailAssigneeLabel" wrapText="true" styleClass="detail-value" />
                                     </VBox>
-                                </GridPane>
+                                </FlowPane>
                                 <VBox fx:id="resolutionBox" spacing="5.0" visible="false" managed="false"
                                       styleClass="resolution-box">
                                     <Label text="RESOLUTION" styleClass="detail-key" />
@@ -196,12 +203,6 @@
                                     </HBox>
                                 </VBox>
                                 <Label text="Support actions" styleClass="card-heading" />
-                                <HBox alignment="CENTER_LEFT" spacing="10.0">
-                                    <Label text="Priority" styleClass="field-label" labelFor="$priorityField" />
-                                    <ComboBox fx:id="priorityField" prefWidth="150.0" />
-                                    <Button fx:id="changePriorityButton" mnemonicParsing="true" onAction="#changePriority"
-                                            text="_Update priority" styleClass="secondary-button, compact-button" />
-                                </HBox>
                                 <VBox fx:id="resolveBox" spacing="8.0" visible="false" managed="false"
                                       styleClass="resolution-action-box">
                                     <Label fx:id="resolutionFieldLabel" text="Resolution note" styleClass="field-label" />
@@ -214,6 +215,12 @@
                                                 text="_Resolve ticket" styleClass="primary-button, workspace-button" />
                                     </HBox>
                                 </VBox>
+                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                    <Label fx:id="priorityFieldLabel" text="Priority" styleClass="field-label" />
+                                    <ComboBox fx:id="priorityField" prefWidth="150.0" />
+                                    <Button fx:id="changePriorityButton" mnemonicParsing="true" onAction="#changePriority"
+                                            text="_Update priority" styleClass="secondary-button, compact-button" />
+                                </HBox>
                             </VBox>
 
                             <VBox spacing="14.0" styleClass="content-card">
