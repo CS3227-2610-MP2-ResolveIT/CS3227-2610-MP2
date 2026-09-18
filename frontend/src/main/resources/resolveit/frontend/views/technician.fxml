@@ -34,7 +34,8 @@
             <Label text="SUPPORT" styleClass="nav-section-label" />
             <Button fx:id="queueNavButton" accessibleText="Open Ticket Queue" maxWidth="Infinity"
                     mnemonicParsing="true" onAction="#showQueue" text="▤  Ticket _Queue" styleClass="nav-button" />
-            <Button fx:id="requestsNavButton" text="Submit / edit requests" onAction="#showRequests" styleClass="nav-button" maxWidth="Infinity" />
+            <Button fx:id="requestsNavButton" accessibleText="Open request workspace" maxWidth="Infinity"
+                    mnemonicParsing="true" onAction="#showRequests" text="_Request workspace" styleClass="nav-button" />
             <Button fx:id="usersNavButton" text="_User Management" onAction="#showUsers" mnemonicParsing="true" styleClass="nav-button" maxWidth="Infinity" />
             <Region VBox.vgrow="ALWAYS" />
         </VBox>
@@ -47,26 +48,40 @@
                 <VBox spacing="18.0">
                     <VBox spacing="5.0">
                         <Label fx:id="queueHeading" text="Ticket Queue" styleClass="workspace-heading" />
-                        <Label fx:id="queueDescription" text="Review unresolved requests, take ownership, and keep work moving."
+                        <Label fx:id="queueDescription" text="Review support requests, take ownership, and keep work moving."
                                styleClass="workspace-description" wrapText="true" />
                     </VBox>
-                    <HBox alignment="CENTER_LEFT" spacing="10.0" styleClass="toolbar">
-                        <ComboBox fx:id="statusFilter" prefWidth="145.0" promptText="All statuses"
-                                  accessibleText="Filter tickets by status" />
-                        <ComboBox fx:id="priorityFilter" prefWidth="145.0" promptText="All priorities"
-                                  accessibleText="Filter tickets by priority" />
-                        <ComboBox fx:id="assignmentFilter" prefWidth="165.0"
-                                  accessibleText="Filter tickets by assignment" />
+                    <FlowPane fx:id="queueToolbar" alignment="BOTTOM_LEFT" hgap="10.0" vgap="10.0" styleClass="toolbar">
+                        <VBox spacing="4.0">
+                            <Label fx:id="statusFilterLabel" text="Status" styleClass="field-label" />
+                            <ComboBox fx:id="statusFilter" prefWidth="145.0" promptText="All statuses"
+                                      accessibleText="Filter tickets by status" />
+                        </VBox>
+                        <VBox spacing="4.0">
+                            <Label fx:id="priorityFilterLabel" text="Priority" styleClass="field-label" />
+                            <ComboBox fx:id="priorityFilter" prefWidth="145.0" promptText="All priorities"
+                                      accessibleText="Filter tickets by priority" />
+                        </VBox>
+                        <VBox spacing="4.0">
+                            <Label fx:id="assignmentFilterLabel" text="Assignment" styleClass="field-label" />
+                            <ComboBox fx:id="assignmentFilter" prefWidth="165.0"
+                                      accessibleText="Filter tickets by assignment" />
+                        </VBox>
                         <Button fx:id="refreshQueueButton" mnemonicParsing="true" onAction="#refreshQueue"
                                 text="↻  _Refresh" styleClass="secondary-button, compact-button" />
                         <ProgressIndicator fx:id="queueProgress" maxHeight="22.0" maxWidth="22.0"
+                                           accessibleText="Ticket queue is loading"
                                            visible="false" managed="false" />
-                        <Region HBox.hgrow="ALWAYS" />
+                        <Label fx:id="queueBusyLabel" text="Loading tickets…" styleClass="busy-label"
+                               visible="false" managed="false" />
                         <Label fx:id="ticketCountLabel" text="0 tickets" styleClass="count-label" />
-                    </HBox>
+                    </FlowPane>
                     <Label fx:id="queueErrorLabel" wrapText="true" styleClass="form-error" />
                     <TableView fx:id="ticketsTable" VBox.vgrow="ALWAYS" accessibleText="Technician ticket queue">
-                        <placeholder><Label text="No tickets match these filters." styleClass="empty-label" /></placeholder>
+                        <placeholder>
+                            <Label fx:id="queueEmptyLabel" text="No tickets are currently visible."
+                                   styleClass="empty-label" />
+                        </placeholder>
                         <columns>
                             <TableColumn fx:id="numberColumn" prefWidth="125.0" text="Ticket" />
                             <TableColumn fx:id="subjectColumn" minWidth="190.0" prefWidth="260.0" text="Subject" />
@@ -170,11 +185,14 @@
 
                             <VBox spacing="12.0" styleClass="content-card">
                                 <VBox fx:id="assignmentBox" spacing="8.0">
-                                    <Label text="Assign or reassign" labelFor="$assigneeField" styleClass="field-label" />
+                                    <Label fx:id="assigneeFieldLabel" text="Assign or reassign" styleClass="field-label" />
                                     <ComboBox fx:id="assigneeField" maxWidth="Infinity" />
                                     <HBox spacing="10.0">
-                                        <Button fx:id="assignButton" text="Assign" onAction="#assignTicket" styleClass="primary-button, compact-button" />
-                                        <Button fx:id="refreshAssigneesButton" text="Refresh assignable users" onAction="#refreshAssignees" styleClass="secondary-button, compact-button" />
+                                        <Button fx:id="assignButton" mnemonicParsing="true" text="_Assign"
+                                                onAction="#assignTicket" styleClass="primary-button, compact-button" />
+                                        <Button fx:id="refreshAssigneesButton" mnemonicParsing="true"
+                                                text="_Refresh assignable users" onAction="#refreshAssignees"
+                                                styleClass="secondary-button, compact-button" />
                                     </HBox>
                                 </VBox>
                                 <Label text="Support actions" styleClass="card-heading" />
@@ -186,7 +204,7 @@
                                 </HBox>
                                 <VBox fx:id="resolveBox" spacing="8.0" visible="false" managed="false"
                                       styleClass="resolution-action-box">
-                                    <Label text="Resolution note" styleClass="field-label" labelFor="$resolutionField" />
+                                    <Label fx:id="resolutionFieldLabel" text="Resolution note" styleClass="field-label" />
                                     <TextArea fx:id="resolutionField" prefHeight="100.0" wrapText="true"
                                               promptText="Describe what fixed the issue…"
                                               accessibleHelp="A non-blank resolution note is required." />
@@ -203,16 +221,17 @@
                                 <Label text="Internal notes are visible only to technicians and managers."
                                        styleClass="hint-label" />
                                 <ListView fx:id="messagesList" prefHeight="270.0" accessibleText="Ticket messages and internal notes">
-                                    <placeholder><Label text="No messages yet." styleClass="empty-label" /></placeholder>
+                                    <placeholder>
+                                        <Label text="No public comments or internal notes yet." styleClass="empty-label" />
+                                    </placeholder>
                                 </ListView>
                                 <VBox spacing="7.0">
                                     <HBox alignment="CENTER_LEFT" spacing="10.0">
-                                        <Label text="Message type" styleClass="field-label" labelFor="$messageTypeField" />
+                                        <Label fx:id="messageTypeFieldLabel" text="Post as" styleClass="field-label" />
                                         <ComboBox fx:id="messageTypeField" prefWidth="175.0" />
                                     </HBox>
-                                    <Label text="Message" styleClass="field-label" labelFor="$messageField" />
-                                    <TextArea fx:id="messageField" prefHeight="100.0" wrapText="true"
-                                              promptText="Add a public update or an IT-only note…" />
+                                    <Label fx:id="messageFieldLabel" text="Message" styleClass="field-label" />
+                                    <TextArea fx:id="messageField" prefHeight="100.0" wrapText="true" />
                                     <Label fx:id="messageErrorLabel" wrapText="true" styleClass="field-error" />
                                     <HBox alignment="CENTER_RIGHT">
                                         <Button fx:id="addMessageButton" mnemonicParsing="true" onAction="#addMessage"

@@ -113,9 +113,12 @@ public final class TechnicianController implements ViewLifecycle {
     @FXML private ComboBox<TicketStatus> statusFilter;
     @FXML private ComboBox<TicketPriority> priorityFilter;
     @FXML private ComboBox<AssignmentFilter> assignmentFilter;
+    @FXML private Label statusFilterLabel, priorityFilterLabel, assignmentFilterLabel;
     @FXML private Button refreshQueueButton;
     @FXML private ProgressIndicator queueProgress;
+    @FXML private Label queueBusyLabel;
     @FXML private Label queueErrorLabel;
+    @FXML private Label queueEmptyLabel;
     @FXML private Label ticketCountLabel;
     @FXML private Label pageLabel;
     @FXML private Button previousButton;
@@ -159,6 +162,8 @@ public final class TechnicianController implements ViewLifecycle {
     @FXML private TextArea messageField;
     @FXML private Label messageErrorLabel;
     @FXML private Button addMessageButton;
+    @FXML private Label assigneeFieldLabel, priorityFieldLabel, resolutionFieldLabel;
+    @FXML private Label messageTypeFieldLabel, messageFieldLabel;
 
     public TechnicianController(SessionState session, TechnicianTicketService ticketService,
                                 ManagerService managerService, Navigator navigator) {
@@ -174,6 +179,15 @@ public final class TechnicianController implements ViewLifecycle {
         userNameLabel.setText(user.username());
         userRoleLabel.setText(user.role().displayName());
         avatarLabel.setText(initials(user.username()));
+
+        statusFilterLabel.setLabelFor(statusFilter);
+        priorityFilterLabel.setLabelFor(priorityFilter);
+        assignmentFilterLabel.setLabelFor(assignmentFilter);
+        assigneeFieldLabel.setLabelFor(assigneeField);
+        priorityFieldLabel.setLabelFor(priorityField);
+        resolutionFieldLabel.setLabelFor(resolutionField);
+        messageTypeFieldLabel.setLabelFor(messageTypeField);
+        messageFieldLabel.setLabelFor(messageField);
 
         statusFilter.setItems(FXCollections.observableArrayList(
                 TicketStatus.OPEN, TicketStatus.IN_PROGRESS, TicketStatus.RESOLVED));
@@ -202,7 +216,10 @@ public final class TechnicianController implements ViewLifecycle {
         assignmentFilter.setItems(FXCollections.observableArrayList(AssignmentFilter.values()));
         statusFilter.setConverter(nullableConverter("All statuses", TicketStatus::displayName));
         priorityFilter.setConverter(nullableConverter("All priorities", TicketPriority::displayName));
-        assignmentFilter.setConverter(nullableConverter("All visible", AssignmentFilter::displayName));
+        assignmentFilter.setConverter(nullableConverter(
+                "Any assignment",
+                assignment -> assignment == AssignmentFilter.ALL
+                        ? "Any assignment" : assignment.displayName()));
         assignmentFilter.setValue(AssignmentFilter.ALL);
         addFilterListener(statusFilter);
         addFilterListener(priorityFilter);
@@ -213,6 +230,9 @@ public final class TechnicianController implements ViewLifecycle {
         messageTypeField.setItems(FXCollections.observableArrayList(MessageType.values()));
         messageTypeField.setConverter(nullableConverter("", MessageType::displayName));
         messageTypeField.setValue(MessageType.PUBLIC_COMMENT);
+        messageTypeField.valueProperty().addListener(
+                (ignored, oldValue, newValue) -> updateMessageComposerCopy(newValue));
+        updateMessageComposerCopy(messageTypeField.getValue());
 
         numberColumn.setCellValueFactory(cell -> text(cell.getValue().ticketNumber()));
         subjectColumn.setCellValueFactory(cell -> text(cell.getValue().subject()));
@@ -222,6 +242,9 @@ public final class TechnicianController implements ViewLifecycle {
         assigneeColumn.setCellValueFactory(cell -> text(cell.getValue().assignedToUsername() == null
                 ? "Unassigned" : cell.getValue().assignedToUsername()));
         updatedColumn.setCellValueFactory(cell -> text(formatDate(cell.getValue().updatedAt())));
+        configureQueueCellDiscovery();
+        ticketsTable.widthProperty().addListener((ignored, oldWidth, newWidth) ->
+                resizeQueueColumns(newWidth.doubleValue()));
         ticketsTable.setRowFactory(ignored -> ticketRow());
         ticketsTable.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.ENTER) {
