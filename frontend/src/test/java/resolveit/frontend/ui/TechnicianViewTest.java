@@ -200,6 +200,44 @@ class TechnicianViewTest {
         }
     }
 
+    @Test
+    void disposingOpenDetailCancelsOutstandingDetailRequests() throws Exception {
+        var client = new StubTicketClient();
+        var fixture = loadFixtureWithQueue(client);
+        var detail = client.queueDetail();
+        var messages = client.queueMessages();
+
+        openFirstTicket(fixture);
+        dispose(fixture);
+
+        assertTrue(detail.isCancelled());
+        assertTrue(messages.isCancelled());
+    }
+
+    @Test
+    void managerWorkspaceConfiguresNestedQueueAndAssignmentControls() throws Exception {
+        var client = new StubTicketClient();
+        client.queueList();
+        var fixture = onJavaFxThread(() -> loadFixture(client, Role.MANAGER));
+
+        try {
+            onJavaFxThread(() -> {
+                var statusFilter = fixture.node("#statusFilter", ComboBox.class);
+                var assignmentBox = fixture.node("#assignmentBox", VBox.class);
+                assertEquals("Manager workspace", fixture.node("#workspaceLabel", Label.class).getText());
+                assertEquals("All Tickets", fixture.node("#queueHeading", Label.class).getText());
+                assertEquals("All _Tickets", fixture.node("#queueNavButton", Button.class).getText());
+                assertTrue(statusFilter.getItems().contains(TicketStatus.CANCELLED));
+                assertTrue(assignmentBox.isVisible());
+                assertTrue(assignmentBox.isManaged());
+                assertTrue(fixture.node("#usersNavButton", Button.class).isVisible());
+                return null;
+            });
+        } finally {
+            dispose(fixture);
+        }
+    }
+
     private TechnicianFixture loadFixtureWithQueue(StubTicketClient client) throws Exception {
         var initialList = client.queueList();
         var fixture = onJavaFxThread(() -> loadFixture(client));
@@ -226,9 +264,14 @@ class TechnicianViewTest {
     }
 
     private TechnicianFixture loadFixture(StubTicketClient client) throws Exception {
+        return loadFixture(client, Role.TECHNICIAN);
+    }
+
+    private TechnicianFixture loadFixture(StubTicketClient client, Role role) throws Exception {
         var session = new SessionState();
-        var user = new User(7, "technician1", "technician1@resolveit.local",
-                Role.TECHNICIAN, true, "2026-09-12T00:00:00Z", "2026-09-12T00:00:00Z");
+        var user = new User(7, role == Role.MANAGER ? "manager" : "technician1",
+                role == Role.MANAGER ? "manager@resolveit.local" : "technician1@resolveit.local",
+                role, true, "2026-09-12T00:00:00Z", "2026-09-12T00:00:00Z");
         session.start(new LoginResponse("access", "refresh", "Bearer", 3600, 7200, user));
         var controller = new TechnicianController(
                 session, new TechnicianTicketService(client), null, null);
@@ -237,6 +280,12 @@ class TechnicianViewTest {
         loader.setControllerFactory(type -> {
             if (type == TechnicianController.class) {
                 return controller;
+            }
+            if (type == TechnicianQueueController.class) {
+                return new TechnicianQueueController(new TechnicianTicketService(client), role == Role.MANAGER);
+            }
+            if (type == TechnicianTicketDetailController.class) {
+                return new TechnicianTicketDetailController(session, new TechnicianTicketService(client), null, null);
             }
             throw new IllegalArgumentException("Unexpected FXML controller: " + type.getName());
         });
