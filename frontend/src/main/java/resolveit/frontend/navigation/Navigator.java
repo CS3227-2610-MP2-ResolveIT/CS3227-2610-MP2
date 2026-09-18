@@ -15,6 +15,8 @@ import resolveit.frontend.ticket.TechnicianTicketService;
 import resolveit.frontend.ui.AuthenticatedController;
 import resolveit.frontend.ui.LoginController;
 import resolveit.frontend.ui.TechnicianController;
+import resolveit.frontend.ui.TechnicianQueueController;
+import resolveit.frontend.ui.TechnicianTicketDetailController;
 import resolveit.frontend.user.ManagerService;
 
 public final class Navigator {
@@ -70,6 +72,13 @@ public final class Navigator {
             show("/resolveit/frontend/views/technician.fxml", type -> {
                 if (type == TechnicianController.class) {
                     return new TechnicianController(session, technicianTicketService, managerService, this);
+                }
+                if (type == TechnicianQueueController.class) {
+                    return new TechnicianQueueController(technicianTicketService,
+                            session.current().orElseThrow().user().role() == Role.MANAGER);
+                }
+                if (type == TechnicianTicketDetailController.class) {
+                    return new TechnicianTicketDetailController(session, technicianTicketService, managerService, this);
                 }
                 throw new IllegalArgumentException("Unsupported FXML controller: " + type.getName());
             });
