@@ -139,6 +139,138 @@ class TicketApiIntegrationTest {
     }
 
     @Test
+    void onlyAssignedTechnicianOrManagerCanBeginWork() throws Exception {
+        var id = createTicket(login("employee@test.local"));
+        var managerToken = login("manager@test.local");
+        assignTicket(id, managerToken, technician.getId());
+
+        mvc.perform(patch("/api/v1/tickets/{id}/status", id)
+                        .header("Authorization", bearer(login("other@test.local")))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"IN_PROGRESS\"}"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
+        mvc.perform(patch("/api/v1/tickets/{id}/status", id)
+                        .header("Authorization", bearer(login("technician2@test.local")))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"IN_PROGRESS\"}"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
+        mvc.perform(patch("/api/v1/tickets/{id}/status", id)
+                        .header("Authorization", bearer(login("technician@test.local")))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"IN_PROGRESS\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("IN_PROGRESS"));
+    }
+
+    @Test
+    void managerCanBeginAssignedWorkAndInvalidStatusIsRejected() throws Exception {
+        var id = createTicket(login("employee@test.local"));
+        var managerToken = login("manager@test.local");
+        assignTicket(id, managerToken, technician.getId());
+
+        mvc.perform(patch("/api/v1/tickets/{id}/status", id)
+                        .header("Authorization", bearer(managerToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"RESOLVED\"}"))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("INVALID_STATUS_TRANSITION"));
+        mvc.perform(patch("/api/v1/tickets/{id}/status", id)
+                        .header("Authorization", bearer(managerToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\":\"IN_PROGRESS\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("IN_PROGRESS"));
+    }
+
+    @Test
+    void onlySupportRolesCanChangePriority() throws Exception {
+        var id = createTicket(login("employee@test.local"));
+        var technicianToken = login("technician@test.local");
+        var managerToken = login("manager@test.local");
+
+        mvc.perform(patch("/api/v1/tickets/{id}/priority", id)
+                        .header("Authorization", bearer(login("employee@test.local")))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"priority\":\"HIGH\"}"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
+        mvc.perform(patch("/api/v1/tickets/{id}/priority", id)
+                        .header("Authorization", bearer(technicianToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"priority\":\"HIGH\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.priority").value("HIGH"));
+        mvc.perform(patch("/api/v1/tickets/{id}/priority", id)
+                        .header("Authorization", bearer(managerToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"priority\":\"LOW\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.priority").value("LOW"));
+    }
+
+    @Test
+    void technicianCanFilterTheirQueueByAssignmentState() throws Exception {
+        var managerToken = login("manager@test.local");
+        var assignedId = createTicket(login("employee@test.local"));
+        var unassignedId = createTicket(login("other@test.local"));
+        assignTicket(assignedId, managerToken, technician.getId());
+
+        mvc.perform(get("/api/v1/tickets")
+                        .header("Authorization", bearer(login("technician@test.local")))
+                        .param("assignedToMe", "true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.content[0].id").value(assignedId));
+        mvc.perform(get("/api/v1/tickets")
+                        .header("Authorization", bearer(login("technician@test.local")))
+                        .param("unassigned", "true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.content[0].id").value(unassignedId));
+    }
+
+    @Test
+    void onlyManagerCanFilterTicketsByAnotherAssignee() throws Exception {
+        var managerToken = login("manager@test.local");
+        var id = createTicket(login("employee@test.local"));
+        assignTicket(id, managerToken, technician.getId());
+
+        mvc.perform(get("/api/v1/tickets")
+                        .header("Authorization", bearer(managerToken))
+                        .param("assignedToId", Integer.toString(technician.getId())))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.content[0].id").value(id));
+        mvc.perform(get("/api/v1/tickets")
+                        .header("Authorization", bearer(login("technician@test.local")))
+                        .param("assignedToId", Integer.toString(technician.getId())))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("ACCESS_DENIED"));
+    }
+
+    @Test
+    void assignmentFiltersPreserveEmployeeVisibilityAndRejectConflicts() throws Exception {
+        var employeeToken = login("employee@test.local");
+        var employeeTicket = createTicket(employeeToken);
+        createTicket(login("other@test.local"));
+
+        mvc.perform(get("/api/v1/tickets")
+                        .header("Authorization", bearer(employeeToken))
+                        .param("unassigned", "true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(1))
+                .andExpect(jsonPath("$.content[0].id").value(employeeTicket));
+        mvc.perform(get("/api/v1/tickets")
+                        .header("Authorization", bearer(login("technician@test.local")))
+                        .param("assignedToMe", "true")
+                        .param("unassigned", "true"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_FILTER"));
+    }
+
+    @Test
     void internalNotesAreNeverReturnedToEmployees() throws Exception {
         var employeeToken = login("employee@test.local");
         var technicianToken = login("technician@test.local");
@@ -210,6 +342,15 @@ class TicketApiIntegrationTest {
                 .andExpect(jsonPath("$.assignedToId").doesNotExist())
                 .andReturn();
         return objectMapper.readTree(result.getResponse().getContentAsString()).get("id").asInt();
+    }
+
+    private void assignTicket(int id, String managerToken, int assigneeId) throws Exception {
+        mvc.perform(post("/api/v1/tickets/{id}/assign", id)
+                        .header("Authorization", bearer(managerToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"technicianId\":" + assigneeId + "}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.assignedToId").value(assigneeId));
     }
 
     private String login(String email) throws Exception {
