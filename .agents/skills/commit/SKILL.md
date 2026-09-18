@@ -31,6 +31,9 @@ Never use `.gitignore` to hide an uncertain or user-owned file.
 
 Group changes by intent, not merely by file. Each commit should represent one independently valid logical outcome. Keep implementation with its direct tests and documentation when inseparable; split independently reviewable outcomes such as reusable tooling, test scenarios that consume it, and generated artifacts.
 
+Do not combine unrelated workflows into one large commit; split at independently reviewable outcome boundaries.
+Strongly prefer small, focused commits; keep work together only when splitting it would make a commit invalid or misleading.
+
 ### Commit grouping standard
 
 There is no fixed one-issue-to-one-commit rule. Use the following decision
