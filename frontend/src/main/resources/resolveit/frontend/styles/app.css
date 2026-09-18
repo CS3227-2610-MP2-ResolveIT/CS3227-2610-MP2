@@ -400,6 +400,12 @@
     -fx-text-fill: white;
 }
 
+.technician-workspace .nav-button:focused {
+    -fx-border-color: #93c5fd;
+    -fx-border-radius: 8px;
+    -fx-border-width: 2px;
+}
+
 .workspace-heading {
     -fx-font-size: 25px;
     -fx-font-weight: 800;
@@ -408,6 +414,12 @@
 
 .workspace-description, .hint-label, .count-label {
     -fx-text-fill: -text-secondary;
+}
+
+.technician-workspace .workspace-description,
+.technician-workspace .hint-label,
+.technician-workspace .count-label {
+    -fx-text-fill: -text-placeholder;
 }
 
 .workspace-description {
@@ -420,6 +432,12 @@
 
 .count-label {
     -fx-font-weight: 700;
+}
+
+.busy-label {
+    -fx-font-size: 12px;
+    -fx-font-weight: 700;
+    -fx-text-fill: -text-placeholder;
 }
 
 .toolbar, .content-card {
@@ -446,17 +464,68 @@
 }
 
 .danger-button {
-    -fx-background-color: white;
+    -fx-background-color: #fff1f0;
     -fx-background-radius: 8px;
-    -fx-border-color: #efb4ae;
+    -fx-border-color: #d85a51;
     -fx-border-radius: 8px;
+    -fx-border-width: 1.2px;
     -fx-cursor: hand;
     -fx-font-weight: 700;
     -fx-text-fill: -danger;
 }
 
 .danger-button:hover {
-    -fx-background-color: #fff1f0;
+    -fx-background-color: #ffe1de;
+    -fx-border-color: #b42318;
+}
+
+.danger-button:focused {
+    -fx-effect: dropshadow(gaussian, rgba(180, 35, 24, 0.32), 7, 0.3, 0, 0);
+}
+
+.technician-confirmation-dialog {
+    -fx-background-color: white;
+    -fx-padding: 0;
+}
+
+.technician-confirmation-dialog > .header-panel {
+    -fx-background-color: -surface-subtle;
+    -fx-padding: 22px 24px 16px;
+}
+
+.technician-confirmation-dialog > .header-panel .label {
+    -fx-font-size: 17px;
+    -fx-font-weight: 800;
+    -fx-text-fill: -text-primary;
+}
+
+.technician-confirmation-dialog > .content.label {
+    -fx-padding: 16px 24px 8px;
+    -fx-text-fill: -text-strong;
+}
+
+.technician-confirmation-dialog > .button-bar {
+    -fx-background-color: white;
+    -fx-padding: 16px 24px 22px;
+}
+
+.technician-confirmation-dialog .button {
+    -fx-min-height: 36px;
+}
+
+.technician-confirmation-dialog .danger-button {
+    -fx-background-color: -danger;
+    -fx-border-color: -danger;
+    -fx-text-fill: white;
+}
+
+.technician-confirmation-dialog .danger-button:hover {
+    -fx-background-color: #8f1d15;
+    -fx-border-color: #8f1d15;
+}
+
+.technician-confirmation-dialog .danger-button:focused {
+    -fx-effect: dropshadow(gaussian, rgba(180, 35, 24, 0.42), 7, 0.3, 0, 0);
 }
 
 .success-message {
@@ -464,8 +533,28 @@
     -fx-background-radius: 8px;
     -fx-border-color: #a6e7bd;
     -fx-border-radius: 8px;
-    -fx-padding: 11px 13px;
+    -fx-effect: dropshadow(gaussian, rgba(21, 112, 58, 0.12), 12, 0.15, 0, 4);
+    -fx-padding: 10px 13px;
     -fx-text-fill: #15703a;
+}
+
+.completion-mark {
+    -fx-alignment: center;
+    -fx-background-color: #15703a;
+    -fx-background-radius: 12px;
+}
+
+.completion-mark-path {
+    -fx-fill: white;
+}
+
+.information-message {
+    -fx-background-color: #eef5ff;
+    -fx-background-radius: 8px;
+    -fx-border-color: #b8d2ff;
+    -fx-border-radius: 8px;
+    -fx-padding: 11px 13px;
+    -fx-text-fill: #244f91;
 }
 
 .text-area {
@@ -581,6 +670,10 @@
     -fx-font-size: 10px;
     -fx-font-weight: 800;
     -fx-text-fill: #728198;
+}
+
+.technician-workspace .detail-key {
+    -fx-text-fill: -text-placeholder;
 }
 
 .detail-title {

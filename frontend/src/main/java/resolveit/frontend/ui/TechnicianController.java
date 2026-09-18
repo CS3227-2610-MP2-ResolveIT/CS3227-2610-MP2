@@ -104,7 +104,7 @@ public final class TechnicianController implements ViewLifecycle {
     @FXML private void cancelTicket() {
         if (selectedTicket == null || actionLoading
                 || !confirm("Cancel ticket", "Cancel " + selectedTicket.ticketNumber() + "?",
-                        "Cancelled tickets cannot be reopened.")) {
+                        "Cancelled tickets cannot be reopened.", "Cancel ticket", "Keep ticket", true)) {
             return;
         }
         mutate(ticketService.cancel(selectedTicket.id()), "Ticket cancelled.");
@@ -142,6 +142,8 @@ public final class TechnicianController implements ViewLifecycle {
     @FXML private Label detailStatusLabel;
     @FXML private Label detailErrorLabel;
     @FXML private Label detailNoticeLabel;
+    @FXML private HBox detailNoticeBox;
+    @FXML private StackPane detailNoticeMark;
     @FXML private ProgressIndicator detailProgress;
     @FXML private Label detailBusyLabel;
     @FXML private Button refreshDetailButton;
@@ -262,7 +264,7 @@ public final class TechnicianController implements ViewLifecycle {
 
         bindManaged(queueErrorLabel);
         bindManaged(detailErrorLabel);
-        bindManaged(detailNoticeLabel);
+        bindManaged(detailNoticeBox, detailNoticeLabel);
         bindManaged(resolutionErrorLabel);
         bindManaged(messageErrorLabel);
         resolutionField.textProperty().addListener((ignored, oldValue, newValue) -> resolutionErrorLabel.setText(""));
@@ -285,7 +287,7 @@ public final class TechnicianController implements ViewLifecycle {
     @FXML
     private void showQueue() {
         showPage(queuePage);
-        queueNavButton.getStyleClass().add("nav-button-active");
+        setQueueNavigationActive();
         refreshQueue();
     }
 
@@ -703,18 +705,19 @@ public final class TechnicianController implements ViewLifecycle {
 
     private void track(CompletableFuture<?> future) { inFlight.add(future); }
 
-    private void showFailure(Label target, Throwable problem) {
+    private boolean showFailure(Label target, Throwable problem) {
         var cause = unwrap(problem);
         if (cause instanceof TicketFailure failure) {
             if (failure.kind() == TicketFailure.Kind.UNAUTHORIZED) {
                 session.clear();
                 navigator.showLogin();
-                return;
+                return false;
             }
             target.setText(failure.getMessage());
         } else {
             target.setText("The request could not be completed. Please try again.");
         }
+        return true;
     }
 
     private boolean isConflict(Throwable problem) {
