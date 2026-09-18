@@ -4,14 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static resolveit.frontend.ui.JavaFxTestSupport.onJavaFxThread;
 
-import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
-import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -21,7 +17,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.ProgressIndicator;
 import javafx.scene.control.TextField;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import resolveit.frontend.auth.AuthClient;
@@ -35,18 +30,9 @@ import resolveit.frontend.navigation.Navigator;
 import resolveit.frontend.session.SessionState;
 
 class LoginViewTest {
-    private static final long FX_TIMEOUT_SECONDS = 10;
-
     @BeforeAll
     static void startJavaFx() throws Exception {
-        var started = new CompletableFuture<Void>();
-        Platform.startup(() -> started.complete(null));
-        started.get(FX_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-    }
-
-    @AfterAll
-    static void stopJavaFx() {
-        Platform.exit();
+        JavaFxTestSupport.startJavaFx();
     }
 
     @Test
@@ -141,16 +127,6 @@ class LoginViewTest {
         root.applyCss();
         root.layout();
         return new LoginFixture(root, loader.getController(), client);
-    }
-
-    private static <T> T onJavaFxThread(Callable<T> action) throws Exception {
-        var task = new FutureTask<>(action);
-        Platform.runLater(task);
-        try {
-            return task.get(FX_TIMEOUT_SECONDS, TimeUnit.SECONDS);
-        } catch (ExecutionException exception) {
-            throw new AssertionError("JavaFX action failed", exception.getCause());
-        }
     }
 
     private record LoginFixture(Parent root, LoginController controller, StubAuthClient client) {
