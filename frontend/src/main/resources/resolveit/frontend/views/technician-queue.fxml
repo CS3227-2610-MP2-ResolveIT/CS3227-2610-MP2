@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<StackPane xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="resolveit.frontend.ui.TechnicianQueueController">
+  <VBox spacing="18.0">
+    <VBox spacing="5.0">
+      <Label fx:id="queueHeading" text="Ticket Queue" styleClass="workspace-heading"/>
+      <Label fx:id="queueDescription" text="Review support requests, take ownership, and keep work moving." styleClass="workspace-description" wrapText="true"/>
+    </VBox>
+    <FlowPane fx:id="queueToolbar" alignment="BOTTOM_LEFT" hgap="10.0" vgap="10.0" styleClass="toolbar">
+      <VBox spacing="4.0">
+        <Label fx:id="statusFilterLabel" text="Status" styleClass="field-label"/>
+        <ComboBox fx:id="statusFilter" prefWidth="145.0" promptText="All statuses" accessibleText="Filter tickets by status"/>
+      </VBox>
+      <VBox spacing="4.0">
+        <Label fx:id="priorityFilterLabel" text="Priority" styleClass="field-label"/>
+        <ComboBox fx:id="priorityFilter" prefWidth="145.0" promptText="All priorities" accessibleText="Filter tickets by priority"/>
+      </VBox>
+      <VBox spacing="4.0">
+        <Label fx:id="assignmentFilterLabel" text="Assignment" styleClass="field-label"/>
+        <ComboBox fx:id="assignmentFilter" prefWidth="165.0" accessibleText="Filter tickets by assignment"/>
+      </VBox>
+      <Button fx:id="refreshQueueButton" mnemonicParsing="true" onAction="#refreshQueue" text="↻  _Refresh" styleClass="secondary-button, compact-button"/>
+      <ProgressIndicator fx:id="queueProgress" maxHeight="22.0" maxWidth="22.0" accessibleText="Ticket queue is loading" visible="false" managed="false"/>
+      <Label fx:id="queueBusyLabel" text="Loading tickets…" styleClass="busy-label" visible="false" managed="false"/>
+      <Label fx:id="ticketCountLabel" text="0 tickets" styleClass="count-label"/>
+    </FlowPane>
+    <Label fx:id="queueErrorLabel" wrapText="true" styleClass="form-error"/>
+    <TableView fx:id="ticketsTable" VBox.vgrow="ALWAYS" accessibleText="Technician ticket queue">
+      <placeholder>
+        <Label fx:id="queueEmptyLabel" text="No tickets are currently visible." styleClass="empty-label"/>
+      </placeholder>
+      <columns>
+        <TableColumn fx:id="numberColumn" prefWidth="125.0" text="Ticket"/>
+        <TableColumn fx:id="subjectColumn" minWidth="190.0" prefWidth="260.0" text="Subject"/>
+        <TableColumn fx:id="requesterColumn" prefWidth="125.0" text="Requester"/>
+        <TableColumn fx:id="priorityColumn" prefWidth="90.0" text="Priority"/>
+        <TableColumn fx:id="statusColumn" prefWidth="115.0" text="Status"/>
+        <TableColumn fx:id="assigneeColumn" prefWidth="125.0" text="Assignee"/>
+        <TableColumn fx:id="updatedColumn" minWidth="160.0" prefWidth="170.0" text="Last updated"/>
+      </columns>
+    </TableView>
+    <FlowPane fx:id="queueFooter" alignment="CENTER_LEFT" hgap="9.0" vgap="9.0">
+      <Label text="Select a row and press Enter, or double-click, to open it." styleClass="hint-label"/>
+      <Button fx:id="previousButton" mnemonicParsing="true" onAction="#previousPage" text="←  _Previous" styleClass="secondary-button, compact-button"/>
+      <Label fx:id="pageLabel" text="Page 0 of 0" styleClass="count-label"/>
+      <Button fx:id="nextButton" mnemonicParsing="true" onAction="#nextPage" text="_Next  →" styleClass="secondary-button, compact-button"/>
+    </FlowPane>
+  </VBox>
+</StackPane>
