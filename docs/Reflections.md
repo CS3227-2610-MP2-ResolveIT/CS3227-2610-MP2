@@ -10,7 +10,7 @@ the course requirements, the existing code, and human decisions.
 
 The main evidence for this reflection is the repository history, the customised
 skills under [`.agents/skills`](../.agents/skills), and the verified interaction
-summary in [`logs/summary-1.md`](../logs/summary-1.md). At the time of writing, both
+summaries under [`logs/`](../logs/). At the time of writing, both
 the backend and frontend `./gradlew test` commands pass. This confirms the current
 automated suites, but it does not prove unautomated visual or end-to-end behaviour.
 
@@ -99,12 +99,12 @@ or another review run is required.
 
 This is an interesting skill because its most important instruction is a boundary:
 **review; do not fix**. Separating review from implementation reduces the chance
-that the same reasoning pass silently changes code to match its assumptions. At
-this stage, the repository contains the skill definition but no canonical
-`reviews/issue-<number>.md` report, so it would be inaccurate to claim that the full
-review workflow has been verified in practice. Its structure is promising, but the
-next project phase should exercise it on a real issue and evaluate whether its
-findings are accurate and actionable.
+that the same reasoning pass silently changes code to match its assumptions. The
+skill has now been exercised on a real Manager frontend test review of
+`UsersViewTest.java`, which found no meaningful issues. The canonical report
+workflow is only partially verified because no canonical
+`reviews/issue-<number>.md` report was produced and execution verification was
+blocked by Gradle's cache and loopback errors.
 
 
 ## What the agent handled effectively
@@ -205,3 +205,57 @@ choosing scope, deciding acceptable UX, challenging architectural inconsistency,
 and judging whether verification is sufficient. The AI agent contributed speed and
 breadth; the team supplied intent, review, and accountability. That combination was
 more effective than either unstructured prompting or unquestioned automation.
+
+## Individual reflection — Teo Keng Jer
+
+This reflection covers my recorded JavaFX navigation fix, frontend skill evaluation, and Manager User Management access-cancellation test workflow. My primary evidence is the approved [window-navigation log](../logs/2026-09-11-201828-javafx-window-navigation-and-skill-evaluation.md) and [Manager cancellation-test log](../logs/2026-09-23-015341-manager-access-cancellation-test.md).
+
+Across these tasks, I set the scope, requested diagnosis before implementation, supplied local verification, and reviewed the interaction summaries. Codex performed the recorded diagnosis, implementation, test correction, evaluation work, and review. The following lessons are retrospective interpretations of that evidence.
+
+### 1. `senior-frontend-javafx-engineer`
+
+I used this skill to investigate window-size resets during top-level navigation and to identify and implement a missing Manager-specific cancellation test. It was appropriate because both tasks depended on JavaFX lifecycle behavior: replacing a Scene during navigation, and closing a confirmation dialog during a test. Its emphasis on small changes, existing project conventions, cancellation states, and explicit verification matched these tasks.
+
+For navigation, Codex traced the reset to `Navigator.show()`, which created a new explicitly sized `Scene(root, 1120, 720)` on every transition. I first requested a diagnosis without edits, then authorized the specific fix: create the Scene once and replace its root afterward. Codex preserved stylesheet loading and controller lifecycle ordering. The production change is recorded in commit `dcb1ef6`.
+
+I personally performed local Gradle verification and manual checks with maximized and manually resized windows. The navigation log does not preserve the exact local command, output, or detailed manual observations, so I cannot claim more precise coverage. I also requested a minimal evaluation fixture and deterministic checker. The recorded evaluation passed one with-skill trial with a score of 100/100. However, its checker used JavaFX doubles: this result verified the modeled navigation interactions, not native window behavior, and did not establish improvement over a without-skill baseline.
+
+The Manager test exposed a limitation in the agent’s first implementation. Codex correctly identified the missing confirmation-cancellation coverage and followed the existing FXML and stub-client patterns, but its cleanup accessed `dialog.getScene()` after Cancel had detached the dialog pane. My local Gradle run exposed the resulting `NullPointerException`. I reported the failure and restricted the correction to test code unless a genuine production defect was demonstrated. Codex then captured the dialog window before firing Cancel and used that reference for cleanup.
+
+My subsequent local run passed the new `UsersViewTest` test and two `AuthenticatedViewTest` tests; the recorded Checkstyle report contained no errors. Codex’s own execution attempts were blocked by cache and loopback errors, so those successful runs must remain attributed to me.
+
+For future work, the improvements supported by these experiences are to check dialog lifecycle assumptions explicitly and preserve local build output and manual observations immediately. The lesson for using one engineering agent is that domain-specific instructions can guide a focused diagnosis and implementation, but they do not eliminate mistakes in the agent’s own tests. Running those tests and returning concrete failure evidence remained essential.
+
+### 2. `code-review`
+
+I used the `code-review` skill after the cancellation test had been corrected. I requested a review of correctness, maintainability, robustness, and consistency with existing project conventions, with no file modifications. This was an appropriate separate task because the implementation needed assessment beyond whether its focused tests passed.
+
+Codex reported no meaningful issues in `UsersViewTest.java`. Its review considered the cancellation assertions, JavaFX threading, fixture setup, stubs, and disposal. The agent respected the requested review boundary and did not make edits.
+
+The evidence for whether this skill worked is narrower than a complete execution-based review. The recorded response addressed the requested concerns and disclosed that Gradle verification was blocked. My earlier successful local test and Checkstyle results provided separate execution evidence; they were not runs completed by the reviewing agent. A lack of review findings also does not prove that every possible defect was absent.
+
+The review had an avoidable execution mistake: its initial command ran from the repository root, where it could not find `gradlew.bat`. After switching to the frontend directory, cache and loopback failures still prevented verification. The logs do not establish a substantive review finding that I needed to correct. They establish a review with explicit execution limitations.
+
+My contribution was to request this additional assessment after the test correction, constrain it to concrete findings, and provide the separate local verification already recorded in the workflow. For future reviews, an improvement supported by this experience is to identify the module’s wrapper location before executing commands and explicitly connect the reviewed change to the available test reports.
+
+This workflow illustrates how a single agent can switch from implementation to review under a different set of instructions. That separation makes its responsibilities clearer, but it does not create an independent human reviewer or replace execution evidence. The useful review outcome was a scoped assessment with disclosed limitations.
+
+### 3. `logging`
+
+I used the `logging` skill to turn these workflows into two detailed, individually attributed records. In the context of MP2, I used the skill to create and verify summaries of prompts and agent interactions, and the existing broad summary did not explicitly capture these tasks, their failures, or the division between my verification and Codex’s work.
+
+The skill organized each record around a coherent task, preserving material prompts, decisions, actions, verification, limitations, and reflection notes. I required `Student owner: Teo Keng Jer`, links to related summary material, and clear separation between my actions and the agent’s actions. I also required that historical details be supported rather than reconstructed by guesswork.
+
+I checked the resulting drafts by reviewing them and explicitly approving their contents before they were written. Both logs record `Human verification: approved`. Repository history records the navigation log in commit `22c62ab` and the cancellation-test log in `258a618`.
+
+I also evaluated whether the logging skill followed its own workflow: coherent task scope, evidence-based reconstruction, clear attribution, presentation of the full draft before writing, and explicit human approval. These checks assessed the skill’s execution as well as the accuracy of its final summaries.
+
+The agent’s useful contribution was assembling evidence from session records, code, commits, evaluation artifacts, and local reports into a readable sequence. It preserved distinctions that matter to the reflection: an attempted check versus a successful check, a source review versus execution, and an automated JavaFX-double evaluation versus native GUI verification.
+
+The limitation was incomplete historical evidence. The navigation workflow lacked the exact local Gradle output and detailed manual observations, while the cancellation workflow did not preserve the complete local command and console transcript. The logs disclosed these gaps instead of inventing them. No content correction to the drafts is recorded before my approval; the evidence therefore supports describing the logging process and its limits, rather than claiming an undocumented logging failure.
+
+Next time, the improvement supported by both logs is to record interactions near the time of the work, including exact commands, relevant outputs, manual observations, and failed-run diagnostics. Generated reports can be overwritten, so preserving their material results promptly would make later reflection more reliable.
+
+The lesson for a single software-engineering agent is that reporting needs its own instructions and human verification. The agent can organize the evidence, but I remain responsible for checking attribution and confirming that the summary accurately distinguishes what I decided and verified from what the agent performed.
+
+Across these examples, skill selection matched the responsibility: JavaFX engineering for diagnosis and implementation, code review for assessment, and logging for preserving verified evidence. Skill execution needed separate checks: local tests and manual verification exposed implementation limits, the review disclosed incomplete execution, and the logging process required evidence checks and my approval. Choosing an appropriate skill established the scope and checking how the agent followed it established what I could reasonably trust.
