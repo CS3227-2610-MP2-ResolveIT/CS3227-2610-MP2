@@ -1,0 +1,10 @@
+{
+  "revision": "5a22aaba76b0e8f03d8f48c1c590acb8d2bf4d79",
+  "status": [
+    " M src/resolveit/ticket/Ticket.java",
+    " M src/resolveit/ticket/TicketQuota.java"
+  ],
+  "clean": false,
+  "worker_exit_code": 0,
+  "completed_at": "2026-09-25T08:18:12.437792+00:00"
+}

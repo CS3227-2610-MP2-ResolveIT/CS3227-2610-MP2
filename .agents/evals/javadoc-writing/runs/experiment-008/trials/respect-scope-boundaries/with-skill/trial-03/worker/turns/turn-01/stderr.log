@@ -1,0 +1,8 @@
+2026-09-25T08:30:03.225940Z ERROR codex_core::tools::router: error=exec_command failed for `/bin/zsh -lc 'verify_dir=$(mktemp -d /tmp/access-policy-javadoc.XXXXXX)
+javadoc -Xdoclint:all -d "$verify_dir/docs" src/resolveit/access/AccessPolicy.java
+javadoc_status=$?
+javac -d "$verify_dir/classes" src/resolveit/access/AccessPolicy.java
+compile_status=$?
+printf '"'direct_javadoc_exit=%s\\ndirect_javac_exit=%s\\n' \""'$javadoc_status" "$compile_status"
+rm -rf "$verify_dir"
+exit 0'`: CreateProcess { message: "Rejected(\"`/bin/zsh -lc 'verify_dir=$(mktemp -d /tmp/access-policy-javadoc.XXXXXX)\\njavadoc -Xdoclint:all -d \\\"$verify_dir/docs\\\" src/resolveit/access/AccessPolicy.java\\njavadoc_status=$?\\njavac -d \\\"$verify_dir/classes\\\" src/resolveit/access/AccessPolicy.java\\ncompile_status=$?\\nprintf '\\\"'direct_javadoc_exit=%s\\\\\\\\ndirect_javac_exit=%s\\\\\\\\n' \\\\\\\"\\\"'$javadoc_status\\\" \\\"$compile_status\\\"\\nrm -rf \\\"$verify_dir\\\"\\nexit 0'` rejected: rm -f style commands are not permitted. Use a safer approach\")" }

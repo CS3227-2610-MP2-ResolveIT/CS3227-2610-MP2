@@ -1,0 +1,12 @@
+2026-09-25T08:28:34.252785Z ERROR codex_core::tools::router: error=exec_command failed for `/bin/zsh -lc 'set -o pipefail
+rm -rf /tmp/access-policy-javadoc /tmp/access-policy-classes
+mkdir -p /tmp/access-policy-javadoc /tmp/access-policy-classes
+javadoc -quiet -d /tmp/access-policy-javadoc src/resolveit/access/AccessPolicy.java
+javadoc_status=$?
+javac -d /tmp/access-policy-classes src/resolveit/access/AccessPolicy.java
+javac_status=$?
+printf '"'javadoc exit: %s\\njavac exit: %s\\n' \""'$javadoc_status" "$javac_status"
+printf '"'\\n--- FINAL STATUS ---\\n'
+git status --short
+printf '\\n--- CHANGED PATHS ---\\n'
+git diff --name-only"`: CreateProcess { message: "Rejected(\"`/bin/zsh -lc 'set -o pipefail\\nrm -rf /tmp/access-policy-javadoc /tmp/access-policy-classes\\nmkdir -p /tmp/access-policy-javadoc /tmp/access-policy-classes\\njavadoc -quiet -d /tmp/access-policy-javadoc src/resolveit/access/AccessPolicy.java\\njavadoc_status=$?\\njavac -d /tmp/access-policy-classes src/resolveit/access/AccessPolicy.java\\njavac_status=$?\\nprintf '\\\"'javadoc exit: %s\\\\\\\\njavac exit: %s\\\\\\\\n' \\\\\\\"\\\"'$javadoc_status\\\" \\\"$javac_status\\\"\\nprintf '\\\"'\\\\\\\\n--- FINAL STATUS ---\\\\\\\\n'\\ngit status --short\\nprintf '\\\\\\\\n--- CHANGED PATHS ---\\\\\\\\n'\\ngit diff --name-only\\\"` rejected: rm -f style commands are not permitted. Use a safer approach\")" }

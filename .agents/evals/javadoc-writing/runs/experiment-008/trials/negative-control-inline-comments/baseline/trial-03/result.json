@@ -1,0 +1,25 @@
+{
+  "status": "graded",
+  "skill": "javadoc-writing",
+  "test_case": "negative-control-inline-comments",
+  "configuration": "baseline",
+  "trial": 3,
+  "overall_pass": true,
+  "score": 90,
+  "deterministic_score": 100,
+  "semantic_score": 90,
+  "deterministic_pass": true,
+  "semantic_pass": true,
+  "semantic_judges": 1,
+  "worker_exit_code": 0,
+  "worker_turns_planned": 1,
+  "worker_turns_completed": 1,
+  "protected_inputs_intact": true,
+  "deterministic_status": "completed",
+  "semantic_status": "completed",
+  "workspace_git_metadata_removed": true,
+  "failure_reasons": [
+    "semantic/inline-comment-quality: The comments usefully explain the default zero load for missing entries and why the strict comparison retains the first technician in a tie. However, the requested non-obvious load-balancing logic is not fully covered: there is no comment explaining the initial Integer.MAX_VALUE sentinel or explicitly describing how the running fewest-load value is tracked. The final return comment mostly restates observable behavior rather than adding a WHAT/WHY explanation. Deducted 10 points for these omissions."
+  ],
+  "run_directory": "/Users/junhaong/Documents/y3s1/CS3227/CS3227-2610-MP2/.agents/evals/javadoc-writing/runs/experiment-008/trials/negative-control-inline-comments/baseline/trial-03"
+}

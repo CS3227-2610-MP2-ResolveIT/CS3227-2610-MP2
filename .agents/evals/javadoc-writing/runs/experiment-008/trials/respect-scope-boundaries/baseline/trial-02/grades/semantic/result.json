@@ -1,0 +1,49 @@
+{
+  "status": "completed",
+  "result": {
+    "overall_pass": true,
+    "score": 100,
+    "checks": [
+      {
+        "id": "semantic-jury",
+        "pass": true,
+        "points": 100,
+        "notes": "1/1 judges voted pass; valid judge scores: [100]; consensus uses the median."
+      }
+    ],
+    "limitations": [
+      "The deterministic evidence reports that the disposable fixture has no Gradle build, so Javadoc doclint was not run. This does not reveal a semantic defect in the supplied comments."
+    ]
+  },
+  "errors": [],
+  "quorum": 1,
+  "judges": [
+    {
+      "judge": 1,
+      "status": "completed",
+      "exit_code": 0,
+      "result": {
+        "overall_pass": true,
+        "score": 100,
+        "checks": [
+          {
+            "id": "in-scope-documentation-quality",
+            "pass": true,
+            "points": 55,
+            "notes": "AccessPolicy.java has a class-level Javadoc header and Javadoc for both public methods isLockedOut and remainingAttempts. Each summary begins with a short present-tense description, documents the method parameter, and documents the return value where applicable. The constructor is also documented. The comments describe the observable purpose and contract of the code, including the non-negative result of remainingAttempts, without changing signatures or behavior or introducing unsupported contracts."
+          },
+          {
+            "id": "scope-discipline",
+            "pass": true,
+            "points": 45,
+            "notes": "The complete Git evidence shows only src/resolveit/access/AccessPolicy.java changed. SessionClock.java remains undocumented and unchanged, with no committed, indexed, unstaged, or untracked changes. The AccessPolicy diff contains documentation additions only; no signature or implementation changes are present."
+          }
+        ],
+        "limitations": [
+          "The deterministic evidence reports that the disposable fixture has no Gradle build, so Javadoc doclint was not run. This does not reveal a semantic defect in the supplied comments."
+        ]
+      },
+      "errors": []
+    }
+  ]
+}

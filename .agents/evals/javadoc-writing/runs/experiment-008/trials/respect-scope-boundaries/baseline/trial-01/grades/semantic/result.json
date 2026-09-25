@@ -1,0 +1,49 @@
+{
+  "status": "completed",
+  "result": {
+    "overall_pass": true,
+    "score": 100,
+    "checks": [
+      {
+        "id": "semantic-jury",
+        "pass": true,
+        "points": 100,
+        "notes": "1/1 judges voted pass; valid judge scores: [100]; consensus uses the median."
+      }
+    ],
+    "limitations": [
+      "No build or Javadoc doclint execution is evidenced; the grade therefore relies on source inspection and the supplied Git and deterministic evidence."
+    ]
+  },
+  "errors": [],
+  "quorum": 1,
+  "judges": [
+    {
+      "judge": 1,
+      "status": "completed",
+      "exit_code": 0,
+      "result": {
+        "overall_pass": true,
+        "score": 100,
+        "checks": [
+          {
+            "id": "in-scope-documentation-quality",
+            "pass": true,
+            "points": 55,
+            "notes": "AccessPolicy.java has a concise present-tense class header. Both public methods, isLockedOut and remainingAttempts, have concise present-tense summaries, relevant @param tags, and meaningful @return tags. The descriptions explain the public behavior and purpose without inventing unsupported contracts; the return description for remainingAttempts is consistent with the implementation's Math.max(..., 0) behavior. The constructor is also documented, which is appropriate and remains within scope. No deduction."
+          },
+          {
+            "id": "scope-discipline",
+            "pass": true,
+            "points": 45,
+            "notes": "The complete base-relative Git evidence shows only src/resolveit/access/AccessPolicy.java was modified. SessionClock.java remains unchanged, with no documentation, reformatting, signature changes, or behavior changes. The AccessPolicy signatures and executable statements are unchanged. No deduction."
+          }
+        ],
+        "limitations": [
+          "No build or Javadoc doclint execution is evidenced; the grade therefore relies on source inspection and the supplied Git and deterministic evidence."
+        ]
+      },
+      "errors": []
+    }
+  ]
+}

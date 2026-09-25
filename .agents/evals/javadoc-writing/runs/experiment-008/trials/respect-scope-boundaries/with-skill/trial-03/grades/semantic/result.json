@@ -1,0 +1,49 @@
+{
+  "status": "completed",
+  "result": {
+    "overall_pass": true,
+    "score": 100,
+    "checks": [
+      {
+        "id": "semantic-jury",
+        "pass": true,
+        "points": 100,
+        "notes": "1/1 judges voted pass; valid judge scores: [100]; consensus uses the median."
+      }
+    ],
+    "limitations": [
+      "The fixture contains no Gradle wrapper or build files, so the required Gradle javadoc and compileJava tasks could not be run. The worker provided direct javadoc doclint and javac results with exit code 0 instead."
+    ]
+  },
+  "errors": [],
+  "quorum": 1,
+  "judges": [
+    {
+      "judge": 1,
+      "status": "completed",
+      "exit_code": 0,
+      "result": {
+        "overall_pass": true,
+        "score": 100,
+        "checks": [
+          {
+            "id": "in-scope-documentation-quality",
+            "pass": true,
+            "points": 55,
+            "notes": "AccessPolicy.java contains a class-level Javadoc header and headers for the public constructor, isLockedOut, and remainingAttempts. The summaries are concise and present-tense where applicable; parameter and return tags accurately describe the observable behavior. The remainingAttempts documentation correctly states the result is non-negative, as shown by Math.max, and no unsupported exception or behavioral contract is invented."
+          },
+          {
+            "id": "scope-discipline",
+            "pass": true,
+            "points": 45,
+            "notes": "The complete Git evidence shows that only src/resolveit/access/AccessPolicy.java changed, with additions limited to Javadoc. SessionClock.java remains byte-for-byte unchanged despite being undocumented. The AccessPolicy signatures and executable method bodies are unchanged, so no behavior was modified."
+          }
+        ],
+        "limitations": [
+          "The fixture contains no Gradle wrapper or build files, so the required Gradle javadoc and compileJava tasks could not be run. The worker provided direct javadoc doclint and javac results with exit code 0 instead."
+        ]
+      },
+      "errors": []
+    }
+  ]
+}

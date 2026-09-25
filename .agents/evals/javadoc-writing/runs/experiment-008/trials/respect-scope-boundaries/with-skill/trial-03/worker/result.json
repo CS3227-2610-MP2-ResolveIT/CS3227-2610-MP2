@@ -1,0 +1,37 @@
+{
+  "exit_code": 0,
+  "elapsed_seconds": 86.15,
+  "turns_planned": 1,
+  "turns_completed": 1,
+  "metrics": {
+    "event_count": 28,
+    "parse_errors": 0,
+    "command_count": 10,
+    "failed_command_count": 0,
+    "repeated_command_count": 5,
+    "prohibited_commands": [],
+    "skill_read_observed": true,
+    "input_tokens": 121895,
+    "output_tokens": 2393,
+    "skill_invocation_mode": "implicit-candidate",
+    "worker_elapsed_seconds": 86.15
+  },
+  "final_git_state": {
+    "revision": "3070498b6cfa35a993fa5c21f163ba8cf2ea33aa",
+    "status": [
+      " M src/resolveit/access/AccessPolicy.java"
+    ],
+    "clean": false,
+    "worker_exit_code": 0,
+    "completed_at": "2026-09-25T08:30:17.662269+00:00",
+    "protected_inputs_intact": true,
+    "task_prompt_intact": true,
+    "injected_skill_intact": true,
+    "supporting_skills_intact": {}
+  },
+  "protected_inputs_intact": true,
+  "task_prompt_intact": true,
+  "injected_skill_intact": true,
+  "supporting_skills_intact": {},
+  "untracked_files": []
+}

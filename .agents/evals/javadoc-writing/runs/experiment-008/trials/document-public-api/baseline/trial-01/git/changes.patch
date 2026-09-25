@@ -1,0 +1,77 @@
+diff --git a/src/resolveit/ticket/Ticket.java b/src/resolveit/ticket/Ticket.java
+index 13102d2..c7e71e6 100644
+--- a/src/resolveit/ticket/Ticket.java
++++ b/src/resolveit/ticket/Ticket.java
+@@ -1,4 +1,11 @@
+ package resolveit.ticket;
+ 
++/**
++ * Represents a ticket and whether it contributes to the daily ticket quota.
++ *
++ * @param id the ticket's identifier
++ * @param subject the ticket's subject
++ * @param countsAgainstQuota whether the ticket counts against the daily quota
++ */
+ public record Ticket(long id, String subject, boolean countsAgainstQuota) {
+ }
+diff --git a/src/resolveit/ticket/TicketQuota.java b/src/resolveit/ticket/TicketQuota.java
+index 79f4bf1..2343ac6 100644
+--- a/src/resolveit/ticket/TicketQuota.java
++++ b/src/resolveit/ticket/TicketQuota.java
+@@ -2,13 +2,31 @@ package resolveit.ticket;
+ 
+ import java.util.List;
+ 
++/**
++ * Tracks and enforces the number of tickets that may be created in a day.
++ */
+ public final class TicketQuota {
+     private final int dailyLimit;
+ 
++    /**
++     * Creates a ticket quota with the specified daily limit.
++     *
++     * @param dailyLimit the maximum number of tickets that may count against
++     *                   the quota in one day
++     */
+     public TicketQuota(int dailyLimit) {
+         this.dailyLimit = dailyLimit;
+     }
+ 
++    /**
++     * Calculates how many quota-counting tickets can still be created today.
++     * Tickets for which {@link Ticket#countsAgainstQuota()} returns
++     * {@code false} are not included in the count. The result is never
++     * negative.
++     *
++     * @param todaysTickets the tickets created today
++     * @return the number of remaining tickets allowed by this quota
++     */
+     public int remaining(List<Ticket> todaysTickets) {
+         int used = 0;
+         for (Ticket ticket : todaysTickets) {
+@@ -19,12 +37,24 @@ public final class TicketQuota {
+         return Math.max(dailyLimit - used, 0);
+     }
+ 
++    /**
++     * Verifies that another ticket can be created under this quota.
++     *
++     * @param todaysTickets the tickets created today
++     * @throws QuotaExceededException if no quota remains
++     */
+     public void assertCanCreate(List<Ticket> todaysTickets) {
+         if (remaining(todaysTickets) <= 0) {
+             throw new QuotaExceededException(dailyLimit);
+         }
+     }
+ 
++    /**
++     * Returns the maximum number of tickets that may count against the quota
++     * in one day.
++     *
++     * @return the daily ticket limit
++     */
+     public int getDailyLimit() {
+         return dailyLimit;
+     }

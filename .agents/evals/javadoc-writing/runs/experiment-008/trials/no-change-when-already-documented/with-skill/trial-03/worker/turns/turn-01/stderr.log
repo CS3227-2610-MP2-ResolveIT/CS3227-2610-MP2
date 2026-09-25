@@ -1,0 +1,11 @@
+2026-09-25T08:25:01.660895Z ERROR codex_core::tools::router: error=exec_command failed for `/bin/zsh -lc 'check_dir=$(mktemp -d /tmp/lockout-policy-check.XXXXXX)
+javadoc -quiet -d "$check_dir/javadoc" src/resolveit/auth/LockoutPolicy.java
+javadoc_status=$?
+javac -d "$check_dir/classes" src/resolveit/auth/LockoutPolicy.java
+compile_status=$?
+printf '"'direct_javadoc_exit=%s\\ndirect_javac_exit=%s\\n' \""'$javadoc_status" "$compile_status"
+git status --short
+git diff --check
+printf '"'diff_check_exit=%s\\n' \""'$?"
+rm -rf "$check_dir"
+exit 0'`: CreateProcess { message: "Rejected(\"`/bin/zsh -lc 'check_dir=$(mktemp -d /tmp/lockout-policy-check.XXXXXX)\\njavadoc -quiet -d \\\"$check_dir/javadoc\\\" src/resolveit/auth/LockoutPolicy.java\\njavadoc_status=$?\\njavac -d \\\"$check_dir/classes\\\" src/resolveit/auth/LockoutPolicy.java\\ncompile_status=$?\\nprintf '\\\"'direct_javadoc_exit=%s\\\\\\\\ndirect_javac_exit=%s\\\\\\\\n' \\\\\\\"\\\"'$javadoc_status\\\" \\\"$compile_status\\\"\\ngit status --short\\ngit diff --check\\nprintf '\\\"'diff_check_exit=%s\\\\\\\\n' \\\\\\\"\\\"'$?\\\"\\nrm -rf \\\"$check_dir\\\"\\nexit 0'` rejected: rm -f style commands are not permitted. Use a safer approach\")" }

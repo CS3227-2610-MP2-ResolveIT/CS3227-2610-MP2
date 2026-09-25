@@ -1,0 +1,9 @@
+{
+  "revision": "dd46981f354c33991709deaab6884af98ffa477a",
+  "status": [
+    " M src/resolveit/ticket/TechnicianRouter.java"
+  ],
+  "clean": false,
+  "worker_exit_code": 0,
+  "completed_at": "2026-09-25T08:19:59.052106+00:00"
+}

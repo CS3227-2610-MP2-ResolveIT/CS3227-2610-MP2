@@ -1,0 +1,32 @@
+{
+  "skill": "javadoc-writing",
+  "skill_sha256": "587902e9d1b146f4fbc8b94b144825337da039550aded7653b890aa19a2ef761",
+  "test_case": "respect-scope-boundaries",
+  "configuration": "baseline",
+  "trial": 3,
+  "fixture_sha256": "e5dc54390865a4dc33742c625d76ed2c81b229b1a9a8034439f71bebbeb18925",
+  "fixture_revision": "5401d25f1c9f62dcb7bccf28f1e2bf4aac04668e",
+  "workspace_base_revision": "92c6d552b4a79276d09b9116f178926b0c91ee91",
+  "fixture_path": "/Users/junhaong/Documents/y3s1/CS3227/CS3227-2610-MP2/.agents/evals/javadoc-writing/test-cases/respect-scope-boundaries/fixture",
+  "prompt_sha256": "4cc3ce05d0fc3dec7c1ce0e737d136da9bab038f940d99b0d9dbef21e0ddc396",
+  "supporting_skills": [],
+  "supporting_skill_sha256": {},
+  "interactions": [],
+  "worker_turns_planned": 1,
+  "model": "codex-configured-default",
+  "sandbox": "workspace-write",
+  "semantic_grading": false,
+  "semantic_judges": 0,
+  "workspace_git_metadata_removed": true,
+  "initial_git_state": {
+    "revision": "92c6d552b4a79276d09b9116f178926b0c91ee91",
+    "status": [],
+    "clean": true
+  },
+  "started_at": "2026-09-25T08:26:11.980484+00:00",
+  "skill_invocation": "no-skill-baseline",
+  "worker_prompt_sha256": "4cc3ce05d0fc3dec7c1ce0e737d136da9bab038f940d99b0d9dbef21e0ddc396",
+  "worker_turns_completed": 1,
+  "thread_id": null,
+  "completed_at": "2026-09-25T08:26:45.095026+00:00"
+}

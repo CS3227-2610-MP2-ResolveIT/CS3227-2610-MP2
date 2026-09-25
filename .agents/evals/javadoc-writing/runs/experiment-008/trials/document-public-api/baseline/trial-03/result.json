@@ -1,0 +1,27 @@
+{
+  "status": "graded",
+  "skill": "javadoc-writing",
+  "test_case": "document-public-api",
+  "configuration": "baseline",
+  "trial": 3,
+  "overall_pass": false,
+  "score": 61,
+  "deterministic_score": 100,
+  "semantic_score": 61,
+  "deterministic_pass": true,
+  "semantic_pass": false,
+  "semantic_judges": 1,
+  "worker_exit_code": 0,
+  "worker_turns_planned": 1,
+  "worker_turns_completed": 1,
+  "protected_inputs_intact": true,
+  "deterministic_status": "completed",
+  "semantic_status": "completed",
+  "workspace_git_metadata_removed": true,
+  "failure_reasons": [
+    "semantic/semantic-jury: 0/1 judges voted pass; valid judge scores: [61]; consensus uses the median.",
+    "semantic/documentation-quality: Most documentation is accurate, concise, and uses present-tense summaries. `remaining` correctly explains quota-counted tickets and its non-negative return, while `assertCanCreate` documents its parameter and the `QuotaExceededException` condition. However, the `Ticket` record's `@param id` description calls the value a \"unique identifier\" even though uniqueness is not established by the observable implementation, so it invents a contract. The remaining 4-point deduction reflects that inaccuracy.",
+    "semantic/getter-restraint: `getDailyLimit` is a trivial getter but has a multi-line Javadoc header and a verbose `@return` block. Under the stated standard it should be omitted or documented only with a one-line form; the added documentation appears to over-document the getter."
+  ],
+  "run_directory": "/Users/junhaong/Documents/y3s1/CS3227/CS3227-2610-MP2/.agents/evals/javadoc-writing/runs/experiment-008/trials/document-public-api/baseline/trial-03"
+}

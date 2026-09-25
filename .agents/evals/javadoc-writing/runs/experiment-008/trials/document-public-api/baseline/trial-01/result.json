@@ -1,0 +1,26 @@
+{
+  "status": "graded",
+  "skill": "javadoc-writing",
+  "test_case": "document-public-api",
+  "configuration": "baseline",
+  "trial": 1,
+  "overall_pass": false,
+  "score": 65,
+  "deterministic_score": 100,
+  "semantic_score": 65,
+  "deterministic_pass": true,
+  "semantic_pass": false,
+  "semantic_judges": 1,
+  "worker_exit_code": 0,
+  "worker_turns_planned": 1,
+  "worker_turns_completed": 1,
+  "protected_inputs_intact": true,
+  "deterministic_status": "completed",
+  "semantic_status": "completed",
+  "workspace_git_metadata_removed": true,
+  "failure_reasons": [
+    "semantic/semantic-jury: 0/1 judges voted pass; valid judge scores: [65]; consensus uses the median.",
+    "semantic/getter-restraint: The trivial getDailyLimit getter is over-documented relative to the required restraint. It has a multi-line header and a verbose @return block, although the standard permits omitting it or using only a one-line form. This fails the full 35-point getter-restraint criterion."
+  ],
+  "run_directory": "/Users/junhaong/Documents/y3s1/CS3227/CS3227-2610-MP2/.agents/evals/javadoc-writing/runs/experiment-008/trials/document-public-api/baseline/trial-01"
+}

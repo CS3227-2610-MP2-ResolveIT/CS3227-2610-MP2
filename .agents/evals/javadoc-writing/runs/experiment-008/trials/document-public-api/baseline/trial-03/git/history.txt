@@ -1,0 +1,3 @@
+* bec4535 (HEAD -> main) eval: prepare controlled workspace
+* c60bd2a (tag: fixture-target) eval: capture fixture target
+* 898bc76 (tag: fixture-base) eval: create empty fixture base

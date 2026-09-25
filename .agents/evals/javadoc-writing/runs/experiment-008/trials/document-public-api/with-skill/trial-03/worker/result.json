@@ -1,0 +1,38 @@
+{
+  "exit_code": 0,
+  "elapsed_seconds": 79.782,
+  "turns_planned": 1,
+  "turns_completed": 1,
+  "metrics": {
+    "event_count": 30,
+    "parse_errors": 0,
+    "command_count": 10,
+    "failed_command_count": 0,
+    "repeated_command_count": 5,
+    "prohibited_commands": [],
+    "skill_read_observed": true,
+    "input_tokens": 141620,
+    "output_tokens": 3274,
+    "skill_invocation_mode": "implicit-candidate",
+    "worker_elapsed_seconds": 79.782
+  },
+  "final_git_state": {
+    "revision": "7c2fdcb8acd35497e2922386b6c361a9186c3cb9",
+    "status": [
+      " M src/resolveit/ticket/Ticket.java",
+      " M src/resolveit/ticket/TicketQuota.java"
+    ],
+    "clean": false,
+    "worker_exit_code": 0,
+    "completed_at": "2026-09-25T08:19:32.607013+00:00",
+    "protected_inputs_intact": true,
+    "task_prompt_intact": true,
+    "injected_skill_intact": true,
+    "supporting_skills_intact": {}
+  },
+  "protected_inputs_intact": true,
+  "task_prompt_intact": true,
+  "injected_skill_intact": true,
+  "supporting_skills_intact": {},
+  "untracked_files": []
+}

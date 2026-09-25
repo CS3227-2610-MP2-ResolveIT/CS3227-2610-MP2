@@ -1,0 +1,19 @@
+diff --git a/src/resolveit/ticket/TechnicianRouter.java b/src/resolveit/ticket/TechnicianRouter.java
+index 2049cce..f5fd6be 100644
+--- a/src/resolveit/ticket/TechnicianRouter.java
++++ b/src/resolveit/ticket/TechnicianRouter.java
+@@ -6,11 +6,14 @@ import java.util.Map;
+ public final class TechnicianRouter {
+ 
+     public String pickTechnician(List<String> technicians, Map<String, Integer> openCounts) {
++        // Start with no technician selected and the largest possible workload.
+         String chosen = null;
+         int fewest = Integer.MAX_VALUE;
+         for (String technician : technicians) {
++            // Missing workload entries mean that the technician has no open tickets.
+             int load = openCounts.getOrDefault(technician, 0);
+             if (load < fewest) {
++                // Keep the first technician found with the smallest workload.
+                 fewest = load;
+                 chosen = technician;
+             }

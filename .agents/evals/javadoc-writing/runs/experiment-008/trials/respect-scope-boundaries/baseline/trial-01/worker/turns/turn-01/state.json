@@ -1,0 +1,9 @@
+{
+  "revision": "ae4ad5d2595ba12a65baf5550d90db5cfdbccf6b",
+  "status": [
+    " M src/resolveit/access/AccessPolicy.java"
+  ],
+  "clean": false,
+  "worker_exit_code": 0,
+  "completed_at": "2026-09-25T08:25:45.477563+00:00"
+}

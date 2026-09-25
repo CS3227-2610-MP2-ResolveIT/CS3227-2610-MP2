@@ -1,0 +1,55 @@
+{
+  "status": "completed",
+  "result": {
+    "overall_pass": true,
+    "score": 100,
+    "checks": [
+      {
+        "id": "semantic-jury",
+        "pass": true,
+        "points": 100,
+        "notes": "1/1 judges voted pass; valid judge scores: [100]; consensus uses the median."
+      }
+    ],
+    "limitations": [
+      "The fixture has no Gradle wrapper or build module, so the requested Gradle javadoc and compile tasks could not be run. Worker evidence shows equivalent direct javadoc and javac checks completed successfully; direct javadoc reported only pre-existing warnings for QuotaExceededException and the intentionally undocumented trivial getter."
+    ]
+  },
+  "errors": [],
+  "quorum": 1,
+  "judges": [
+    {
+      "judge": 1,
+      "status": "completed",
+      "exit_code": 0,
+      "result": {
+        "overall_pass": true,
+        "score": 100,
+        "checks": [
+          {
+            "id": "documentation-quality",
+            "pass": true,
+            "points": 40,
+            "notes": "TicketQuota and Ticket have accurate class headers with concise present-tense summaries. The constructor documents its parameter; remaining explains the quota-slot result and documents its return value; assertCanCreate explains the operation and meaningfully documents both its parameter and the QuotaExceededException condition. The descriptions reflect observable behavior without invented contracts or implementation details. No deduction."
+          },
+          {
+            "id": "getter-restraint",
+            "pass": true,
+            "points": 35,
+            "notes": "getDailyLimit is intentionally left undocumented. This is conformant with the stated standard for trivial getters and avoids the prohibited verbose multi-line return documentation. No deduction."
+          },
+          {
+            "id": "standard-conformant-structure-and-scope",
+            "pass": true,
+            "points": 25,
+            "notes": "The TicketQuota and Ticket public types are documented, and all non-getter public methods in the requested ticket API are documented. The record components of Ticket also have appropriate parameter documentation. Git evidence shows only src/resolveit/ticket/Ticket.java and src/resolveit/ticket/TicketQuota.java changed; no public signature was modified. No deduction."
+          }
+        ],
+        "limitations": [
+          "The fixture has no Gradle wrapper or build module, so the requested Gradle javadoc and compile tasks could not be run. Worker evidence shows equivalent direct javadoc and javac checks completed successfully; direct javadoc reported only pre-existing warnings for QuotaExceededException and the intentionally undocumented trivial getter."
+        ]
+      },
+      "errors": []
+    }
+  ]
+}

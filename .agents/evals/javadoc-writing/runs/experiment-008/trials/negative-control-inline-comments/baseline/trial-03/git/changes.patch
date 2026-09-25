@@ -1,0 +1,20 @@
+diff --git a/src/resolveit/ticket/TechnicianRouter.java b/src/resolveit/ticket/TechnicianRouter.java
+index 2049cce..1f60beb 100644
+--- a/src/resolveit/ticket/TechnicianRouter.java
++++ b/src/resolveit/ticket/TechnicianRouter.java
+@@ -9,12 +9,15 @@ public final class TechnicianRouter {
+         String chosen = null;
+         int fewest = Integer.MAX_VALUE;
+         for (String technician : technicians) {
++            // Treat technicians without an entry as having no open tickets.
+             int load = openCounts.getOrDefault(technician, 0);
++            // Keep the first technician seen at the lowest load.
+             if (load < fewest) {
+                 fewest = load;
+                 chosen = technician;
+             }
+         }
++        // Return null when the list is empty; otherwise return the least-loaded technician.
+         return chosen;
+     }
+ }

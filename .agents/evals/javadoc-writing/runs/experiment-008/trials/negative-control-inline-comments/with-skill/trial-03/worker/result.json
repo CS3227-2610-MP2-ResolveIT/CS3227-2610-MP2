@@ -1,0 +1,37 @@
+{
+  "exit_code": 0,
+  "elapsed_seconds": 27.568,
+  "turns_planned": 1,
+  "turns_completed": 1,
+  "metrics": {
+    "event_count": 14,
+    "parse_errors": 0,
+    "command_count": 4,
+    "failed_command_count": 0,
+    "repeated_command_count": 2,
+    "prohibited_commands": [],
+    "skill_read_observed": false,
+    "input_tokens": 58639,
+    "output_tokens": 762,
+    "skill_invocation_mode": "implicit-candidate",
+    "worker_elapsed_seconds": 27.568
+  },
+  "final_git_state": {
+    "revision": "7f94cd8947bc347a02662f65fcc68ac4f7d6c374",
+    "status": [
+      " M src/resolveit/ticket/TechnicianRouter.java"
+    ],
+    "clean": false,
+    "worker_exit_code": 0,
+    "completed_at": "2026-09-25T08:22:32.918734+00:00",
+    "protected_inputs_intact": true,
+    "task_prompt_intact": true,
+    "injected_skill_intact": true,
+    "supporting_skills_intact": {}
+  },
+  "protected_inputs_intact": true,
+  "task_prompt_intact": true,
+  "injected_skill_intact": true,
+  "supporting_skills_intact": {},
+  "untracked_files": []
+}

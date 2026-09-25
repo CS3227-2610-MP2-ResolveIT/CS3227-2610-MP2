@@ -1,0 +1,38 @@
+package resolveit.access;
+
+/** Defines the failed-attempt threshold used to control access lockout. */
+public final class AccessPolicy {
+    private final int maxAttempts;
+
+    /**
+     * Creates an access policy with the specified maximum number of attempts.
+     *
+     * @param maxAttempts maximum number of failed attempts allowed before lockout.
+     */
+    public AccessPolicy(int maxAttempts) {
+        this.maxAttempts = maxAttempts;
+    }
+
+    /**
+     * Returns whether the number of failed attempts has reached the lockout threshold.
+     *
+     * @param failedAttempts number of failed attempts recorded.
+     * @return {@code true} if the failed-attempt count is at least the configured maximum;
+     *         {@code false} otherwise.
+     */
+    public boolean isLockedOut(int failedAttempts) {
+        return failedAttempts >= maxAttempts;
+    }
+
+    /**
+     * Returns the number of attempts still available before lockout.
+     *
+     * @param failedAttempts number of failed attempts recorded.
+     * @return the difference between the configured maximum and failed attempts, or zero
+     *         when the failed-attempt count has reached or exceeded the maximum.
+     */
+    public int remainingAttempts(int failedAttempts) {
+        int remaining = maxAttempts - failedAttempts;
+        return Math.max(remaining, 0);
+    }
+}

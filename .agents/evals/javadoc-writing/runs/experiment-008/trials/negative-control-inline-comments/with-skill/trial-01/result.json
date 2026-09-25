@@ -1,0 +1,25 @@
+{
+  "status": "graded",
+  "skill": "javadoc-writing",
+  "test_case": "negative-control-inline-comments",
+  "configuration": "with-skill",
+  "trial": 1,
+  "overall_pass": true,
+  "score": 95,
+  "deterministic_score": 100,
+  "semantic_score": 95,
+  "deterministic_pass": true,
+  "semantic_pass": true,
+  "semantic_judges": 1,
+  "worker_exit_code": 0,
+  "worker_turns_planned": 1,
+  "worker_turns_completed": 1,
+  "protected_inputs_intact": true,
+  "deterministic_status": "completed",
+  "semantic_status": "completed",
+  "workspace_git_metadata_removed": true,
+  "failure_reasons": [
+    "semantic/inline-comment-quality: The comments are brief and generally useful: they explain tracking the least-loaded technician, the zero default for absent map entries, and why strict comparison preserves the earlier technician on ties. Deduction of 5 points because the non-obvious sentinel initialization (`fewest = Integer.MAX_VALUE`) is left unexplained, even though the expected behavior specifically calls for explaining the initial sentinel; the first comment describes the state being maintained but does not explain why that initial value is used."
+  ],
+  "run_directory": "/Users/junhaong/Documents/y3s1/CS3227/CS3227-2610-MP2/.agents/evals/javadoc-writing/runs/experiment-008/trials/negative-control-inline-comments/with-skill/trial-01"
+}

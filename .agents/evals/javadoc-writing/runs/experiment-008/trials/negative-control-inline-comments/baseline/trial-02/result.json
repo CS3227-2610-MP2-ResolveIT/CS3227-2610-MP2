@@ -1,0 +1,25 @@
+{
+  "status": "graded",
+  "skill": "javadoc-writing",
+  "test_case": "negative-control-inline-comments",
+  "configuration": "baseline",
+  "trial": 2,
+  "overall_pass": true,
+  "score": 93,
+  "deterministic_score": 100,
+  "semantic_score": 93,
+  "deterministic_pass": true,
+  "semantic_pass": true,
+  "semantic_judges": 1,
+  "worker_exit_code": 0,
+  "worker_turns_planned": 1,
+  "worker_turns_completed": 1,
+  "protected_inputs_intact": true,
+  "deterministic_status": "completed",
+  "semantic_status": "completed",
+  "workspace_git_metadata_removed": true,
+  "failure_reasons": [
+    "semantic/inline-comment-quality: The comments are brief and generally useful: they explain retaining the least-loaded technician, treating absent map entries as zero open tickets, and preserving the first technician on a tie. However, the requested non-obvious initial sentinel step is not explicitly explained: the initialization of fewest to Integer.MAX_VALUE has no comment stating why that sentinel allows the first technician/load to be selected. This is a minor completeness deduction, and the comments otherwise use appropriate WHAT/WHY-oriented explanations rather than line-by-line restatement."
+  ],
+  "run_directory": "/Users/junhaong/Documents/y3s1/CS3227/CS3227-2610-MP2/.agents/evals/javadoc-writing/runs/experiment-008/trials/negative-control-inline-comments/baseline/trial-02"
+}

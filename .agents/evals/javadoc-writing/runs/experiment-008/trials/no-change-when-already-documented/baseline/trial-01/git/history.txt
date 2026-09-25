@@ -1,0 +1,3 @@
+* 949496f (HEAD -> main) eval: prepare controlled workspace
+* 8fb21f1 (tag: fixture-target) eval: capture fixture target
+* 41f6a23 (tag: fixture-base) eval: create empty fixture base

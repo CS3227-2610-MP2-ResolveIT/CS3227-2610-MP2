@@ -1,0 +1,12 @@
+2026-09-25T08:27:20.709875Z ERROR codex_core::tools::router: error=exec_command failed for `/bin/zsh -lc "set -o pipefail
+printf '%s\\n' '--- diff check ---'
+git diff --check
+printf '%s\\n' '--- diff ---'
+git diff -- src/resolveit/access/AccessPolicy.java
+printf '%s\\n' '--- javadoc ---'
+rm -rf /tmp/access-policy-javadoc /tmp/access-policy-classes
+javadoc -quiet -d /tmp/access-policy-javadoc src/resolveit/access/AccessPolicy.java
+printf '%s\\n' '--- javac ---'
+javac -d /tmp/access-policy-classes src/resolveit/access/AccessPolicy.java
+printf '%s\\n' '--- status ---'
+git status --short"`: CreateProcess { message: "Rejected(\"`/bin/zsh -lc \\\"set -o pipefail\\nprintf '%s\\\\\\\\n' '--- diff check ---'\\ngit diff --check\\nprintf '%s\\\\\\\\n' '--- diff ---'\\ngit diff -- src/resolveit/access/AccessPolicy.java\\nprintf '%s\\\\\\\\n' '--- javadoc ---'\\nrm -rf /tmp/access-policy-javadoc /tmp/access-policy-classes\\njavadoc -quiet -d /tmp/access-policy-javadoc src/resolveit/access/AccessPolicy.java\\nprintf '%s\\\\\\\\n' '--- javac ---'\\njavac -d /tmp/access-policy-classes src/resolveit/access/AccessPolicy.java\\nprintf '%s\\\\\\\\n' '--- status ---'\\ngit status --short\\\"` rejected: rm -f style commands are not permitted. Use a safer approach\")" }
