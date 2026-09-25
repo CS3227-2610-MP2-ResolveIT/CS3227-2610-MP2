@@ -12,6 +12,10 @@ Before logging:
 - Read `AGENTS.md`, `requirements/PROJECT.md`, and `requirements/MP2-requirements.md` for every session in this repository. These documents explain the ResolveIT requirements and why these logs exist: to support reflection on basic Agentic SE and at least three explained skills in `docs/Reflections.md`.
 - Inspect existing files in `logs/` and follow their naming conventions.
 - Do not overwrite an existing log without inspecting it first.
+- For evaluation sessions, read and cite the run's `report.md`,
+  `experiment.json`, `result.json`, and trace under `.agents/evals/<skill>/runs/...`.
+  Do not state grader results, approval gates, or guardrail behaviour the
+  artefacts or conversation do not support.
 
 ## Ordering
 
@@ -78,6 +82,25 @@ Human verification: pending
 - Prompting versus manual work, when relevant:
 - What to do differently next time:
 ```
+
+## Evaluation evidence (evaluation sessions only)
+
+For a skill/workflow evaluation, add `## Evaluation evidence` after
+`## Work and verification`. Omit inapplicable items; do not write "N/A".
+
+Required:
+
+- Skill and fixture/test-case path.
+- Grader results, citing the artefact: deterministic and semantic.
+- Agent verification versus human verification.
+- Limitations: trial count, missing baseline, environment blocks.
+
+If present:
+
+- Grader–judge disagreement and any oracle/grader correction (commit).
+- Trace: command and exit status; changed files versus allowed scope;
+  stop/escalation on a missing or ambiguous target.
+- Approval gates or human redirections.
 
 ## Evidence and approval
 
