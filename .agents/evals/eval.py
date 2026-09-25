@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import sys
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 
 
@@ -23,6 +24,7 @@ from harness import (  # noqa: E402
     discover_skills,
     next_experiment_id,
     now,
+    regrade_with_semantic,
     run_trial,
     validate_grade_schema,
     write_json,
@@ -74,6 +76,11 @@ def parse_args() -> argparse.Namespace:
         "--no-semantic-judges",
         action="store_true",
         help="run workers and check.py without semantic-judge calls",
+    )
+    run_parser.add_argument(
+        "--parallel",
+        action="store_true",
+        help="run all workers first, then batch semantic judges in parallel",
     )
     return parser.parse_args()
 
@@ -390,7 +397,14 @@ def run_evaluation(args: argparse.Namespace, skills: dict[str, Path]) -> int:
 
     current = 0
     results = []
+    pending_semantic = []
     try:
+        if args.parallel:
+            print(
+                f"\n########## Phase 1: {worker_trials} worker(s) + deterministic "
+                f"grading (sequential) ##########",
+                flush=True,
+            )
         for case in selected:
             for configuration in configurations:
                 for trial in range(1, args.trials + 1):
@@ -414,17 +428,51 @@ def run_evaluation(args: argparse.Namespace, skills: dict[str, Path]) -> int:
                         trial=trial,
                         run_dir=run_dir,
                         schema=SCHEMA,
-                        semantic_enabled=semantic_enabled,
+                        semantic_enabled=semantic_enabled and not args.parallel,
                         semantic_judges=args.judges,
                         timeout=DEFAULT_TIMEOUT_SECONDS,
                         model=None,
+                        semantic_deferred=(
+                            args.parallel
+                            and semantic_enabled
+                            and case.expected is not None
+                        ),
                     )
                     results.append(result)
+                    if args.parallel and semantic_enabled and case.expected is not None:
+                        pending_semantic.append((case, run_dir, len(results) - 1))
                     print(
                         f"      result: score={result['score']} "
                         f"pass={result['overall_pass']}",
                         flush=True,
                     )
+        if pending_semantic:
+            print(
+                f"\n########## Phase 2: {len(pending_semantic)} semantic judge(s) "
+                f"(parallel) ##########",
+                flush=True,
+            )
+            max_parallel = min(len(pending_semantic), 8)
+            with ThreadPoolExecutor(max_workers=max_parallel) as executor:
+                futures = {
+                    executor.submit(
+                        regrade_with_semantic,
+                        case=case,
+                        run_dir=run_dir,
+                        schema=SCHEMA,
+                        timeout=DEFAULT_TIMEOUT_SECONDS,
+                        model=None,
+                        judge_count=args.judges,
+                    ): index
+                    for case, run_dir, index in pending_semantic
+                }
+                for future in as_completed(futures):
+                    results[futures[future]] = future.result()
+        if args.parallel:
+            print(
+                "\n########## Phase 3: writing report ##########",
+                flush=True,
+            )
     except KeyboardInterrupt:
         experiment["status"] = "interrupted"
         experiment["completed_at"] = now()
