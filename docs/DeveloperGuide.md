@@ -619,21 +619,24 @@ sequenceDiagram
 
     User->>Client: Sign in
     Client->>API: POST /auth/login (email, password)
-    API->>DB: Verify active user and password; store refresh hash
+    API->>DB: Verify active user and password and store refresh hash
     API-->>Client: Access token, refresh token, lifetimes, user
     Client->>Session: Start in-memory session
 
     User->>Client: Perform protected action
     Client->>Session: Read credentials and expiry
+
     opt Access token expires within 30 seconds
         Client->>API: POST /auth/refresh (refresh token)
         API->>DB: Validate and atomically rotate refresh credential
         API-->>Client: Replacement token pair and lifetimes
         Client->>Session: Replace credentials
     end
+
     Client->>API: Protected request with Bearer access token
     API->>DB: Check active account, current role, and operation rules
     API-->>Client: Result or error
+
     opt First protected attempt returns 401
         Client->>API: POST /auth/refresh (current refresh token)
         API->>DB: Validate and rotate refresh credential
@@ -644,7 +647,7 @@ sequenceDiagram
     end
 
     User->>Client: Sign out
-    Note over Client,API: Obtain a valid session first; refresh if near expiry
+    Note over Client,API: Obtain a valid session first and refresh if near expiry
     Client->>API: POST /auth/logout (refresh token), with Bearer token
     API->>DB: Revoke presented token only for authenticated owner
     API-->>Client: 204 No Content
