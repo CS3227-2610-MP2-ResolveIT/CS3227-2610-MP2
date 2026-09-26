@@ -142,6 +142,7 @@ public final class TechnicianTicketDetailController {
     @FXML private void showQueue() { queueHandler.run(); }
     @FXML private void refreshDetails() { if (ticketId != null) { loadDetails(ticketId, null); } }
 
+    /** Loads a ticket and its visible messages for the detail view. */
     private void loadDetails(int id, String notice) {
         if (loading || actionLoading || disposed) { return; }
         loading = true;
@@ -219,6 +220,7 @@ public final class TechnicianTicketDetailController {
     }
 
     @FXML
+    /** Validates and submits the resolution note for the selected ticket. */
     private void resolveTicket() {
         if (selectedTicket == null || actionLoading) {
             return;
@@ -293,6 +295,7 @@ public final class TechnicianTicketDetailController {
     }
 
     @FXML
+    /** Assigns the selected ticket to the chosen active support user. */
     private void assignTicket() {
         if (selectedTicket == null || actionLoading || assigneeField.getValue() == null) {
             return;
@@ -300,6 +303,7 @@ public final class TechnicianTicketDetailController {
         mutate(managerService.assign(selectedTicket.id(), assigneeField.getValue().id()), "Assignment updated.");
     }
 
+    /** Runs a ticket mutation and refreshes the detail state afterward. */
     private void mutate(CompletionStage<Ticket> operation, String notice) {
         if (selectedTicket == null || actionLoading) {
             return;
@@ -326,6 +330,7 @@ public final class TechnicianTicketDetailController {
         });
     }
 
+    /** Renders ticket state and derives the role-sensitive available actions. */
     private void render(Ticket ticket) {
         renderer.render(ticket, session.current().orElseThrow().user().id(), isManager(),
                 TechnicianTicketDetailController::formatDate,
@@ -336,6 +341,7 @@ public final class TechnicianTicketDetailController {
                         resolutionErrorLabel));
     }
 
+    /** Disables mutation controls while an asynchronous operation is active. */
     private void updateBusyState() {
         var busy = loading || actionLoading;
         detailContent.setDisable(busy || stale);
@@ -386,6 +392,7 @@ public final class TechnicianTicketDetailController {
         return alert.showAndWait().filter(confirmButton::equals).isPresent();
     }
 
+    /** Maps a failed request to safe detail-view feedback and recovery behavior. */
     private boolean showFailure(Label target, Throwable problem) {
         var cause = unwrap(problem);
         if (cause instanceof TicketFailure failure) {

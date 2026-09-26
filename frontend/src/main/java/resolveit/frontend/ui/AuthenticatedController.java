@@ -300,6 +300,7 @@ public final class AuthenticatedController implements ViewLifecycle {
         loadDetails(ticketId, null);
     }
 
+    /** Loads ticket details and messages, ignoring results from a disposed view. */
     private void loadDetails(int ticketId, String noticeAfterLoad) {
         if (detailLoading || actionLoading || disposed) {
             return;
@@ -385,6 +386,7 @@ public final class AuthenticatedController implements ViewLifecycle {
     }
 
     @FXML
+    /** Validates and submits the employee's permitted ticket edits. */
     private void saveEdit() {
         if (selectedTicket == null || actionLoading) {
             return;
@@ -463,6 +465,7 @@ public final class AuthenticatedController implements ViewLifecycle {
         });
     }
 
+    /** Runs a ticket mutation and reloads the detail view after completion. */
     private void mutateTicket(java.util.concurrent.CompletionStage<Ticket> operation) {
         actionLoading = true;
         detailErrorLabel.setText("");
@@ -484,6 +487,7 @@ public final class AuthenticatedController implements ViewLifecycle {
         });
     }
 
+    /** Renders the current ticket and derives the requester action availability. */
     private void renderTicket(Ticket ticket) {
         detailNumberLabel.setText(ticket.ticketNumber());
         detailStatusLabel.setText(ticket.status().displayName());
@@ -519,6 +523,7 @@ public final class AuthenticatedController implements ViewLifecycle {
         editButton.setDisable(editing || actionLoading);
     }
 
+    /** Keeps controls disabled while an asynchronous operation is active. */
     private void updateBusyState() {
         ticketsProgress.setVisible(listLoading);
         ticketsProgress.setManaged(listLoading);
@@ -540,6 +545,7 @@ public final class AuthenticatedController implements ViewLifecycle {
         commentField.setDisable(actionLoading);
     }
 
+    /** Refreshes the list without replacing the currently displayed ticket detail. */
     private void refreshTicketsInBackground() {
         if (!listLoading) {
             refreshTickets();
@@ -626,6 +632,7 @@ public final class AuthenticatedController implements ViewLifecycle {
         return alert.showAndWait().filter(ButtonType.OK::equals).isPresent();
     }
 
+    /** Delivers an asynchronous result on the JavaFX thread when the view is alive. */
     private <T> void run(java.util.concurrent.CompletionStage<T> operation,
                          Consumer<T> success, Consumer<Throwable> failure) {
         operations.run(operation, () -> disposed, success, failure);
@@ -635,6 +642,7 @@ public final class AuthenticatedController implements ViewLifecycle {
         operations.track(future);
     }
 
+    /** Maps a failed request to safe, user-facing feedback. */
     private void showFailure(Label target, Throwable problem) {
         var cause = unwrap(problem);
         if (cause instanceof TicketFailure ticketFailure) {
@@ -705,6 +713,7 @@ public final class AuthenticatedController implements ViewLifecycle {
     }
 
     @FXML
+    /** Signs out, clears the session, and returns to the login view. */
     private void logout() {
         if (logoutButton.isDisabled()) {
             return;

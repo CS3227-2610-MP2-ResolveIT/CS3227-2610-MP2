@@ -140,6 +140,7 @@ public final class TechnicianQueueController {
     }
 
     @FXML
+    /** Loads the selected queue page and ignores late results after disposal. */
     private void refreshQueue() {
         if (loading || disposed) {
             return;
@@ -238,6 +239,7 @@ public final class TechnicianQueueController {
         updatedColumn.setCellFactory(ignored -> tooltipCell());
     }
 
+    /** Connects queue controls to navigation and refresh behavior. */
     private void configureInteraction() {
         ticketsTable.widthProperty().addListener((ignored, oldWidth, newWidth) ->
                 resizeColumns(newWidth.doubleValue()));
@@ -249,6 +251,7 @@ public final class TechnicianQueueController {
         });
     }
 
+    /** Disables queue actions while a request is in flight. */
     private void updateBusyState() {
         ticketsTable.setDisable(detailBusy || loading || stale);
         queueProgress.setVisible(loading);

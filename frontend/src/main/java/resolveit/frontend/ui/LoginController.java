@@ -98,6 +98,7 @@ public final class LoginController implements ViewLifecycle {
     }
 
     @FXML
+    /** Validates credentials and starts the asynchronous login request. */
     private void submitLogin() {
         if (loading.get()) {
             return;
@@ -125,6 +126,7 @@ public final class LoginController implements ViewLifecycle {
         inFlight.whenComplete((response, failure) -> Platform.runLater(() -> completeLogin(failure)));
     }
 
+    /** Completes login feedback or navigates after a successful authentication. */
     private void completeLogin(Throwable failure) {
         if (disposed) {
             return;

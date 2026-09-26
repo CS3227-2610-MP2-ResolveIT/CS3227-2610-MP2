@@ -31,9 +31,37 @@ public final class EmployeeTicketService {
     public CompletionStage<PageResponse<Ticket>> list(TicketStatus status, int page) {
         return client.list(status, page, 20);
     }
+    /**
+     * Loads one ticket visible to the employee.
+     *
+     * @param id ticket identifier
+     * @return a stage completing with the ticket details
+     */
     public CompletionStage<Ticket> get(int id) { return client.get(id); }
+
+    /**
+     * Creates a ticket owned by the current employee.
+     *
+     * @param request ticket fields to submit
+     * @return a stage completing with the created ticket
+     */
     public CompletionStage<Ticket> create(CreateTicket request) { return client.create(request); }
+
+    /**
+     * Updates permitted fields of an employee-owned ticket.
+     *
+     * @param id ticket identifier
+     * @param request fields and version expected by the update
+     * @return a stage completing with the updated ticket
+     */
     public CompletionStage<Ticket> update(int id, UpdateTicket request) { return client.update(id, request); }
+
+    /**
+     * Loads the messages visible to the employee for a ticket.
+     *
+     * @param id ticket identifier
+     * @return a stage completing with the visible messages
+     */
     public CompletionStage<PageResponse<TicketMessage>> messages(int id) { return client.messages(id); }
 
     /**
@@ -46,6 +74,19 @@ public final class EmployeeTicketService {
     public CompletionStage<TicketMessage> addComment(int id, String message) {
         return client.addComment(id, new CreateMessage("PUBLIC_COMMENT", message.trim()));
     }
+    /**
+     * Cancels an eligible ticket owned by the employee.
+     *
+     * @param id ticket identifier
+     * @return a stage completing with the cancelled ticket
+     */
     public CompletionStage<Ticket> cancel(int id) { return client.cancel(id); }
+
+    /**
+     * Reopens a resolved ticket owned by the employee.
+     *
+     * @param id ticket identifier
+     * @return a stage completing with the reopened ticket
+     */
     public CompletionStage<Ticket> reopen(int id) { return client.reopen(id); }
 }

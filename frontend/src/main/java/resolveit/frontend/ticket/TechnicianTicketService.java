@@ -39,8 +39,28 @@ public final class TechnicianTicketService {
                 assignment == AssignmentFilter.UNASSIGNED ? true : null, page, 20);
     }
 
+    /**
+     * Loads one ticket visible to the technician or manager.
+     *
+     * @param id ticket identifier
+     * @return a stage completing with the ticket details
+     */
     public CompletionStage<Ticket> get(int id) { return client.get(id); }
+
+    /**
+     * Loads messages visible to the technician or manager for a ticket.
+     *
+     * @param id ticket identifier
+     * @return a stage completing with the visible messages
+     */
     public CompletionStage<PageResponse<TicketMessage>> messages(int id) { return client.messages(id); }
+
+    /**
+     * Atomically takes an unassigned open ticket for the current support user.
+     *
+     * @param id ticket identifier
+     * @return a stage completing with the assigned ticket
+     */
     public CompletionStage<Ticket> take(int id) { return client.take(id); }
 
     /**
@@ -52,6 +72,13 @@ public final class TechnicianTicketService {
     public CompletionStage<Ticket> beginWork(int id) {
         return client.changeStatus(id, new ChangeStatus(TicketStatus.IN_PROGRESS));
     }
+    /**
+     * Changes a ticket's priority through the support API.
+     *
+     * @param id ticket identifier
+     * @param priority new priority
+     * @return a stage completing with the updated ticket
+     */
     public CompletionStage<Ticket> changePriority(int id, TicketPriority priority) {
         return client.changePriority(id, new ChangePriority(priority));
     }
@@ -78,7 +105,20 @@ public final class TechnicianTicketService {
     public CompletionStage<Ticket> resolve(int id, String resolutionNote) {
         return client.resolve(id, new ResolveTicket(resolutionNote.trim()));
     }
+    /**
+     * Cancels an eligible ticket as a manager or permitted requester.
+     *
+     * @param id ticket identifier
+     * @return a stage completing with the cancelled ticket
+     */
     public CompletionStage<Ticket> cancel(int id) { return client.cancel(id); }
+
+    /**
+     * Reopens a resolved ticket.
+     *
+     * @param id ticket identifier
+     * @return a stage completing with the reopened ticket
+     */
     public CompletionStage<Ticket> reopen(int id) { return client.reopen(id); }
 
     /** Assignment scope offered in the technician queue filter. */
