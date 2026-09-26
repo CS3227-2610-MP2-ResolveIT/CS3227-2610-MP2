@@ -139,6 +139,92 @@ class TicketApiIntegrationTest {
     }
 
     @Test
+    void employeeCanCancelOwnOpenTicketButOtherEmployeeCannot() throws Exception {
+        var employeeToken = login("employee@test.local");
+        var id = createTicket(employeeToken);
+
+        mvc.perform(post("/api/v1/tickets/{id}/cancel", id)
+                        .header("Authorization", bearer(login("other@test.local"))))
+                .andExpect(status().isNotFound());
+
+        mvc.perform(post("/api/v1/tickets/{id}/cancel", id)
+                        .header("Authorization", bearer(employeeToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("CANCELLED"));
+    }
+
+    @Test
+    void employeeCanCancelOwnInProgressTicket() throws Exception {
+        var employeeToken = login("employee@test.local");
+        var id = createTicket(employeeToken);
+        var technicianToken = login("technician@test.local");
+
+        mvc.perform(post("/api/v1/tickets/{id}/take", id)
+                        .header("Authorization", bearer(technicianToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("IN_PROGRESS"));
+
+        mvc.perform(post("/api/v1/tickets/{id}/cancel", id)
+                        .header("Authorization", bearer(employeeToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("CANCELLED"));
+    }
+
+    @Test
+    void managerCanCancelOpenOrInProgressTicket() throws Exception {
+        var managerToken = login("manager@test.local");
+        var openTicketId = createTicket(login("employee@test.local"));
+
+        mvc.perform(post("/api/v1/tickets/{id}/cancel", openTicketId)
+                        .header("Authorization", bearer(managerToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("CANCELLED"));
+
+        var inProgressTicketId = createTicket(login("other@test.local"));
+        mvc.perform(post("/api/v1/tickets/{id}/take", inProgressTicketId)
+                        .header("Authorization", bearer(login("technician@test.local"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("IN_PROGRESS"));
+
+        mvc.perform(post("/api/v1/tickets/{id}/cancel", inProgressTicketId)
+                        .header("Authorization", bearer(managerToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("CANCELLED"));
+    }
+
+    @Test
+    void cancellationIsRejectedForResolvedOrAlreadyCancelledTicket() throws Exception {
+        var employeeToken = login("employee@test.local");
+        var resolvedTicketId = createTicket(employeeToken);
+        var technicianToken = login("technician@test.local");
+
+        mvc.perform(post("/api/v1/tickets/{id}/take", resolvedTicketId)
+                        .header("Authorization", bearer(technicianToken)))
+                .andExpect(status().isOk());
+        mvc.perform(post("/api/v1/tickets/{id}/resolve", resolvedTicketId)
+                        .header("Authorization", bearer(technicianToken))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"resolutionNote\":\"Issue resolved.\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("RESOLVED"));
+
+        mvc.perform(post("/api/v1/tickets/{id}/cancel", resolvedTicketId)
+                        .header("Authorization", bearer(employeeToken)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("INVALID_STATUS_TRANSITION"));
+
+        var cancelledTicketId = createTicket(employeeToken);
+        mvc.perform(post("/api/v1/tickets/{id}/cancel", cancelledTicketId)
+                        .header("Authorization", bearer(employeeToken)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("CANCELLED"));
+        mvc.perform(post("/api/v1/tickets/{id}/cancel", cancelledTicketId)
+                        .header("Authorization", bearer(employeeToken)))
+                .andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("INVALID_STATUS_TRANSITION"));
+    }
+
+    @Test
     void onlyAssignedTechnicianOrManagerCanBeginWork() throws Exception {
         var id = createTicket(login("employee@test.local"));
         var managerToken = login("manager@test.local");
