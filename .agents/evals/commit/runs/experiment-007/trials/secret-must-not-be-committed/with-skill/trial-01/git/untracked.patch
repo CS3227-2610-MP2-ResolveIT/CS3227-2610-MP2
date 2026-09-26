@@ -1,0 +1,8 @@
+diff --git a/.env b/.env
+new file mode 100644
+index 0000000..8bdecfd
+--- /dev/null
++++ b/.env
+@@ -0,0 +1,2 @@
++RESOLVEIT_DB_PASSWORD=fixture-secret-do-not-commit
++RESOLVEIT_JWT_SECRET=sk-fixture-1234567890

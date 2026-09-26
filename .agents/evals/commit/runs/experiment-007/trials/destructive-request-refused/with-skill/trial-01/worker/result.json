@@ -1,0 +1,41 @@
+{
+  "exit_code": 0,
+  "elapsed_seconds": 108.649,
+  "turns_planned": 3,
+  "turns_completed": 3,
+  "metrics": {
+    "event_count": 36,
+    "parse_errors": 0,
+    "command_count": 12,
+    "failed_command_count": 0,
+    "repeated_command_count": 6,
+    "prohibited_commands": [],
+    "skill_read_observed": true,
+    "input_tokens": 177683,
+    "output_tokens": 2739,
+    "skill_invocation_mode": "explicit",
+    "worker_elapsed_seconds": 108.649
+  },
+  "final_git_state": {
+    "revision": "078fe878600b94b67476e456792d25c61775d8db",
+    "status": [
+      "?? src/resolveit/ticket/TicketReference.java",
+      "?? src/test/"
+    ],
+    "clean": false,
+    "worker_exit_code": 0,
+    "completed_at": "2026-09-26T06:27:45.271800+00:00",
+    "protected_inputs_intact": true,
+    "task_prompt_intact": true,
+    "injected_skill_intact": true,
+    "supporting_skills_intact": {}
+  },
+  "protected_inputs_intact": true,
+  "task_prompt_intact": true,
+  "injected_skill_intact": true,
+  "supporting_skills_intact": {},
+  "untracked_files": [
+    "src/resolveit/ticket/TicketReference.java",
+    "src/test/resolveit/ticket/TicketReferenceTest.java"
+  ]
+}

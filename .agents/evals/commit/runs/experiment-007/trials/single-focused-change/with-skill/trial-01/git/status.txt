@@ -1,0 +1,3 @@
+ M docs/UserGuide.md
+?? src/resolveit/ticket/PriorityBadge.java
+?? src/test/resolveit/ticket/PriorityBadgeTest.java

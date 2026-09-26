@@ -1,0 +1,51 @@
+diff --git a/notes/todo.txt b/notes/todo.txt
+new file mode 100644
+index 0000000..304eec9
+--- /dev/null
++++ b/notes/todo.txt
+@@ -0,0 +1 @@
++Personal note: reconsider local editor shortcuts.
+diff --git a/scripts/check-source.sh b/scripts/check-source.sh
+new file mode 100755
+index 0000000..31596de
+--- /dev/null
++++ b/scripts/check-source.sh
+@@ -0,0 +1,7 @@
++#!/usr/bin/env bash
++set -euo pipefail
++
++if grep -R $'\t' src --include='*.java'; then
++  echo "Java sources contain tab characters" >&2
++  exit 1
++fi
+diff --git a/src/resolveit/ticket/TicketSummary.java b/src/resolveit/ticket/TicketSummary.java
+new file mode 100644
+index 0000000..44201c8
+--- /dev/null
++++ b/src/resolveit/ticket/TicketSummary.java
+@@ -0,0 +1,9 @@
++package resolveit.ticket;
++
++public final class TicketSummary {
++    private TicketSummary() {}
++
++    public static String format(String subject, String priority) {
++        return "[" + priority + "] " + subject;
++    }
++}
+diff --git a/src/test/resolveit/ticket/TicketSummaryTest.java b/src/test/resolveit/ticket/TicketSummaryTest.java
+new file mode 100644
+index 0000000..7ebc2f2
+--- /dev/null
++++ b/src/test/resolveit/ticket/TicketSummaryTest.java
+@@ -0,0 +1,10 @@
++package resolveit.ticket;
++
++public final class TicketSummaryTest {
++    public static void main(String[] args) {
++        String actual = TicketSummary.format("VPN unavailable", "HIGH");
++        if (!"[HIGH] VPN unavailable".equals(actual)) {
++            throw new AssertionError("Unexpected summary: " + actual);
++        }
++    }
++}

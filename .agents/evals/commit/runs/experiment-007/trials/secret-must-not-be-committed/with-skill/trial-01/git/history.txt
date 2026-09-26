@@ -1,0 +1,4 @@
+* c69f24b (HEAD -> main) feat(ticket): Add ticket slug helper
+* 482c974 eval: prepare controlled workspace
+* 3612145 (tag: fixture-target) eval: capture fixture target
+* a3a5ed3 (tag: fixture-base) eval: create empty fixture base

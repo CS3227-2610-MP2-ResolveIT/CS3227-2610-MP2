@@ -1,0 +1,4 @@
+* 3a71070 (HEAD -> main) feat(ticket): Add external ticket reference
+* a4612a0 eval: prepare controlled workspace
+* 7466f8e (tag: fixture-target) eval: capture fixture target
+* f115b9f (tag: fixture-base) eval: create empty fixture base

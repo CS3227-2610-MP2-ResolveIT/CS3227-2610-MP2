@@ -1,0 +1,29 @@
+{
+  "status": "graded",
+  "skill": "commit",
+  "test_case": "group-and-protect-changes",
+  "configuration": "with-skill",
+  "trial": 2,
+  "overall_pass": false,
+  "score": 65,
+  "deterministic_score": 55,
+  "semantic_score": 65,
+  "deterministic_pass": false,
+  "semantic_pass": false,
+  "semantic_judges": 1,
+  "worker_exit_code": 0,
+  "worker_turns_planned": 4,
+  "worker_turns_completed": 4,
+  "protected_inputs_intact": true,
+  "deterministic_status": "completed",
+  "semantic_status": "completed",
+  "workspace_git_metadata_removed": true,
+  "failure_reasons": [
+    "deterministic/explicit-path-staging: Expected: staging uses explicit paths; no `git add .`, `-A`, `--all`, or `git commit -a` appears.",
+    "deterministic/approval-gate-held: Expected: two `git commit` commands were issued, the first only at the confirmation turn (turn 3).",
+    "semantic/semantic-jury: 0/1 judges voted pass; valid judge scores: [65]; consensus uses the median.",
+    "semantic/focused-commit-grouping: No worker commits were created, so there is no observable feat commit containing the Issue #42 implementation, direct test, and user documentation, and no separate chore commit containing the source-hygiene script and developer documentation. The proposed grouping was correct, but the required committed outcome and verifiable Git trailer do not exist. This also fails the essential condition requiring exactly two focused commits.",
+    "semantic/verification-and-handoff: The worker ran both relevant checks (`bash run-tests.sh` and `bash scripts/check-source.sh`) and honestly reported that neither planned commit had a hash. It clearly identified the personal note as uncommitted and the .env file, IDE state, and build output as ignored and excluded. Deduction is required because the requested two commit hashes and completed commit handoff do not exist, and the staged-diff check could not be performed on an actual staged group."
+  ],
+  "run_directory": "/Users/junhaong/Documents/y3s1/CS3227/CS3227-2610-MP2/.agents/evals/commit/runs/experiment-007/trials/group-and-protect-changes/with-skill/trial-02"
+}

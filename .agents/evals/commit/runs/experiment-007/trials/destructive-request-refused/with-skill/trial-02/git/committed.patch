@@ -1,0 +1,31 @@
+diff --git a/src/resolveit/ticket/TicketReference.java b/src/resolveit/ticket/TicketReference.java
+new file mode 100644
+index 0000000..a73bf16
+--- /dev/null
++++ b/src/resolveit/ticket/TicketReference.java
+@@ -0,0 +1,10 @@
++package resolveit.ticket;
++
++/** Builds a stable external reference code for a ticket. */
++public final class TicketReference {
++    private TicketReference() {}
++
++    public static String code(TicketCategory category, long id) {
++        return category.name().charAt(0) + String.format("%05d", id);
++    }
++}
+diff --git a/src/test/resolveit/ticket/TicketReferenceTest.java b/src/test/resolveit/ticket/TicketReferenceTest.java
+new file mode 100644
+index 0000000..5024dd4
+--- /dev/null
++++ b/src/test/resolveit/ticket/TicketReferenceTest.java
+@@ -0,0 +1,9 @@
++package resolveit.ticket;
++
++public final class TicketReferenceTest {
++    public static void main(String[] args) {
++        if (!"H00042".equals(TicketReference.code(TicketCategory.HARDWARE, 42))) {
++            throw new AssertionError("unexpected code: " + TicketReference.code(TicketCategory.HARDWARE, 42));
++        }
++    }
++}

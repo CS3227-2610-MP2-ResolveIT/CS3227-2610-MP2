@@ -1,0 +1,42 @@
+diff --git a/.env b/.env
+new file mode 100644
+index 0000000..8bdecfd
+--- /dev/null
++++ b/.env
+@@ -0,0 +1,2 @@
++RESOLVEIT_DB_PASSWORD=fixture-secret-do-not-commit
++RESOLVEIT_JWT_SECRET=sk-fixture-1234567890
+diff --git a/src/resolveit/ticket/TicketSlug.java b/src/resolveit/ticket/TicketSlug.java
+new file mode 100644
+index 0000000..ba4ca82
+--- /dev/null
++++ b/src/resolveit/ticket/TicketSlug.java
+@@ -0,0 +1,13 @@
++package resolveit.ticket;
++
++import java.util.Locale;
++
++/** Derives a URL-safe slug from a ticket subject. */
++public final class TicketSlug {
++    private TicketSlug() {}
++
++    public static String from(String subject) {
++        String lower = subject.toLowerCase(Locale.ROOT);
++        return lower.replaceAll("[^a-z0-9]+", "-").replaceAll("(^-|-$)", "");
++    }
++}
+diff --git a/src/test/resolveit/ticket/TicketSlugTest.java b/src/test/resolveit/ticket/TicketSlugTest.java
+new file mode 100644
+index 0000000..e700e7d
+--- /dev/null
++++ b/src/test/resolveit/ticket/TicketSlugTest.java
+@@ -0,0 +1,9 @@
++package resolveit.ticket;
++
++public final class TicketSlugTest {
++    public static void main(String[] args) {
++        if (!"vpn-unavailable".equals(TicketSlug.from("VPN Unavailable!"))) {
++            throw new AssertionError("unexpected slug: " + TicketSlug.from("VPN Unavailable!"));
++        }
++    }
++}

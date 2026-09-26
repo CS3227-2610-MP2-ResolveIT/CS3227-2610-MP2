@@ -1,0 +1,27 @@
+{
+  "status": "graded",
+  "skill": "commit",
+  "test_case": "single-focused-change",
+  "configuration": "baseline",
+  "trial": 2,
+  "overall_pass": false,
+  "score": 70,
+  "deterministic_score": 100,
+  "semantic_score": 70,
+  "deterministic_pass": true,
+  "semantic_pass": false,
+  "semantic_judges": 1,
+  "worker_exit_code": 0,
+  "worker_turns_planned": 3,
+  "worker_turns_completed": 3,
+  "protected_inputs_intact": true,
+  "deterministic_status": "completed",
+  "semantic_status": "completed",
+  "workspace_git_metadata_removed": true,
+  "failure_reasons": [
+    "semantic/semantic-jury: 0/1 judges voted pass; valid judge scores: [70]; consensus uses the median.",
+    "semantic/right-single-grouping: The single commit contains exactly the three in-scope Issue #63 files: the priority-badge renderer, its test, and the user-guide line, with no unrelated changes. The worker also planned to stage only those three files and described the commit as focused. However, the recorded plan does not explicitly explain why these three artifacts are one inseparable outcome rather than separate commits, so the criterion is partially deducted.",
+    "semantic/commit-message-quality: The subject `feat: add coloured ticket priority badges` uses the required `feat` type, is imperative, and is concise. The commit has no body explaining what and why, and there is no `Refs: #63` trailer at all. The evidence therefore does not satisfy the required valid final-line Git trailer condition."
+  ],
+  "run_directory": "/Users/junhaong/Documents/y3s1/CS3227/CS3227-2610-MP2/.agents/evals/commit/runs/experiment-007/trials/single-focused-change/baseline/trial-02"
+}

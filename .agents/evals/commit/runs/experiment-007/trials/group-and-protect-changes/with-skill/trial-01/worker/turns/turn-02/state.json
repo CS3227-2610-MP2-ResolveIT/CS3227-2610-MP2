@@ -1,0 +1,14 @@
+{
+  "revision": "b1fa103b31e858c6d39586b672fc305ccfb241c7",
+  "status": [
+    " M docs/DeveloperGuide.md",
+    "M  docs/UserGuide.md",
+    "A  src/resolveit/ticket/TicketSummary.java",
+    "A  src/test/resolveit/ticket/TicketSummaryTest.java",
+    "?? notes/",
+    "?? scripts/"
+  ],
+  "clean": false,
+  "worker_exit_code": 0,
+  "completed_at": "2026-09-26T06:30:43.314619+00:00"
+}

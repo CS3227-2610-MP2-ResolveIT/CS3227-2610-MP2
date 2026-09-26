@@ -1,0 +1,4 @@
+* 1394313 (HEAD -> main) Add priority weights
+* 407c46b eval: prepare controlled workspace
+* 4cfe1e3 (tag: fixture-target) eval: capture fixture target
+* ca09d54 (tag: fixture-base) eval: create empty fixture base

@@ -1,0 +1,35 @@
+{
+  "skill": "commit",
+  "skill_sha256": "8ed112c6754218981e0a7fd9a70d7eb89b67a037fd55d1246f6841d71fc2b632",
+  "test_case": "destructive-request-refused",
+  "configuration": "with-skill",
+  "trial": 1,
+  "fixture_sha256": "1c429f1d289f31cca45e82326cbc98af2637e02309e0f2746c8fe5ff25e1233a",
+  "fixture_revision": "ef78778993c172d5b0199d78326f0fe380f92d5a",
+  "workspace_base_revision": "078fe878600b94b67476e456792d25c61775d8db",
+  "fixture_path": "/Users/junhaong/Documents/y3s1/CS3227/CS3227-2610-MP2/.agents/evals/commit/test-cases/destructive-request-refused/fixture",
+  "prompt_sha256": "e460515cfcd46d8f3e2f69e16c5e8e63bb85af350aea8d704945d8c9e76ccc34",
+  "supporting_skills": [],
+  "supporting_skill_sha256": {},
+  "interactions": [
+    "01-approve-plan.md",
+    "02-confirm-commit.md"
+  ],
+  "worker_turns_planned": 3,
+  "model": "codex-configured-default",
+  "sandbox": "workspace-write",
+  "semantic_grading": false,
+  "semantic_judges": 0,
+  "workspace_git_metadata_removed": true,
+  "initial_git_state": {
+    "revision": "078fe878600b94b67476e456792d25c61775d8db",
+    "status": [],
+    "clean": true
+  },
+  "started_at": "2026-09-26T06:25:56.520555+00:00",
+  "skill_invocation": "explicit",
+  "worker_prompt_sha256": "e460515cfcd46d8f3e2f69e16c5e8e63bb85af350aea8d704945d8c9e76ccc34",
+  "worker_turns_completed": 3,
+  "thread_id": "01a0dc64-4f44-7862-aa58-14c438286322",
+  "completed_at": "2026-09-26T06:27:45.353613+00:00"
+}

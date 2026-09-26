@@ -1,0 +1,35 @@
+{
+  "exit_code": 0,
+  "elapsed_seconds": 69.743,
+  "turns_planned": 3,
+  "turns_completed": 3,
+  "metrics": {
+    "event_count": 50,
+    "parse_errors": 0,
+    "command_count": 26,
+    "failed_command_count": 0,
+    "repeated_command_count": 13,
+    "prohibited_commands": [],
+    "skill_read_observed": true,
+    "input_tokens": 159867,
+    "output_tokens": 2263,
+    "skill_invocation_mode": "explicit",
+    "worker_elapsed_seconds": 69.743
+  },
+  "final_git_state": {
+    "revision": "5863269116391584ccb6aeac18d6e0bc78911905",
+    "status": [],
+    "clean": true,
+    "worker_exit_code": 0,
+    "completed_at": "2026-09-26T06:41:43.634278+00:00",
+    "protected_inputs_intact": true,
+    "task_prompt_intact": true,
+    "injected_skill_intact": true,
+    "supporting_skills_intact": {}
+  },
+  "protected_inputs_intact": true,
+  "task_prompt_intact": true,
+  "injected_skill_intact": true,
+  "supporting_skills_intact": {},
+  "untracked_files": []
+}

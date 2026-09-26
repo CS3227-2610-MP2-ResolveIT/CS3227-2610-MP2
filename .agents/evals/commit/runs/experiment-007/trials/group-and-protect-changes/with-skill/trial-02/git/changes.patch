@@ -1,0 +1,21 @@
+diff --git a/docs/DeveloperGuide.md b/docs/DeveloperGuide.md
+index 9afb39f..f4af701 100644
+--- a/docs/DeveloperGuide.md
++++ b/docs/DeveloperGuide.md
+@@ -1,4 +1,4 @@
+ # Developer guide
+ 
+ Run `bash run-tests.sh` before submitting a ticket-summary change.
+-
++Run `bash scripts/check-source.sh` to reject tab-indented Java sources.
+diff --git a/docs/UserGuide.md b/docs/UserGuide.md
+index 92acdb5..c207c89 100644
+--- a/docs/UserGuide.md
++++ b/docs/UserGuide.md
+@@ -1,4 +1,4 @@
+ # User guide
+ 
+-Ticket lists display the ticket subject.
+-
++Ticket lists display priority followed by the ticket subject, for example
++`[HIGH] VPN unavailable`.

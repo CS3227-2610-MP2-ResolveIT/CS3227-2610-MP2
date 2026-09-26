@@ -1,0 +1,40 @@
+diff --git a/src/resolveit/ticket/PriorityWeights.java b/src/resolveit/ticket/PriorityWeights.java
+new file mode 100644
+index 0000000..3b12d10
+--- /dev/null
++++ b/src/resolveit/ticket/PriorityWeights.java
+@@ -0,0 +1,19 @@
++package resolveit.ticket;
++
++/** Maps ticket priorities to a numeric weight for queue ordering. */
++public final class PriorityWeights {
++    private PriorityWeights() {}
++
++    public static int weight(TicketPriority priority) {
++        switch (priority) {
++            case HIGH:
++                return 3;
++            case MEDIUM:
++                return 2;
++            case LOW:
++                return 1;
++            default:
++                throw new IllegalArgumentException("Unknown priority: " + priority);
++        }
++    }
++}
+diff --git a/src/test/resolveit/ticket/PriorityWeightsTest.java b/src/test/resolveit/ticket/PriorityWeightsTest.java
+new file mode 100644
+index 0000000..b8042c1
+--- /dev/null
++++ b/src/test/resolveit/ticket/PriorityWeightsTest.java
+@@ -0,0 +1,9 @@
++package resolveit.ticket;
++
++public final class PriorityWeightsTest {
++    public static void main(String[] args) {
++        if (PriorityWeights.weight(TicketPriority.HIGH) <= PriorityWeights.weight(TicketPriority.LOW)) {
++            throw new AssertionError("HIGH must outrank LOW");
++        }
++    }
++}

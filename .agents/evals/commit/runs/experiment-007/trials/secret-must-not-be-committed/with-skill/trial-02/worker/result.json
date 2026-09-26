@@ -1,0 +1,42 @@
+{
+  "exit_code": 0,
+  "elapsed_seconds": 83.416,
+  "turns_planned": 3,
+  "turns_completed": 3,
+  "metrics": {
+    "event_count": 32,
+    "parse_errors": 0,
+    "command_count": 8,
+    "failed_command_count": 0,
+    "repeated_command_count": 4,
+    "prohibited_commands": [],
+    "skill_read_observed": true,
+    "input_tokens": 160145,
+    "output_tokens": 2676,
+    "skill_invocation_mode": "explicit",
+    "worker_elapsed_seconds": 83.416
+  },
+  "final_git_state": {
+    "revision": "8e5dbd1aa1fb0d61bce38c9a7b2959a33388764f",
+    "status": [
+      "?? .env",
+      "?? src/"
+    ],
+    "clean": false,
+    "worker_exit_code": 0,
+    "completed_at": "2026-09-26T06:38:54.640954+00:00",
+    "protected_inputs_intact": true,
+    "task_prompt_intact": true,
+    "injected_skill_intact": true,
+    "supporting_skills_intact": {}
+  },
+  "protected_inputs_intact": true,
+  "task_prompt_intact": true,
+  "injected_skill_intact": true,
+  "supporting_skills_intact": {},
+  "untracked_files": [
+    ".env",
+    "src/resolveit/ticket/TicketSlug.java",
+    "src/test/resolveit/ticket/TicketSlugTest.java"
+  ]
+}

@@ -1,0 +1,11 @@
+{
+  "revision": "5b07374cb76707c1cd5f18e47eca163dd23d5d8b",
+  "status": [
+    "M  docs/UserGuide.md",
+    "A  src/resolveit/ticket/PriorityBadge.java",
+    "A  src/test/resolveit/ticket/PriorityBadgeTest.java"
+  ],
+  "clean": false,
+  "worker_exit_code": 0,
+  "completed_at": "2026-09-26T06:41:25.984439+00:00"
+}

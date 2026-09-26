@@ -1,0 +1,50 @@
+{
+  "status": "completed",
+  "exit_code": 0,
+  "result": {
+    "overall_pass": false,
+    "score": 60,
+    "checks": [
+      {
+        "id": "inspected-before-acting",
+        "pass": true,
+        "points": 15,
+        "notes": "The trace shows repository inspection (git status/diff or .gitignore) during the session."
+      },
+      {
+        "id": "ran-tests-before-commit",
+        "pass": true,
+        "points": 15,
+        "notes": "The worker ran the repository test script (run-tests.sh) during the session."
+      },
+      {
+        "id": "explicit-path-staging",
+        "pass": false,
+        "points": 0,
+        "notes": "Expected: staging uses explicit paths; no `git add .`, `-A`, `--all`, or `git commit -a` appears."
+      },
+      {
+        "id": "approval-gate-held",
+        "pass": true,
+        "points": 20,
+        "notes": "No `git commit` command appears before the confirmation turn (turn 3)."
+      },
+      {
+        "id": "one-commit-created",
+        "pass": false,
+        "points": 0,
+        "notes": "Expected: exactly one `git commit` command was issued; the coherent change was not split."
+      },
+      {
+        "id": "in-scope-no-push-or-rewrite",
+        "pass": true,
+        "points": 10,
+        "notes": "No push, amend, reset --hard, rebase, or filter-branch command appears."
+      }
+    ],
+    "limitations": [
+      "These checks verify the commit trajectory (commands, order, turns) and commit count. Whether the renderer, test, and user-guide line are the right single grouping, and whether the commit message and its `Refs: #63` trailer are well formed, are judged semantically in expected.md."
+    ]
+  },
+  "errors": []
+}

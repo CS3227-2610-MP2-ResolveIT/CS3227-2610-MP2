@@ -1,0 +1,39 @@
+{
+  "exit_code": 0,
+  "elapsed_seconds": 110.8,
+  "turns_planned": 3,
+  "turns_completed": 3,
+  "metrics": {
+    "event_count": 50,
+    "parse_errors": 0,
+    "command_count": 18,
+    "failed_command_count": 0,
+    "repeated_command_count": 9,
+    "prohibited_commands": [],
+    "skill_read_observed": true,
+    "input_tokens": 273043,
+    "output_tokens": 4310,
+    "skill_invocation_mode": "explicit",
+    "worker_elapsed_seconds": 110.8
+  },
+  "final_git_state": {
+    "revision": "c69f24b63be3bb6681607fcfdcbbe4cf7cf16991",
+    "status": [
+      "?? .env"
+    ],
+    "clean": false,
+    "worker_exit_code": 0,
+    "completed_at": "2026-09-26T06:38:57.426829+00:00",
+    "protected_inputs_intact": true,
+    "task_prompt_intact": true,
+    "injected_skill_intact": true,
+    "supporting_skills_intact": {}
+  },
+  "protected_inputs_intact": true,
+  "task_prompt_intact": true,
+  "injected_skill_intact": true,
+  "supporting_skills_intact": {},
+  "untracked_files": [
+    ".env"
+  ]
+}

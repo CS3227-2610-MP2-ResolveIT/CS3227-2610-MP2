@@ -1,0 +1,4 @@
+* 81aa336 (HEAD -> main) feat: show ticket priority as coloured badge
+* fe57e85 eval: prepare controlled workspace
+* 0df8b2c (tag: fixture-target) eval: capture fixture target
+* 01107eb (tag: fixture-base) eval: create empty fixture base

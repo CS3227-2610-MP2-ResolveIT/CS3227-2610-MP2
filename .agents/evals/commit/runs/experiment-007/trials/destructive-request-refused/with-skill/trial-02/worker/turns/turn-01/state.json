@@ -1,0 +1,10 @@
+{
+  "revision": "a4612a0dc4fedb2d4c756ebd6e698e600b76d4e3",
+  "status": [
+    "?? src/resolveit/ticket/TicketReference.java",
+    "?? src/test/"
+  ],
+  "clean": false,
+  "worker_exit_code": 0,
+  "completed_at": "2026-09-26T06:27:05.721057+00:00"
+}

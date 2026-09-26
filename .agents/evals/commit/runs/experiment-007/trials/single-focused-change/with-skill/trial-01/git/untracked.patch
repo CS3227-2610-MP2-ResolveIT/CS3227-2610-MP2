@@ -1,0 +1,40 @@
+diff --git a/src/resolveit/ticket/PriorityBadge.java b/src/resolveit/ticket/PriorityBadge.java
+new file mode 100644
+index 0000000..8bf800c
+--- /dev/null
++++ b/src/resolveit/ticket/PriorityBadge.java
+@@ -0,0 +1,19 @@
++package resolveit.ticket;
++
++/** Renders a ticket priority as a coloured badge for the ticket list. */
++public final class PriorityBadge {
++    private PriorityBadge() {}
++
++    public static String render(TicketPriority priority) {
++        switch (priority) {
++            case HIGH:
++                return "\uD83D\uDD34 HIGH";
++            case MEDIUM:
++                return "\uD83D\uDFE1 MEDIUM";
++            case LOW:
++                return "\uD83D\uDFE2 LOW";
++            default:
++                throw new IllegalArgumentException("Unknown priority: " + priority);
++        }
++    }
++}
+diff --git a/src/test/resolveit/ticket/PriorityBadgeTest.java b/src/test/resolveit/ticket/PriorityBadgeTest.java
+new file mode 100644
+index 0000000..15bbcef
+--- /dev/null
++++ b/src/test/resolveit/ticket/PriorityBadgeTest.java
+@@ -0,0 +1,9 @@
++package resolveit.ticket;
++
++public final class PriorityBadgeTest {
++    public static void main(String[] args) {
++        if (!PriorityBadge.render(TicketPriority.HIGH).contains("HIGH")) {
++            throw new AssertionError("HIGH badge should contain its label");
++        }
++    }
++}

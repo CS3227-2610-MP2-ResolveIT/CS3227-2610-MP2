@@ -1,0 +1,3 @@
+?? src/resolveit/config/logging.properties
+?? src/resolveit/ticket/PriorityWeights.java
+?? src/test/resolveit/ticket/PriorityWeightsTest.java

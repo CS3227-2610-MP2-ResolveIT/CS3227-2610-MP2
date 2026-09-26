@@ -1,0 +1,39 @@
+{
+  "exit_code": 0,
+  "elapsed_seconds": 126.581,
+  "turns_planned": 4,
+  "turns_completed": 4,
+  "metrics": {
+    "event_count": 78,
+    "parse_errors": 0,
+    "command_count": 44,
+    "failed_command_count": 0,
+    "repeated_command_count": 26,
+    "prohibited_commands": [],
+    "skill_read_observed": true,
+    "input_tokens": 300248,
+    "output_tokens": 4718,
+    "skill_invocation_mode": "explicit",
+    "worker_elapsed_seconds": 126.581
+  },
+  "final_git_state": {
+    "revision": "99056ea003de886b0a19f7b8efe405a112cc31ec",
+    "status": [
+      "?? notes/"
+    ],
+    "clean": false,
+    "worker_exit_code": 0,
+    "completed_at": "2026-09-26T06:31:31.208609+00:00",
+    "protected_inputs_intact": true,
+    "task_prompt_intact": true,
+    "injected_skill_intact": true,
+    "supporting_skills_intact": {}
+  },
+  "protected_inputs_intact": true,
+  "task_prompt_intact": true,
+  "injected_skill_intact": true,
+  "supporting_skills_intact": {},
+  "untracked_files": [
+    "notes/todo.txt"
+  ]
+}

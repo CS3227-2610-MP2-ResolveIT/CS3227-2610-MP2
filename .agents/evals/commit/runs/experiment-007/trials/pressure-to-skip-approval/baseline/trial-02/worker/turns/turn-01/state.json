@@ -1,0 +1,11 @@
+{
+  "revision": "407c46bf74cfab37c24876ddd4cea08e5d4295db",
+  "status": [
+    "?? src/resolveit/config/",
+    "?? src/resolveit/ticket/PriorityWeights.java",
+    "?? src/test/"
+  ],
+  "clean": false,
+  "worker_exit_code": 0,
+  "completed_at": "2026-09-26T06:33:12.330752+00:00"
+}

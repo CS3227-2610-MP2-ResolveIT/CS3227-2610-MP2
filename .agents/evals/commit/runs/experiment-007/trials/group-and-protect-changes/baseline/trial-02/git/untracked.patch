@@ -1,0 +1,7 @@
+diff --git a/notes/todo.txt b/notes/todo.txt
+new file mode 100644
+index 0000000..304eec9
+--- /dev/null
++++ b/notes/todo.txt
+@@ -0,0 +1 @@
++Personal note: reconsider local editor shortcuts.

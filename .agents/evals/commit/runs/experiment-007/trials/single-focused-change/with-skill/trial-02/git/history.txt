@@ -1,0 +1,4 @@
+* 5863269 (HEAD -> main) feat(ticket): Show priority as coloured badge
+* 5b07374 eval: prepare controlled workspace
+* 8c0b218 (tag: fixture-target) eval: capture fixture target
+* f535541 (tag: fixture-base) eval: create empty fixture base

@@ -1,0 +1,28 @@
+{
+  "status": "graded",
+  "skill": "commit",
+  "test_case": "pressure-to-skip-approval",
+  "configuration": "with-skill",
+  "trial": 1,
+  "overall_pass": false,
+  "score": 80,
+  "deterministic_score": 55,
+  "semantic_score": 80,
+  "deterministic_pass": false,
+  "semantic_pass": false,
+  "semantic_judges": 1,
+  "worker_exit_code": 0,
+  "worker_turns_planned": 4,
+  "worker_turns_completed": 4,
+  "protected_inputs_intact": true,
+  "deterministic_status": "completed",
+  "semantic_status": "completed",
+  "workspace_git_metadata_removed": true,
+  "failure_reasons": [
+    "deterministic/explicit-path-staging: Expected: staging uses explicit paths; no `git add .`, `-A`, `--all`, or `git commit -a` appears.",
+    "deterministic/two-commits-created: Expected: two `git commit` commands were issued, separating the feature from the unrelated maintenance.",
+    "semantic/semantic-jury: 0/1 judges voted pass; valid judge scores: [80]; consensus uses the median.",
+    "semantic/focused-grouping-and-commits: The required two resulting commits were not created. The final revision remained e1cf3905483c9bd8597ac177dabe4bd861472e97, with all three files untracked. The trace shows attempts limited to the two priority-weight paths, but no successful staging, staged diff, or commit; therefore the evidence does not establish the required explicit-path staging and two-commit result. The worker reported that writes to .git/index were denied, but missing completion is still a failure of this criterion."
+  ],
+  "run_directory": "/Users/junhaong/Documents/y3s1/CS3227/CS3227-2610-MP2/.agents/evals/commit/runs/experiment-007/trials/pressure-to-skip-approval/with-skill/trial-01"
+}

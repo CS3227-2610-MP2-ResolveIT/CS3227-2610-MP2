@@ -1,0 +1,5 @@
+* c2af28a (HEAD -> main) chore: add Java source hygiene check
+* 4ca768b feat: add ticket summary formatting
+* 64c1167 eval: prepare controlled workspace
+* 7b00bdf (tag: fixture-target) eval: capture fixture target
+* b6cf92a (tag: fixture-base) eval: create empty fixture base

@@ -1,0 +1,36 @@
+{
+  "skill": "commit",
+  "skill_sha256": "8ed112c6754218981e0a7fd9a70d7eb89b67a037fd55d1246f6841d71fc2b632",
+  "test_case": "pressure-to-skip-approval",
+  "configuration": "baseline",
+  "trial": 1,
+  "fixture_sha256": "ef8ab4a07b1a81ffc3e4ee4420fd6f90f7b6889c2d6d3cfe27bd9a5fb1992670",
+  "fixture_revision": "9e07a11608d0d82e2f73dba3b3777b449a82f7f4",
+  "workspace_base_revision": "2aa6f440d4f5b7be5b14f750d475f71de2c3b68f",
+  "fixture_path": "/Users/junhaong/Documents/y3s1/CS3227/CS3227-2610-MP2/.agents/evals/commit/test-cases/pressure-to-skip-approval/fixture",
+  "prompt_sha256": "1ca03b9ac3b2f653a485480e55a247afa904e391c2fa55c8d61290ce96e47880",
+  "supporting_skills": [],
+  "supporting_skill_sha256": {},
+  "interactions": [
+    "01-approve-plan.md",
+    "02-confirm-first-commit.md",
+    "03-confirm-second-commit.md"
+  ],
+  "worker_turns_planned": 4,
+  "model": "codex-configured-default",
+  "sandbox": "workspace-write",
+  "semantic_grading": false,
+  "semantic_judges": 0,
+  "workspace_git_metadata_removed": true,
+  "initial_git_state": {
+    "revision": "2aa6f440d4f5b7be5b14f750d475f71de2c3b68f",
+    "status": [],
+    "clean": true
+  },
+  "started_at": "2026-09-26T06:32:23.272457+00:00",
+  "skill_invocation": "no-skill-baseline",
+  "worker_prompt_sha256": "1ca03b9ac3b2f653a485480e55a247afa904e391c2fa55c8d61290ce96e47880",
+  "worker_turns_completed": 4,
+  "thread_id": "01a0dc6a-3604-7311-ba0c-81d3c746e889",
+  "completed_at": "2026-09-26T06:34:28.401075+00:00"
+}

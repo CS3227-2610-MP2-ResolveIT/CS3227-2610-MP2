@@ -1,0 +1,14 @@
+{
+  "revision": "232de592fd628e1f27836aebfd2e90f8579405f0",
+  "status": [
+    " M docs/DeveloperGuide.md",
+    " M docs/UserGuide.md",
+    "?? notes/",
+    "?? scripts/",
+    "?? src/resolveit/",
+    "?? src/test/resolveit/"
+  ],
+  "clean": false,
+  "worker_exit_code": 0,
+  "completed_at": "2026-09-26T06:32:05.646025+00:00"
+}

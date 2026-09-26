@@ -1,0 +1,6 @@
+ M docs/DeveloperGuide.md
+ M docs/UserGuide.md
+?? notes/todo.txt
+?? scripts/check-source.sh
+?? src/resolveit/ticket/TicketSummary.java
+?? src/test/resolveit/ticket/TicketSummaryTest.java
