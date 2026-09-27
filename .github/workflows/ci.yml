@@ -96,5 +96,5 @@ jobs:
           gh release create "$GITHUB_REF_NAME" \
             backend/build/libs/resolveit-backend-0.1.0.jar \
             frontend/build/libs/resolveit-frontend-0.1.0.jar \
-            --title "ResolveIT v0.1.0" \
+            --title "ResolveIT" \
             --notes "ResolveIT application release."
