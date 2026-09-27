@@ -261,3 +261,359 @@ Next time, the improvement supported by both logs is to record interactions near
 The lesson for a single software-engineering agent is that reporting needs its own instructions and human verification. The agent can organize the evidence, but I remain responsible for checking attribution and confirming that the summary accurately distinguishes what I decided and verified from what the agent performed.
 
 Across these examples, skill selection matched the responsibility: JavaFX engineering for diagnosis and implementation, code review for assessment, and logging for preserving verified evidence. Skill execution needed separate checks: local tests and manual verification exposed implementation limits, the review disclosed incomplete execution, and the logging process required evidence checks and my approval. Choosing an appropriate skill established the scope and checking how the agent followed it established what I could reasonably trust.
+
+
+## Individual reflection — Ng Jun Hao
+
+### My approach to one agent with several narrow skills
+
+For ResolveIT, I did not want one vague instruction telling an agent to “help
+build the project.” That would make it easy for the agent to blur planning,
+implementation, review, and Git actions together. Instead, I treated the agent
+as one assistant that could switch between narrow skills. Each skill had a
+specific job, a boundary, a definition of done, and a point where it had to
+return control to me.
+
+In this reflection, I discuss `senior-frontend-javafx-engineer`,
+`javadoc-writing`, `commit`, and `code-review`. They address four recurring but
+different needs in our project. The frontend skill supported my Technician role
+work; Javadoc work needed a consistent standard without creating
+useless comment clutter. Commit work needed safety because a Git mistake can
+include a secret, combine unrelated work, or rewrite history. Code review needed
+to be separate from implementation so that the agent did not silently “fix” the
+code it was supposed to assess. These were real workflow problems, not four
+arbitrary examples selected after the fact.
+
+These were not the only skills in the project. The backend-engineering and
+logging skills supported shared implementation and traceability across the
+workflow. I focus on these four because I used, refined, or evaluated them with
+the clearest reproducible evidence. Together, they show four different ways an
+agent needs help: implementing a role-specific workflow, applying a quality
+standard, performing a risky repository action, and assessing work without
+changing it.
+
+The way I wrote the skills mattered as much as the task list. I kept the main
+instructions focused on what every run needs: a short trigger, an ordered
+workflow, clear boundaries, and a checkable completion condition. I kept deeper
+or branch-specific material behind references. For example, the code-review
+skill points to separate files for project checks, detailed review criteria, and
+the handoff format. Those references in turn point to the relevant CS2103/T
+and SE-EDU standards instead of copying them repeatedly. This progressive
+disclosure keeps the main workflow readable and reduces the chance that copied
+rules become stale.
+
+I also decided that a skill should not be judged from one convenient run. I
+built a small evaluation harness around disposable project-shaped fixtures. It
+uses the `codex exec --json` trace approach taught in Lecture 4 to run a plain
+baseline and a with-skill configuration, preserve traces and changed-file
+evidence, and combine deterministic checks with semantic LLM judges. It also
+resumes the same Codex thread for ordered follow-up messages, so an evaluation
+can test a workflow over several turns rather than only one final response.
+This follows the distinction in Lectures 4 and 5 between observable workflow
+facts and qualitative judgement. It was especially useful because the semantic
+judges were also LLMs: one score is a sample, not a final truth. The harness
+made repeated trials practical through `--parallel`, although the commit
+experiments also taught me that parallel workers cannot safely share stateful
+Git metadata.
+
+#### Reflection map
+
+| Skill | Workflow problem | Evidence and evaluation result | Main lesson |
+|---|---|---|---|
+| `senior-frontend-javafx-engineer` | Delivering and preserving a role-specific JavaFX workflow | Technician controller split, focused UI/API tests, review, and manual checks; one narrow with-skill evaluation passed | Repeated JavaFX lifecycle and role-state risks justify dedicated technical context, even without a measured baseline delta. |
+| `javadoc-writing` | Useful documentation without clutter | **+24.66 points** on the public-API task; safe no-change and scope behaviour preserved | The baseline's over-documentation and invented contracts show that a focused restraint standard adds value. |
+| `commit` | Safe, reviewable Git actions | Safety and approval behaviour improved by **14.5–42.5 points** across the relevant cases | The baseline's unsafe shortcuts show that approval gates and grouping rules need their own skill. |
+| `code-review` | Evidence-based review without silent fixes | One skill-guided review met the semantic standard, but no baseline was run | Review remains a separate responsibility, but a baseline rerun is needed before claiming a measured improvement. |
+
+### 1. `senior-frontend-javafx-engineer`: applying the skill to Technician work
+
+I used the frontend workflow while working on the IT support Technician
+role, where a correct UI means more than a screen that displays tickets. The
+role needs a usable queue and ticket detail flow, while preserving loading,
+disabled, confirmation, failure, stale-result, and role-sensitive states for
+actions such as taking work, changing status or priority, adding internal notes,
+and resolving tickets.
+
+The skill gave the agent a useful checklist for this work: trace the full JavaFX
+journey, keep blocking work off the JavaFX Application Thread, preserve FXML and
+controller lifecycles, and test keyboard, recovery, and disposal behaviour as
+well as the happy path. I applied that guidance during the Technician refactor.
+The original controller was split into a workspace shell, queue controller, and
+ticket-detail controller; related work made asynchronous lifecycle handling and
+ticket-detail loading more explicit. I deliberately kept the Technician boundary
+separate rather than forcing it into the Employee flow.
+
+The following project artefacts show where I applied that workflow:
+
+| Technician concern | Main implementation files | Evidence of the applied workflow |
+|---|---|---|
+| Workspace composition and navigation | `frontend/src/main/java/resolveit/frontend/ui/TechnicianController.java` and `frontend/src/main/resources/resolveit/frontend/views/technician.fxml` | The workspace shell owns navigation and includes the queue and detail views instead of holding their interaction logic itself. |
+| Queue states and accessibility | `frontend/src/main/java/resolveit/frontend/ui/TechnicianQueueController.java` and `frontend/src/main/resources/resolveit/frontend/views/technician-queue.fxml` | Status, priority, and assignment filters; loading/error/empty states; pagination; keyboard-accessible queue opening; and responsive table layout are explicit. |
+| Selected-ticket workflow | `frontend/src/main/java/resolveit/frontend/ui/TechnicianTicketDetailController.java` and `frontend/src/main/resources/resolveit/frontend/views/technician-ticket-detail.fxml` | Take, begin work, status/priority actions, resolution notes, public/internal messages, confirmations, notices, and role-sensitive controls remain in one detail boundary. |
+| Async lifecycle and rendering | `frontend/src/main/java/resolveit/frontend/ui/AsyncOperationTracker.java`, `TechnicianTicketDetailLoader.java`, and `TechnicianTicketDetailRenderer.java` (same package) | In-flight work, paired detail/message loading, cancellation on disposal, stale-result handling, and rendering were extracted from the workspace shell. |
+| UI and policy verification | `frontend/src/test/java/resolveit/frontend/ui/TechnicianViewTest.java` and `backend/src/test/java/resolveit/ticket/TicketApiIntegrationTest.java` | Focused tests cover queue recovery, stale-detail disabling, keyboard opening, disposal cancellation, Manager child-controller configuration, Technician action/priority/queue-filter rules, and internal-note visibility. |
+
+The workspace review found unreadable nested FXML, undocumented public
+constructors, and missing Manager child-controller coverage, which were then
+fixed and rechecked with frontend tests and native Technician/Manager smoke
+checks. The existing
+[`preserve-window-size` evaluation](../.agents/evals/senior-frontend-javafx-engineer/)
+also passed a narrow navigation/lifecycle case, but I would not claim it proves
+the whole Technician workflow or a baseline-versus-skill improvement. Next time
+I would add Technician-specific evaluation cases for an eligible ticket-taking
+flow, a forbidden role action, and invalid resolution data.
+
+What I learned from this work is that a frontend skill is valuable less because
+it can generate FXML quickly than because it gives the agent—and me—a way to
+reason about the states that are easy to miss. I could have judged the workspace
+from the visible happy path, yet stale data, disposal, keyboard opening, and the
+Manager child-controller path were exactly where the refactor could have failed.
+The skill made those risks routine questions, but I still had to decide the
+responsibility boundary and personally check the native behaviour.
+
+### 2. `javadoc-writing`: useful documentation requires restraint
+
+#### Task and skill design
+
+I created `javadoc-writing` after noticing that “add comments” was the wrong
+task description. The project did not need commentary everywhere. It needed
+good documentation for changed public APIs and non-trivial methods, while
+leaving obvious getters, setters, tests, and inherited overrides alone. The
+central rule became: explain *what* an API does and, when it matters, *why* it
+exists; the code can usually show *how* it works.
+
+I defined the skill around that scope. Before writing, the agent has to identify
+the exact target members and read enough code to describe only behaviour that
+is actually supported. It must not change signatures, logic, or unrelated files.
+Its completion condition is concrete: all appropriate in-scope members are
+documented, the diff contains only in-scope Javadocs, and the required Javadoc
+and compilation checks are reported. I reduced the skill from 97 to 59 lines
+while writing it. Removing repeated explanation made the important instructions
+easier to find whenever the skill was loaded; adding more text would not have
+made the scope clearer. The writing rules are grounded in the CS2103/SE-EDU Java
+standard: accurate present-tense summaries, useful tags only when they add
+information, and no fabricated API contract.
+
+This was applied to ResolveIT rather than kept as an abstract exercise. The
+resulting documentation change covered the Technician ticket services and
+validator, the ticket and user REST DTO contracts, and the non-trivial JavaFX
+controller methods introduced around the workspace split. Keeping that change
+documentation-only made its reviewable contract clear: behaviour and public
+signatures were not supposed to change.
+
+This changed how I think about documentation work. I initially framed it as a
+coverage problem—finding members without comments—but the useful question was
+whether a future maintainer would learn a real contract from the text. The
+CS2103/SE-EDU guidance gave the agent a consistent form, while I still had to
+decide when the code was already clearer than another Javadoc block.
+
+#### Evaluation and observed delta
+
+To verify the skill, I designed a [four-case suite](../.agents/evals/javadoc-writing/): a normal public-API task, a scope-boundary task, an
+already-correct no-change task, and a negative control where an inline comment
+should not trigger Javadoc work. This was my application of Lecture 5's idea of
+a representative task dataset. I also redesigned the fixtures so the coding
+standard lived in the skill and the private rubric, rather than leaking into the
+baseline prompt. That made the comparison a fairer test of what the skill added.
+
+The [experiment-008 report](../.agents/evals/javadoc-writing/runs/experiment-008/report.md)
+showed the intended delta on the public-API task: the skill improved its mean
+score by **24.66 points**. The baseline tended to document trivial getters too
+heavily or invent a contract; the skill more consistently focused on the API
+members that needed explanation. It also preserved the already-perfect no-change
+and scope-boundary results. That is important: the skill was useful not because
+it made more edits, but because it made the appropriate edits more reliably.
+This is why Javadoc deserved its own skill: a generic request to “add comments”
+does not reliably encode the distinction between necessary documentation and
+comment clutter.
+
+#### Human correction and next iteration
+
+However, I would not describe the skill as solved. The strict experiment result
+was still **FAIL**. One skill-guided run over-documented
+a trivial getter, and a deterministic signature check falsely failed because it
+was too sensitive to formatting. I had to decide what documentation was useful,
+check that comments had not invented contracts, and interpret the difference
+between structural and semantic evidence. Next time I would add more
+trivial-member cases and test the grader itself against known-good and known-bad
+examples. The [authoring log](../logs/2026-09-25-093700-javadoc-skill-authoring.md)
+and [evaluation log](../logs/2026-09-25-113000-javadoc-skill-evaluation.md)
+contain the full design and evaluation details.
+
+### 3. `commit`: approval has to be part of the workflow
+
+#### Task and skill design
+
+I created the `commit` skill because Git actions can do more damage than they
+appear to. A request to “commit my work” may contain a secret file, personal
+notes, unrelated changes, or a request to push or rewrite history. The agent
+therefore has to inspect the tree and `.gitignore`, group work by logical
+outcome, stage explicit paths, show the whole proposed commit sequence, and
+wait for approval before staging and explicit confirmation before each commit.
+Pushing, history rewriting, tagging, and issue closing are outside the skill's
+scope.
+
+This made Lecture 5's guardrails and approval gates concrete. It also reflects
+Lecture 6's point that tool-using agents need bounded authority: the skill does
+not assume that silence means approval, and it does not treat a Git command as
+safe just because the user mentioned it in the same request. The per-commit
+confirmation is particularly important. After seeing the proposed message,
+staged paths, and remaining changes, I must explicitly confirm the exact commit
+before the agent creates it. A general approval of the plan is not enough. This
+makes my review an actual approval gate rather than a blanket authorisation the
+agent can reuse later.
+
+I used this workflow throughout the project work rather than only in the
+evaluation fixture. Before committing a coherent Technician change, the skill
+inspected the worktree and `.gitignore`, proposed explicit paths, and presented
+a Conventional Commit type, concise imperative description, and—when the change
+was non-trivial—a body explaining what changed and why. This made the test work
+and the controller/FXML refactor separately reviewable instead of hiding them in
+one large change.
+
+I also refined the skill after seeing that “group by intent” was too vague. It
+now keeps implementation with its direct tests and inseparable documentation,
+but separates independently reviewable outcomes such as reusable tooling, test
+scenarios that consume it, and generated evidence. I later made the preference
+for small, focused commits explicit. This was a practical correction: an agent
+needs a decision rule for a mixed worktree, not just a slogan about clean Git
+history.
+
+This also changed my view of a “good commit.” I first thought the main benefit
+was a more readable log. In practice, the harder value was forcing a pause before
+a state-changing operation: I had to inspect the proposed paths and rationale,
+notice unrelated work, and consciously authorise the next irreversible step.
+The skill turned Git from a final mechanical action into a review checkpoint.
+
+#### Evaluation and observed delta
+
+I built a [six-case suite](../.agents/evals/commit/) that included normal grouping, a clean-tree no-op, secret protection, pressure to
+skip approval, and requests to push or rewrite history. While designing it, I
+realised that my first deterministic graders were attempting to judge things
+they could not reliably infer, such as whether a commit grouping was sensible.
+I changed them to grade the trace instead: which commands ran, in what order,
+and in which turn. Semantic LLM judges handled the genuinely qualitative
+questions about grouping, commit messages, trailers, and refusals. This was a
+much better use of Lecture 4's distinction between observable workflow evidence
+and semantic judgement. The multi-turn cases made this possible: the harness
+first lets the agent inspect and propose a plan, then sends a plan-approval
+message that still requires an immediate confirmation, and only then sends the
+specific confirmation. The trajectory grader can therefore check that no
+`git commit` occurred before the correct human approval turn.
+
+The [experiment-007 report](../.agents/evals/commit/runs/experiment-007/report.md)
+showed the clearest safety deltas. Compared with the baseline, destructive-
+request refusal improved by **42.5 points**, secret protection by **38.5**,
+resistance to approval pressure by **31.5**, and grouping/protection of changes
+by **14.5**. The already-perfect no-op behaviour was preserved, so the skill did
+not create a commit when there was no work to commit. The single-focused-change
+case instead fell slightly by **2.5 points**, and the later trace evidence
+showed that Git metadata locking rather than the proposed workflow prevented
+several commits from completing. In other words, the skill improved the safety
+and planning behaviour most clearly; the run was less reliable evidence about
+successful Git execution. Those safety deltas are also the reason that commit
+work deserved a dedicated skill: a general agent could create a plausible commit
+message, but it did not reliably hold approval gates, protect secrets, refuse
+out-of-scope history operations, or separate independently reviewable work.
+
+#### Human correction and next iteration
+
+The result also exposed the limits of the harness. The strict outcome was
+**FAIL**. Parallel workers shared Git state, and several trials hit
+`.git/index.lock` before a real commit could be created. The run still showed
+useful directional improvements, but it could not support a strong absolute
+pass-rate claim. I also corrected a fixture whose
+literal `\\n` was not a real Git trailer, and moved qualitative expectations out
+of deterministic checks. Next time I would give each worker an isolated
+repository or run workers serially, while retaining parallel read-only judges
+and using more trials or a multi-judge jury. The [suite-authoring log](../logs/2026-09-26-112100-commit-skill-eval-suite-authoring.md)
+and [run log](../logs/2026-09-26-121300-commit-eval-trajectory-graders-and-run.md)
+record those design decisions.
+
+### 4. `code-review`: the evaluator needs review too
+
+#### Task and skill design
+
+I used `code-review` because review should have a different responsibility from
+implementation. The skill identifies the scope and relevant requirements,
+inspects code, tests, documentation, and the diff, runs applicable checks,
+creates evidence-based findings with stable IDs, and states what should happen
+next. Its main boundary is **review; do not fix**. That separation makes the
+review output inspectable and gives the next implementation or documentation
+step a clear handoff. The report also tells the human which manual checks remain,
+such as visual layout, native-dialog, keyboard-flow, or platform-specific checks
+that source review and automated tests cannot establish. The agent prepares the
+evidence and checklist, but does not claim to have performed human acceptance
+work.
+
+This skill is also the clearest example of progressive disclosure. Its main
+file contains the common review flow. At the appropriate steps, it routes the
+agent to project-check, review-criteria, and report references. This avoids
+hiding the everyday review workflow inside a huge list of every possible quality
+rule, while still giving the agent detailed standards when it needs them.
+
+I also applied this separation to the actual Technician workspace split. The
+review of the queue/detail controller and nested-FXML refactor found three
+concrete quality gaps: unreadable nested FXML, missing documentation on changed
+public constructors, and no automated Manager child-controller path. The fixes
+were intentionally performed after the review rather than silently inside it,
+then rechecked with frontend tests and native Technician/Manager smoke checks.
+That was the practical value of a review handoff: it turned a large refactor
+into specific, independently verifiable follow-up work. I used this as a
+recurring quality gate across major Technician milestones—workspace refinement,
+detail-loading extraction, and the controller split—not only as a final review.
+
+This made me less willing to treat a green test run as a complete quality signal.
+The review found maintainability and coverage problems that compilation alone
+would not have surfaced, while the manual checklist kept the agent from claiming
+native UI acceptance that it could not perform. The useful outcome was not an
+agent declaring the work “good”; it was a clearer list of what I still needed to
+judge or verify.
+
+#### Evaluation and observed delta
+
+I tested the skill with a [seeded `String` identity-comparison case](../.agents/evals/code-review/test-cases/detect-string-comparison/).
+The intended workflow delta was from an unstructured opinion to a review that
+identifies the defect, explains why an interned-string test missed it, leaves
+the reviewed files unchanged, and produces an actionable report and manual-check
+handoff. However, I need to be precise about the evidence: the
+[experiment-001 report](../.agents/evals/code-review/runs/experiment-001/report.md)
+ran only the with-skill configuration, so it does **not** measure a numerical
+baseline-versus-skill delta. It verified that one skill-guided review could
+perform the intended work, but it cannot by itself show how much the skill
+improved the result.
+
+The run still gave the most useful lesson in the whole evaluation work. The
+semantic judges considered the review correct, but the strict result was
+**FAIL** because the deterministic oracle required a specific `.equals` phrase even
+though the report correctly recommended value-based comparison.
+
+#### Human correction and next iteration
+
+I corrected that brittle wording check so it accepts equivalent value-comparison
+terminology. I do not claim that this correction
+made the skill pass; it still needs a clean rerun, this time with a matching
+baseline configuration. The agent was useful for creating the fixture, checkers,
+and structured report, but I had to notice that the evaluation was testing
+phrasing too narrowly rather than the intended review behaviour. This taught me
+that evaluation infrastructure is also software. It needs known-good and
+known-bad cases, review of its own assumptions, and honest reporting when the
+evidence is incomplete.
+
+### What I learned about designing an effective single agent
+
+The agent handled bounded, repeatable work well: applying a JavaFX workflow to
+Technician work, applying a scoped documentation standard, preparing a safe
+local-commit plan, and structuring a review and handoff. This improved
+consistency and reduced the repetitive work of re-reading standards, checking
+common conditions, and reconstructing JavaFX, Git, or review procedures. It did
+not remove the need for my judgement. I still had to choose the right skill,
+define the role scope and approval boundary, check quality claims, correct flawed
+fixtures and graders, and decide whether the evidence was sufficient.
+
+My main lesson is that an effective single agent is not one that receives a
+huge prompt and works independently. It is one that changes mode through narrow
+skills, receives the relevant context at the right time, has checkable
+completion conditions and safety limits, produces inspectable evidence, and
+stops for human judgement at scope, approval, manual-acceptance, and
+interpretation boundaries.
