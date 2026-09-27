@@ -1,5 +1,7 @@
 # Reflections on Basic Agentic Software Engineering
 
+## Reflection by Theodore Lim
+
 ## Context and approach
 
 ResolveIT was developed with a single Codex agent customised through repository-level
