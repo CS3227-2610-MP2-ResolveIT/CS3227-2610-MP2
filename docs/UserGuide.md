@@ -15,10 +15,10 @@ and real-time updates are outside the current scope.
 
 1. Install Java 25 and check `java -version`. The client needs a graphical desktop;
    Java is not bundled with the application.
-2. Download both JARs from an available project release, or extract the
+2. Download both JARs from the latest GitHub Release, or extract the
    `resolveit-cross-platform-jars` artifact from a successful GitHub Actions
    packaging run. Locate `resolveit-backend-0.1.0.jar` and
-   `resolveit-frontend-0.1.0.jar` in the extracted files.
+   `resolveit-frontend-0.1.0.jar` in the downloaded files.
 3. In a terminal in the directory containing the backend JAR, run:
 
    ```text
@@ -33,9 +33,10 @@ and real-time updates are outside the current scope.
    java --enable-native-access=ALL-UNNAMED -jar resolveit-frontend-0.1.0.jar
    ```
 
-The login window should appear. These commands are the same on Windows and Linux.
-The package includes native libraries for both platforms. CI checks JAR contents, not application
-startup on both platforms.
+The login window should appear. These commands are the same on Windows, Linux,
+Intel Mac, and Apple-Silicon Mac. The frontend JAR includes Windows and Linux
+JavaFX native libraries plus universal macOS libraries containing both `x86_64`
+and `arm64` code. Java itself is not bundled, so Java 25 is still required.
 
 ### Run from source (alternative)
 

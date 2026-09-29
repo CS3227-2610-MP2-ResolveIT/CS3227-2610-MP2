@@ -1028,11 +1028,28 @@ Checkstyle is included in each module's `check`; there is no separate repository
 
 The backend uses Spring Boot `bootJar`. The frontend builds an executable dependency-bundled JAR with `Launcher` as its entry point.
 
-The frontend explicitly bundles JavaFX native libraries for Windows and Linux. CI verifies expected archive contents, but it does not launch the packaged applications on those operating systems. macOS native packaging is not configured.
+The frontend release JAR bundles JavaFX native libraries for Windows and Linux.
+For macOS, the `universalJar` Gradle task resolves both the Intel `mac` and
+Apple-Silicon `mac-aarch64` JavaFX graphics archives. The
+`create-universal-macos-natives.sh` build helper combines every corresponding
+`.dylib` pair with Apple's `lipo` tool and verifies that each output contains
+both `x86_64` and `arm64` code. The ordinary `jar` task remains available on all
+development platforms; release packaging runs `universalJar` on a macOS CI
+runner because `lipo` is a macOS tool.
+
+CI verifies the backend dependency layout, the frontend entry point, the
+presence of Windows, Linux, and macOS JavaFX natives, and both architectures in
+every packaged macOS library before uploading the two JARs.
 
 ### 14.3 Releases
 
-Tags beginning with `v` trigger GitHub Release creation after checks and packaging succeed. Both builds currently use version `0.1.0`, and the workflow also references that version explicitly, so future releases require coordinated version updates.
+Tags beginning with `v` publish the verified JARs after checks and packaging
+succeed. The workflow can also be started manually with a release tag; it
+replaces existing JAR assets with `gh release upload --clobber`, which supports
+repairing an existing formal release without recreating its tag or release
+notes. Both builds currently use version `0.1.0`, and the workflow also
+references that version explicitly, so future releases require coordinated
+version updates.
 
 ### 14.4 Product website
 

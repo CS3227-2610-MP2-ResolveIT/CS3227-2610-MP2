@@ -80,3 +80,16 @@ sign-in attempts are temporarily rate-limited.
 `./gradlew checkstyleMain checkstyleTest` to execute only the static checks. The test
 suite includes a focused login FXML/controller test; Linux environments need a display
 server, so CI runs the suite through `xvfb-run`.
+
+The formal cross-platform release JAR is built on macOS with:
+
+```bash
+./gradlew universalJar
+```
+
+That task includes Windows and Linux JavaFX natives and uses `lipo` to combine
+the Intel and Apple-Silicon JavaFX libraries into universal macOS binaries. Its
+output is `build/libs/resolveit-frontend-0.1.0-universal.jar`; GitHub Actions
+verifies it and publishes it as `resolveit-frontend-0.1.0.jar`. The ordinary
+`jar` and `build` tasks do not require macOS and remain suitable for local
+development builds.
