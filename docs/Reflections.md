@@ -210,7 +210,7 @@ more effective than either unstructured prompting or unquestioned automation.
 
 ## Individual reflection — Teo Keng Jer
 
-This reflection covers my recorded JavaFX navigation fix, frontend skill evaluation, and Manager User Management access-cancellation test workflow. My primary evidence is the approved [window-navigation log](../logs/2026-09-11-201828-javafx-window-navigation-and-skill-evaluation.md) and [Manager cancellation-test log](../logs/2026-09-23-015341-manager-access-cancellation-test.md).
+This reflection covers my recorded JavaFX navigation fix, frontend skill evaluation, and Manager User Management access-cancellation test workflow. My primary evidence is in [window-navigation log](../logs/2026-09-11-201828-javafx-window-navigation-and-skill-evaluation.md) and [Manager cancellation-test log](../logs/2026-09-23-015341-manager-access-cancellation-test.md).
 
 Across these tasks, I set the scope, requested diagnosis before implementation, supplied local verification, and reviewed the interaction summaries. Codex performed the recorded diagnosis, implementation, test correction, evaluation work, and review. The following lessons are retrospective interpretations of that evidence.
 
